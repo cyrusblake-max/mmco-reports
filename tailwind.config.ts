@@ -10,9 +10,9 @@ const config: Config = {
     extend: {
       colors: {
         luxury: {
-          black:    '#1E1F19',
-          charcoal: '#2A2B23',
-          dark:     '#3A3B2F',
+          black:    '#1A211B',
+          charcoal: '#262D24',
+          dark:     '#384032',
           taupe:    '#8B7D6B',
           gold:     '#C4A882',
           sand:     '#D4C4AE',

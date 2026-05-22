@@ -23,8 +23,8 @@ export default function CoverPage({ report }: Props) {
       )}
 
       {/* Layered olive-black gradients for editorial depth */}
-      <div aria-hidden className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(30,31,25,0.82) 0%, rgba(30,31,25,0.4) 50%, rgba(30,31,25,0.88) 100%)' }} />
-      <div aria-hidden className="absolute inset-0" style={{ background: 'linear-gradient(to right, rgba(30,31,25,0.55) 0%, transparent 50%, rgba(30,31,25,0.35) 100%)' }} />
+      <div aria-hidden className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(26,33,27,0.82) 0%, rgba(26,33,27,0.4) 50%, rgba(26,33,27,0.88) 100%)' }} />
+      <div aria-hidden className="absolute inset-0" style={{ background: 'linear-gradient(to right, rgba(26,33,27,0.55) 0%, transparent 50%, rgba(26,33,27,0.35) 100%)' }} />
 
       {/* Top masthead bar — Confidential on left, MM&Co logo on right (larger), vertically centered */}
       <div className="relative z-10 px-10 md:px-16 pt-10 md:pt-12">
@@ -124,7 +124,7 @@ export default function CoverPage({ report }: Props) {
       </div>
 
       {/* Bottom agent strip */}
-      <div className="relative z-10 border-t border-white/10 backdrop-blur-md" style={{ background: 'rgba(30,31,25,0.55)' }}>
+      <div className="relative z-10 border-t border-white/10 backdrop-blur-md" style={{ background: 'rgba(26,33,27,0.55)' }}>
         <div className="px-10 md:px-16 py-7 flex items-center justify-between gap-6 flex-wrap">
           <div className="flex items-center gap-8 flex-wrap">
             {[property.agent, ...(property.coAgents ?? [])].map((agent, i) => (

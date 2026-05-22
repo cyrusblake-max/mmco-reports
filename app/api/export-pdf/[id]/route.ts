@@ -33,7 +33,7 @@ const TUNE_SCRIPT = `
     .forEach(el => el.style.padding = '1.5rem 0')
   document.querySelectorAll('.report-section-dark').forEach(el => {
     el.style.padding = '1.5rem 0'
-    el.style.backgroundColor = '#1E1F19'
+    el.style.backgroundColor = '#1A211B'
   })
 
   document.querySelectorAll('.text-center.mb-10').forEach(el => {
@@ -63,9 +63,9 @@ const TUNE_SCRIPT = `
   const strategySection = allDark[allDark.length - 1]
   if (strategySection) {
     strategySection.style.paddingBottom = '0'
-    strategySection.style.backgroundColor = '#1E1F19'
+    strategySection.style.backgroundColor = '#1A211B'
     const strategyInner = strategySection.querySelector('.max-w-6xl')
-    if (strategyInner) strategyInner.style.backgroundColor = '#1E1F19'
+    if (strategyInner) strategyInner.style.backgroundColor = '#1A211B'
   }
 
   // Move agent contact out of strategy section into its own dark wrapper before any colophon
@@ -80,7 +80,7 @@ const TUNE_SCRIPT = `
     agentContactFlex.parentNode.removeChild(agentContactFlex)
 
     const sigOuter = document.createElement('div')
-    sigOuter.style.cssText = 'background-color:#1E1F19;color:#FAFAF7;padding:0;break-inside:avoid;page-break-inside:avoid;'
+    sigOuter.style.cssText = 'background-color:#1A211B;color:#FAFAF7;padding:0;break-inside:avoid;page-break-inside:avoid;'
     const sigInner = document.createElement('div')
     sigInner.style.cssText = 'max-width:72rem;margin:0 auto;padding:0 3rem;'
     sigInner.appendChild(agentContactFlex)

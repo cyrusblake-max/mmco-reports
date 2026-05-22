@@ -12,7 +12,7 @@ interface Props { report: WeeklyReport }
 const CHANNEL_COLORS: Record<string, string> = {
   Instagram: '#C4A882',
   Facebook:  '#8B7D6B',
-  Google:    '#1E1F19',
+  Google:    '#1A211B',
   YouTube:   '#B8AC97',
   TikTok:    '#1A1A1A',
 }
