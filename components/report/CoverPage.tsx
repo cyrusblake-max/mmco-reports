@@ -26,10 +26,10 @@ export default function CoverPage({ report }: Props) {
       <div aria-hidden className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(30,31,25,0.82) 0%, rgba(30,31,25,0.4) 50%, rgba(30,31,25,0.88) 100%)' }} />
       <div aria-hidden className="absolute inset-0" style={{ background: 'linear-gradient(to right, rgba(30,31,25,0.55) 0%, transparent 50%, rgba(30,31,25,0.35) 100%)' }} />
 
-      {/* Top masthead bar — Confidential on left, MM&Co logo on right (larger) */}
+      {/* Top masthead bar — Confidential on left, MM&Co logo on right (larger), vertically centered */}
       <div className="relative z-10 px-10 md:px-16 pt-10 md:pt-12">
-        <div className="flex items-start justify-between gap-6">
-          <div className="pt-2">
+        <div className="flex items-center justify-between gap-6">
+          <div>
             <p className="section-label text-luxury-gold">Confidential</p>
             <p className="section-label text-white/45 mt-1.5">Seller Report</p>
             <p className="section-label text-white/30 mt-3">{formatDate(report.reportDate, 'short')}</p>
@@ -123,24 +123,28 @@ export default function CoverPage({ report }: Props) {
         </div>
       </div>
 
-      {/* Bottom strip — In Good Co. partner mark */}
+      {/* Bottom agent strip */}
       <div className="relative z-10 border-t border-white/10 backdrop-blur-md" style={{ background: 'rgba(30,31,25,0.55)' }}>
         <div className="px-10 md:px-16 py-7 flex items-center justify-between gap-6 flex-wrap">
-          <p className="section-label text-white/35">In Partnership With</p>
-          <div className="flex items-center gap-4">
-            {/* Drop /public/ingoodco-logo.png in to replace the wordmark */}
-            <img
-              src="/ingoodco-logo.png"
-              alt="In Good Co."
-              className="h-10 md:h-12 object-contain brightness-0 invert"
-              onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
-            />
-            <p
-              className="font-serif-display text-white font-light italic leading-none"
-              style={{ fontSize: 'clamp(1.5rem, 2.2vw, 2rem)', letterSpacing: '0.01em' }}
-            >
-              In Good Co.
-            </p>
+          <div className="flex items-center gap-8 flex-wrap">
+            {[property.agent, ...(property.coAgents ?? [])].map((agent, i) => (
+              <div key={i} className="flex items-center gap-4">
+                {agent.photoUrl && (
+                  <img
+                    src={agent.photoUrl}
+                    alt={agent.name}
+                    className="w-10 h-10 rounded-full object-cover border border-white/20"
+                  />
+                )}
+                <div>
+                  <p className="text-white font-medium text-sm tracking-tight">{agent.name}</p>
+                  <p className="section-label text-white/45 mt-0.5">
+                    {agent.title}{agent.title && agent.team ? ' · ' : ''}{agent.team}
+                  </p>
+                  {agent.phone && <p className="text-white/35 text-xs mt-0.5">{agent.phone}</p>}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>
