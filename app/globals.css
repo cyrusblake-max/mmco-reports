@@ -6,9 +6,9 @@
   --font-cormorant: 'Cormorant Garamond', Georgia, serif;
   --font-inter: 'Inter', system-ui, sans-serif;
 
-  /* Refined editorial palette */
-  --ink:          #0A0A0A;
-  --ink-2:        #1A1A1A;
+  /* Refined editorial palette — ink is an olive black, not pure black */
+  --ink:          #1E1F19;
+  --ink-2:        #2A2B23;
   --paper:        #FAFAF7;
   --paper-2:      #F4F1EB;
   --paper-3:      #ECE7DE;

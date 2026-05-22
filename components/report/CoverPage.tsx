@@ -11,7 +11,7 @@ export default function CoverPage({ report }: Props) {
   return (
     <section
       className="relative min-h-screen flex flex-col overflow-hidden print-page-break"
-      style={{ background: '#070707' }}
+      style={{ background: 'var(--ink)' }}
     >
       {/* Hero image — covers full cover with elegant gradient overlays */}
       {property.mainImageUrl && (
@@ -22,25 +22,30 @@ export default function CoverPage({ report }: Props) {
         />
       )}
 
-      {/* Layered gradients for editorial depth */}
-      <div aria-hidden className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/40 to-black/85" />
-      <div aria-hidden className="absolute inset-0 bg-gradient-to-r from-black/55 via-transparent to-black/35" />
+      {/* Layered olive-black gradients for editorial depth */}
+      <div aria-hidden className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(30,31,25,0.82) 0%, rgba(30,31,25,0.4) 50%, rgba(30,31,25,0.88) 100%)' }} />
+      <div aria-hidden className="absolute inset-0" style={{ background: 'linear-gradient(to right, rgba(30,31,25,0.55) 0%, transparent 50%, rgba(30,31,25,0.35) 100%)' }} />
 
-      {/* Top masthead bar */}
+      {/* Top masthead bar — Confidential on left, MM&Co logo on right (larger) */}
       <div className="relative z-10 px-10 md:px-16 pt-10 md:pt-12">
         <div className="flex items-start justify-between gap-6">
+          <div className="pt-2">
+            <p className="section-label text-luxury-gold">Confidential</p>
+            <p className="section-label text-white/45 mt-1.5">Seller Report</p>
+            <p className="section-label text-white/30 mt-3">{formatDate(report.reportDate, 'short')}</p>
+          </div>
           <div className="flex items-center gap-4">
             {property.agent.logoUrl ? (
               <img
                 src={property.agent.logoUrl}
                 alt={property.agent.team}
-                className="h-20 md:h-24 object-contain brightness-0 invert"
+                className="h-32 md:h-40 lg:h-48 object-contain brightness-0 invert"
               />
             ) : (
-              <div>
+              <div className="text-right">
                 <p
                   className="font-serif-display text-white font-light leading-none"
-                  style={{ fontSize: 'clamp(2.25rem, 4.2vw, 3.5rem)', letterSpacing: '-0.02em' }}
+                  style={{ fontSize: 'clamp(2.75rem, 5.5vw, 4.5rem)', letterSpacing: '-0.02em' }}
                 >
                   {property.agent.team || property.agent.brokerage}
                 </p>
@@ -51,11 +56,6 @@ export default function CoverPage({ report }: Props) {
                 )}
               </div>
             )}
-          </div>
-          <div className="text-right pt-2">
-            <p className="section-label text-luxury-gold">Confidential</p>
-            <p className="section-label text-white/45 mt-1.5">Seller Report</p>
-            <p className="section-label text-white/30 mt-3">{formatDate(report.reportDate, 'short')}</p>
           </div>
         </div>
 
@@ -123,28 +123,24 @@ export default function CoverPage({ report }: Props) {
         </div>
       </div>
 
-      {/* Bottom agent strip */}
-      <div className="relative z-10 border-t border-white/10 backdrop-blur-md bg-black/45">
+      {/* Bottom strip — In Good Co. partner mark */}
+      <div className="relative z-10 border-t border-white/10 backdrop-blur-md" style={{ background: 'rgba(30,31,25,0.55)' }}>
         <div className="px-10 md:px-16 py-7 flex items-center justify-between gap-6 flex-wrap">
-          <div className="flex items-center gap-8 flex-wrap">
-            {[property.agent, ...(property.coAgents ?? [])].map((agent, i) => (
-              <div key={i} className="flex items-center gap-4">
-                {agent.photoUrl && (
-                  <img
-                    src={agent.photoUrl}
-                    alt={agent.name}
-                    className="w-10 h-10 rounded-full object-cover border border-white/20"
-                  />
-                )}
-                <div>
-                  <p className="text-white font-medium text-sm tracking-tight">{agent.name}</p>
-                  <p className="section-label text-white/45 mt-0.5">
-                    {agent.title}{agent.title && agent.team ? ' · ' : ''}{agent.team}
-                  </p>
-                  {agent.phone && <p className="text-white/35 text-xs mt-0.5">{agent.phone}</p>}
-                </div>
-              </div>
-            ))}
+          <p className="section-label text-white/35">In Partnership With</p>
+          <div className="flex items-center gap-4">
+            {/* Drop /public/ingoodco-logo.png in to replace the wordmark */}
+            <img
+              src="/ingoodco-logo.png"
+              alt="In Good Co."
+              className="h-10 md:h-12 object-contain brightness-0 invert"
+              onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
+            />
+            <p
+              className="font-serif-display text-white font-light italic leading-none"
+              style={{ fontSize: 'clamp(1.5rem, 2.2vw, 2rem)', letterSpacing: '0.01em' }}
+            >
+              In Good Co.
+            </p>
           </div>
         </div>
       </div>

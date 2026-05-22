@@ -116,8 +116,8 @@ export default function WeeklySnapshot({ report }: Props) {
                         <stop offset="95%" stopColor="#C4A882" stopOpacity={0} />
                       </linearGradient>
                       <linearGradient id="seGrad" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%"  stopColor="#0A0A0A" stopOpacity={0.1} />
-                        <stop offset="95%" stopColor="#0A0A0A" stopOpacity={0} />
+                        <stop offset="5%"  stopColor="#1E1F19" stopOpacity={0.1} />
+                        <stop offset="95%" stopColor="#1E1F19" stopOpacity={0} />
                       </linearGradient>
                     </defs>
                     <CartesianGrid strokeDasharray="3 3" stroke="#E8E2D9" />
@@ -126,7 +126,7 @@ export default function WeeklySnapshot({ report }: Props) {
                     <Tooltip contentStyle={{ fontFamily: 'var(--font-inter)', fontSize: 11 }} formatter={(v: number) => [formatNumber(v), '']} />
                     <Legend wrapperStyle={{ fontSize: 10, color: '#8B7D6B', letterSpacing: '0.06em' }} />
                     <Area type="monotone" dataKey="Compass"    stroke="#C4A882" strokeWidth={2.5} fill="url(#compassGrad)" dot={{ fill: '#C4A882', r: 4 }} />
-                    <Area type="monotone" dataKey="StreetEasy" stroke="#0A0A0A" strokeWidth={2}   fill="url(#seGrad)"      dot={{ fill: '#0A0A0A', r: 4 }} />
+                    <Area type="monotone" dataKey="StreetEasy" stroke="#1E1F19" strokeWidth={2}   fill="url(#seGrad)"      dot={{ fill: '#1E1F19', r: 4 }} />
                   </AreaChart>
                 </ResponsiveContainer>
               </div>
