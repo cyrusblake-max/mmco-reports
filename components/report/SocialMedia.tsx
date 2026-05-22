@@ -10,16 +10,18 @@ import SectionMast from './SectionMast'
 
 interface Props { report: WeeklyReport }
 
-const PLATFORM_COLORS = {
+const PLATFORM_COLORS: Record<string, string> = {
   instagram: '#C4A882',
   tiktok:    '#0A0A0A',
   facebook:  '#8B7D6B',
+  youtube:   '#B8AC97',
 }
 
-const PLATFORM_LABELS = {
+const PLATFORM_LABELS: Record<string, string> = {
   instagram: 'Instagram',
   tiktok:    'TikTok',
   facebook:  'Facebook',
+  youtube:   'YouTube',
 }
 
 function PlatformCard({ stats }: { stats: SocialPlatformStats }) {
