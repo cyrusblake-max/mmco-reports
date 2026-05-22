@@ -1,0 +1,281 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-cormorant: 'Cormorant Garamond', Georgia, serif;
+  --font-inter: 'Inter', system-ui, sans-serif;
+
+  /* Refined editorial palette */
+  --ink:          #0A0A0A;
+  --ink-2:        #1A1A1A;
+  --paper:        #FAFAF7;
+  --paper-2:      #F4F1EB;
+  --paper-3:      #ECE7DE;
+  --rule:         #E2DBCE;
+  --rule-soft:    #EFEAE0;
+  --taupe:        #8B7D6B;
+  --taupe-soft:   #B8AC97;
+  --gold:         #C4A882;
+  --gold-deep:    #A88A5F;
+  --gold-glow:    #DCC59B;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    background-color: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-inter);
+    font-feature-settings: 'ss01', 'cv11', 'kern';
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    letter-spacing: -0.005em;
+  }
+
+  ::selection {
+    background-color: var(--gold);
+    color: var(--ink);
+  }
+
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--paper-2); }
+  ::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 3px; }
+}
+
+@layer utilities {
+  .font-serif-display {
+    font-family: var(--font-cormorant);
+    font-optical-sizing: auto;
+    font-feature-settings: 'liga', 'dlig', 'kern';
+  }
+
+  /* — Editorial section label (small caps, generously tracked) — */
+  .section-label {
+    font-family: var(--font-inter);
+    font-size: 0.625rem;
+    font-weight: 500;
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
+  }
+
+  .section-label-lg {
+    font-family: var(--font-inter);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+  }
+
+  /* — Ornamental rules — */
+  .rule-gold {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold) 20%, var(--gold) 80%, transparent);
+  }
+  .rule-soft  { border-top: 1px solid var(--rule); }
+  .rule-soft-b { border-bottom: 1px solid var(--rule); }
+
+  /* — Outlined section numeral (massive editorial display) — */
+  .numeral-outline {
+    font-family: var(--font-cormorant);
+    font-weight: 300;
+    color: transparent;
+    -webkit-text-stroke: 1px var(--gold);
+    line-height: 0.85;
+    letter-spacing: -0.04em;
+    font-feature-settings: 'lnum', 'tnum';
+  }
+
+  /* — Drop cap utility — */
+  .dropcap::first-letter {
+    font-family: var(--font-cormorant);
+    font-size: 4.25em;
+    line-height: 0.85;
+    float: left;
+    padding: 0.1em 0.12em 0 0;
+    color: var(--gold);
+    font-weight: 300;
+  }
+
+  /* — Card surfaces — */
+  .card-luxury {
+    background: #FFFFFF;
+    border: 1px solid var(--rule);
+    border-radius: 1px;
+  }
+  .card-luxury-dark {
+    background: var(--ink-2);
+    border: 1px solid #2C2C2C;
+    border-radius: 1px;
+  }
+
+  /* — Subtle hairlines kept for back-compat — */
+  .luxury-border    { border: 1px solid var(--rule); }
+  .luxury-border-t  { border-top: 1px solid var(--rule); }
+  .luxury-border-b  { border-bottom: 1px solid var(--rule); }
+
+  /* — Small-caps numeric pair (label / value stack) — */
+  .stat-pair > .stat-label {
+    font-family: var(--font-inter);
+    font-size: 0.62rem;
+    font-weight: 500;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--taupe);
+    margin-bottom: 0.5rem;
+  }
+  .stat-pair > .stat-value {
+    font-family: var(--font-cormorant);
+    font-weight: 300;
+    line-height: 0.95;
+  }
+
+  /* — Editorial pull quote — */
+  .pullquote {
+    font-family: var(--font-cormorant);
+    font-style: italic;
+    font-weight: 300;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Section frames — generous vertical rhythm
+   ───────────────────────────────────────────────────────────── */
+.report-section {
+  padding: 7.5rem 0;
+  background: #FFFFFF;
+}
+.report-section-dark {
+  background: var(--ink);
+  color: var(--paper);
+  padding: 7.5rem 0;
+}
+.report-section-beige {
+  background: var(--paper-2);
+  padding: 7.5rem 0;
+}
+.report-section-ivory {
+  background: var(--paper);
+  padding: 7.5rem 0;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Recharts polish
+   ───────────────────────────────────────────────────────────── */
+.recharts-tooltip-wrapper { outline: none !important; }
+
+.recharts-default-tooltip {
+  border: 1px solid var(--rule) !important;
+  border-radius: 1px !important;
+  background: #FFFFFF !important;
+  box-shadow: 0 8px 28px rgba(10,10,10,0.08) !important;
+}
+
+.recharts-cartesian-axis-tick text {
+  font-feature-settings: 'tnum';
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Print / PDF
+   ───────────────────────────────────────────────────────────── */
+@page {
+  size: Letter;
+  margin: 0.55in 0.5in 0.65in 0.5in;
+
+  /* Running footer */
+  @bottom-left {
+    content: var(--print-property, '');
+    font-family: var(--font-inter);
+    font-size: 8pt;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #8B7D6B;
+  }
+  @bottom-center {
+    content: 'M M & C O';
+    font-family: var(--font-inter);
+    font-size: 8pt;
+    letter-spacing: 0.32em;
+    color: #C4A882;
+  }
+  @bottom-right {
+    content: counter(page) ' / ' counter(pages);
+    font-family: var(--font-inter);
+    font-size: 8pt;
+    letter-spacing: 0.18em;
+    color: #8B7D6B;
+  }
+}
+
+@media print {
+  html, body {
+    background: white;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Scale 1440px design down to fit Letter's ~7.5in usable width */
+  html { zoom: 0.62; }
+
+  .no-print { display: none !important; }
+
+  /* Let Chrome's natural algorithm place breaks — no forced gaps */
+  .print-page-break {
+    page-break-before: auto;
+    break-before: auto;
+  }
+
+  /* Tighten section padding for print */
+  .report-section,
+  .report-section-dark,
+  .report-section-beige,
+  .report-section-ivory {
+    padding: 1.5rem 0 !important;
+  }
+
+  /* Keep section openers with their first paragraph */
+  .section-mast { page-break-after: avoid; break-after: avoid; }
+
+  /* Avoid splitting cards / charts mid-page */
+  .card-luxury,
+  .card-luxury-dark,
+  .recharts-wrapper,
+  .recharts-responsive-container {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  /* Hide all decorative numerals — they create huge whitespace */
+  .numeral-outline { display: none !important; }
+
+  nav, header, footer.no-print { display: none !important; }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Motion / Animations
+   ───────────────────────────────────────────────────────────── */
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, var(--paper-2) 25%, var(--rule) 50%, var(--paper-2) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.fade-up {
+  animation: fadeUp 0.6s ease-out both;
+}
+.fade-up-delayed { animation-delay: 0.08s; }
