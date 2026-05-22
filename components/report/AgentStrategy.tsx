@@ -68,23 +68,13 @@ export default function AgentStrategy({ report }: Props) {
         <StrategyBlock icon={Calendar} title="Open Houses Planned" content={strategy.openHousesPlanned} />
 
         {/* Closing signature — In Good Co. partner mark */}
-        <div className="mt-16 pt-12 border-t border-white/10 flex items-center justify-between gap-6">
-          <p className="section-label text-white/35">In Partnership With</p>
-          <div className="flex items-center gap-4">
-            {/* Drop /public/ingoodco-logo.png to swap in a real logo file */}
-            <img
-              src="/ingoodco-logo.png"
-              alt="In Good Co."
-              className="h-10 md:h-12 object-contain brightness-0 invert"
-              onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
-            />
-            <p
-              className="font-serif-display text-white font-light italic leading-none"
-              style={{ fontSize: 'clamp(1.5rem, 2.2vw, 2rem)', letterSpacing: '0.01em' }}
-            >
-              In Good Co.
-            </p>
-          </div>
+        <div className="mt-16 pt-12 border-t border-white/10 flex items-center justify-center">
+          <img
+            src="/ingoodco-logo.png"
+            alt="In Good Co."
+            className="h-16 md:h-20 object-contain brightness-0 invert"
+            onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
+          />
         </div>
       </div>
     </section>
