@@ -92,8 +92,14 @@ function ActivityRow({ activity }: { activity: MarketingActivity }) {
 }
 
 export default function MarketingActivities({ report }: Props) {
-  const { marketing } = report
+  const { marketing, weekStartDate, weekEndDate } = report
   if (!marketing || marketing.length === 0) return null
+
+  // Show only this-week's activities (so prior-week posts don't bleed into a new report)
+  const weekActivities = weekStartDate && weekEndDate
+    ? marketing.filter(m => m.date >= weekStartDate && m.date <= weekEndDate)
+    : marketing
+  if (weekActivities.length === 0) return null
 
   return (
     <section className="report-section-dark print-page-break">
@@ -108,9 +114,9 @@ export default function MarketingActivities({ report }: Props) {
 
         {/* Activity list */}
         <div>
-          <p className="section-label text-luxury-gold mb-6">{marketing.length} Marketing Activities This Week</p>
+          <p className="section-label text-luxury-gold mb-6">{weekActivities.length} Marketing Activities This Week</p>
           <div>
-            {marketing.map(activity => (
+            {weekActivities.map(activity => (
               <ActivityRow key={activity.id} activity={activity} />
             ))}
           </div>

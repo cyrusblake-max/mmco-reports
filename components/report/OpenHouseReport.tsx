@@ -62,15 +62,19 @@ function EventCard({ event }: { event: OpenHouseEvent }) {
 }
 
 export default function OpenHouseReport({ report }: Props) {
-  const { openHouses, currentMetrics } = report
+  const { openHouses, currentMetrics, weekStartDate, weekEndDate } = report
   if (!openHouses || openHouses.length === 0) return null
 
-  const totalAttendees = openHouses.reduce((s, oh) => s + oh.totalAttendees, 0)
-  const avgAttendance  = Math.round(totalAttendees / openHouses.length)
-  const peak           = openHouses.reduce((best, oh) => oh.totalAttendees > best.totalAttendees ? oh : best, openHouses[0])
+  // Filter to events that occurred during THIS reporting week.
+  // Falls back to the latest event if the week range is misconfigured.
+  const weekEvents = weekStartDate && weekEndDate
+    ? openHouses.filter(oh => oh.date >= weekStartDate && oh.date <= weekEndDate)
+    : []
+  const eventsToShow = weekEvents.length > 0 ? weekEvents : [openHouses[openHouses.length - 1]]
 
-  // Current week = last entry
-  const current = openHouses[openHouses.length - 1]
+  const weekTotalAttendees = eventsToShow.reduce((s, oh) => s + oh.totalAttendees, 0)
+  const weekAvgAttendance  = eventsToShow.length > 0 ? Math.round(weekTotalAttendees / eventsToShow.length) : 0
+  const peak = eventsToShow.reduce((best, oh) => oh.totalAttendees > best.totalAttendees ? oh : best, eventsToShow[0])
 
   return (
     <section className="report-section bg-white print-page-break">
@@ -86,7 +90,7 @@ export default function OpenHouseReport({ report }: Props) {
         <div className="grid grid-cols-2 gap-px bg-luxury-cream mb-12">
           <div className="bg-luxury-black p-6">
             <p className="section-label text-luxury-gold mb-2">Open House Attendees</p>
-            <p className="font-serif-display text-4xl font-light text-white">{current.totalAttendees}</p>
+            <p className="font-serif-display text-4xl font-light text-white">{weekTotalAttendees}</p>
             <p className="section-label text-white/40 mt-1">This Week</p>
           </div>
           <div className="bg-luxury-off p-6">
@@ -96,8 +100,8 @@ export default function OpenHouseReport({ report }: Props) {
           </div>
         </div>
 
-        {/* ── Peak event callout ── */}
-        {openHouses.length > 1 && (
+        {/* ── Peak event callout — only if we had real attendance ── */}
+        {eventsToShow.length > 1 && peak.totalAttendees > 0 && (
           <div className="flex items-center gap-3 mb-6 px-5 py-3 border-l-2 border-luxury-gold bg-luxury-off">
             <TrendingUp className="w-4 h-4 text-luxury-gold flex-shrink-0" />
             <p className="text-sm text-luxury-taupe">
@@ -105,14 +109,16 @@ export default function OpenHouseReport({ report }: Props) {
               <span className="text-luxury-black font-medium">{peak.totalAttendees} guests</span>
               {' '}on{' '}
               <span className="text-luxury-black font-medium">{formatDate(peak.date, 'short')}</span>
-              {' '}— {Math.round(((peak.totalAttendees - avgAttendance) / Math.max(avgAttendance, 1)) * 100)}% above week average.
+              {weekAvgAttendance > 0 && <> — {Math.round(((peak.totalAttendees - weekAvgAttendance) / Math.max(weekAvgAttendance, 1)) * 100)}% above week average.</>}
             </p>
           </div>
         )}
 
-        {/* Individual event cards — current week only */}
+        {/* Individual event cards — every open house from this week */}
         <div className="space-y-6">
-          <EventCard key={current.id} event={current} />
+          {eventsToShow.map(event => (
+            <EventCard key={event.id} event={event} />
+          ))}
         </div>
       </div>
     </section>

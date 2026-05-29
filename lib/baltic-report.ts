@@ -2,10 +2,10 @@ import { WeeklyReport } from './types'
 
 export const BALTIC_REPORT: WeeklyReport = {
   id: 'baltic-613-9c-w1',
-  weekNumber: 2,
-  reportDate: '2026-05-20',
-  weekStartDate: '2026-05-14',
-  weekEndDate: '2026-05-20',
+  weekNumber: 3,
+  reportDate: '2026-05-29',
+  weekStartDate: '2026-05-22',
+  weekEndDate: '2026-05-28',
 
   property: {
     address: '613 Baltic Street',
@@ -47,7 +47,27 @@ export const BALTIC_REPORT: WeeklyReport = {
     ],
   },
 
+  // Week 3 (May 22–28): two open houses, both 0 attendees.
+  // Web stats from Compass Insights (May 21–27): 293 total views, 122 unique visitors,
+  // 176 Compass / 117 StreetEasy publisher views; 87% of Compass views were public.
   currentMetrics: {
+    totalViews: 293,
+    websiteTraffic: 0,
+    zillowViews: 0,
+    streetEasyViews: 117,
+    compassViews: 176,
+    saves: 0,
+    inquiries: 0,
+    showingRequests: 0,
+    openHouseAttendees: 0,
+    brokerInquiries: 0,
+    buyerLeads: 0,
+    socialReach: 0,
+    videoViews: 0,
+  },
+
+  // Previous = Week 2's actuals so trends still compute when Week 3 numbers land
+  previousMetrics: {
     totalViews: 545,
     websiteTraffic: 0,
     zillowViews: 0,
@@ -61,22 +81,6 @@ export const BALTIC_REPORT: WeeklyReport = {
     buyerLeads: 4,
     socialReach: 555,
     videoViews: 555,
-  },
-
-  previousMetrics: {
-    totalViews: 998,
-    websiteTraffic: 0,
-    zillowViews: 0,
-    streetEasyViews: 312,
-    compassViews: 686,
-    saves: 0,
-    inquiries: 0,
-    showingRequests: 1,
-    openHouseAttendees: 2,
-    brokerInquiries: 0,
-    buyerLeads: 0,
-    socialReach: 0,
-    videoViews: 0,
   },
 
   metricsHistory: [
@@ -116,6 +120,25 @@ export const BALTIC_REPORT: WeeklyReport = {
         buyerLeads: 4,
         socialReach: 555,
         videoViews: 555,
+      },
+    },
+    {
+      weekLabel: 'Week 3',
+      weekNumber: 3,
+      metrics: {
+        totalViews: 293,
+        websiteTraffic: 0,
+        zillowViews: 0,
+        streetEasyViews: 117,
+        compassViews: 176,
+        saves: 0,
+        inquiries: 0,
+        showingRequests: 0,
+        openHouseAttendees: 0,
+        brokerInquiries: 0,
+        buyerLeads: 0,
+        socialReach: 0,
+        videoViews: 0,
       },
     },
   ],
@@ -158,6 +181,32 @@ export const BALTIC_REPORT: WeeklyReport = {
       questionsAsked: '',
       followUpActions: 'One buyer requesting a second private showing — scheduled for Friday May 22.',
     },
+    {
+      id: 'oh-baltic-002',
+      date: '2026-05-24',
+      startTime: '12:00',
+      endTime: '13:30',
+      totalAttendees: 0,
+      brokers: 0,
+      buyers: 0,
+      seriousInterestLevel: 1,
+      commonFeedback: '',
+      questionsAsked: '',
+      followUpActions: 'Memorial Day weekend — no attendees.',
+    },
+    {
+      id: 'oh-baltic-003',
+      date: '2026-05-28',
+      startTime: '18:30',
+      endTime: '20:30',
+      totalAttendees: 0,
+      brokers: 0,
+      buyers: 0,
+      seriousInterestLevel: 1,
+      commonFeedback: '',
+      questionsAsked: '',
+      followUpActions: 'Wine & Cheese Sunset Open House — no attendees.',
+    },
   ],
 
   marketing: [
@@ -195,6 +244,17 @@ export const BALTIC_REPORT: WeeklyReport = {
       clicks: 0,
       reach: 8000,
       notes: 'Targeted email blast sent to 8,000+ NYC brokers announcing 613 Baltic Street, Unit 9C.',
+    },
+    {
+      id: 'mkt-baltic-broker-blast-w3',
+      type: 'broker_outreach',
+      name: 'Broker Blast — NYC Network (weekly)',
+      date: '2026-05-23',
+      impressions: 0,
+      engagement: 0,
+      clicks: 0,
+      reach: 8000,
+      notes: 'Weekly broker blast — 8,000+ NYC brokers reminded of the listing and upcoming open houses.',
     },
     {
       id: 'mkt-baltic-002',
@@ -237,20 +297,20 @@ export const BALTIC_REPORT: WeeklyReport = {
   },
 
   digitalAds: {
-    reportingPeriod: 'May 8 – May 21, 2026',
-    totalImpressions: 20611,
-    totalClicks: 843,
-    topChannel: { name: 'Instagram', ctr: 7.56 },
+    reportingPeriod: 'May 23 – May 26, 2026',
+    totalImpressions: 7775,
+    totalClicks: 259,
+    topChannel: { name: 'Facebook', ctr: 4.02 },
     byChannel: [
-      { channel: 'Instagram', clicks: 368, ctr: 7.56 },
-      { channel: 'Google',    clicks: 301, ctr: 2.55 },
-      { channel: 'Facebook',  clicks: 174, ctr: 4.39 },
+      { channel: 'Google',    clicks: 190, ctr: 3.34 },
+      { channel: 'Instagram', clicks: 38,  ctr: 2.86 },
+      { channel: 'Facebook',  clicks: 31,  ctr: 4.02 },
     ],
-    socialTrafficPeriod: 'April 22 – May 22, 2026',
+    socialTrafficPeriod: 'May 21 – May 27, 2026',
     socialTrafficShare: [
-      { channel: 'Instagram', share: 59.7 },
-      { channel: 'Facebook',  share: 30.5 },
-      { channel: 'YouTube',   share: 9.8  },
+      { channel: 'Facebook',  share: 52.6 },
+      { channel: 'Instagram', share: 44.3 },
+      { channel: 'YouTube',   share: 3.1  },
     ],
   },
 
@@ -265,10 +325,10 @@ export const BALTIC_REPORT: WeeklyReport = {
 
   strategy: {
     keyRecommendations: '',
-    marketingPlanNextWeek: '— New Instagram reel showcasing the terrace and skyline views\n— Additional Instagram posts on @maggie_leigh_marshall and @soldbycy\n— Weekly broker blast to NYC network\n— Targeted broker outreach to agents with active buyers in the $3M+ Brooklyn market\n— Story series highlighting the neighborhood lifestyle and proximity to Prospect Park',
+    marketingPlanNextWeek: '— Personal follow-up with the confirmed Sunday May 31 RSVP\n— New Instagram reel showcasing the terrace and skyline views\n— Additional Instagram posts on @maggie_leigh_marshall and @soldbycy\n— Weekly broker blast to NYC network\n— Targeted broker outreach to agents with active buyers in the $3M+ Brooklyn market\n— Story series highlighting the neighborhood lifestyle and proximity to Prospect Park',
     pricingStrategy: '',
     upcomingCampaigns: '',
     brokerEvents: '',
-    openHousesPlanned: '— Private second showing: Friday May 22 (buyer returning from May 17 open house)\n— Public open house: Sunday May 25, 12:00–1:30 PM\n— Wine & Cheese Sunset Open House: Thursday May 28, 6:00–8:30 PM',
+    openHousesPlanned: '— Public open house: Sunday May 31, 12:00–1:30 PM (one guest already RSVP\u2019d)',
   },
 }
