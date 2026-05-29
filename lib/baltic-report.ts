@@ -362,6 +362,6 @@ export const BALTIC_REPORT: WeeklyReport = {
     pricingStrategy: '',
     upcomingCampaigns: '',
     brokerEvents: '',
-    openHousesPlanned: '— Public open house: Sunday May 31, 12:00–1:30 PM (one guest already RSVP\u2019d)',
+    openHousesPlanned: '— Public open house: Sunday May 31, 12:00–1:30 PM (one guest already RSVP\u2019d)\n— Broker open house: Thursday June 4 (pending participation)',
   },
 }
