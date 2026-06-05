@@ -100,9 +100,9 @@ export default function OpenHouseReport({ report }: Props) {
             <p className="section-label text-white/40 mt-1">This Week</p>
           </div>
           <div className="bg-luxury-off p-6">
-            <p className="section-label text-luxury-taupe mb-2">Private Showings</p>
+            <p className="section-label text-luxury-taupe mb-2">Repeat Visitors</p>
             <p className="font-serif-display text-4xl font-light">{currentMetrics?.showingRequests ?? 0}</p>
-            <p className="section-label text-luxury-taupe mt-1">This Week</p>
+            <p className="section-label text-luxury-taupe mt-1">Family returned Sunday — 2nd visit</p>
           </div>
         </div>
 

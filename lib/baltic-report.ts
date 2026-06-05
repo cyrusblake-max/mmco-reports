@@ -59,7 +59,7 @@ export const BALTIC_REPORT: WeeklyReport = {
     compassViews: 151,
     saves: 0,
     inquiries: 0,
-    showingRequests: 0,
+    showingRequests: 1,
     openHouseAttendees: 11,
     brokerInquiries: 0,
     buyerLeads: 0,
