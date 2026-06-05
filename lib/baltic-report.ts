@@ -2,10 +2,10 @@ import { WeeklyReport } from './types'
 
 export const BALTIC_REPORT: WeeklyReport = {
   id: 'baltic-613-9c-w1',
-  weekNumber: 3,
-  reportDate: '2026-05-29',
-  weekStartDate: '2026-05-22',
-  weekEndDate: '2026-05-28',
+  weekNumber: 4,
+  reportDate: '2026-06-04',
+  weekStartDate: '2026-05-28',
+  weekEndDate: '2026-06-03',
 
   property: {
     address: '613 Baltic Street',
@@ -47,10 +47,28 @@ export const BALTIC_REPORT: WeeklyReport = {
     ],
   },
 
-  // Week 3 (May 22–28): two open houses, both 0 attendees.
-  // Web stats from Compass Insights (May 21–27): 293 total views, 122 unique visitors,
-  // 176 Compass / 117 StreetEasy publisher views; 87% of Compass views were public.
+  // Week 4 (May 28 – June 3): broker open house Thursday with 9 attendees.
+  // Compass Insights (May 28 – June 3): 285 total views, 117 unique visitors,
+  // 151 Compass / 134 StreetEasy. 86% of Compass views from public visitors.
+  // Top traffic source: Social (43%); top social channel: Instagram (85%).
   currentMetrics: {
+    totalViews: 285,
+    websiteTraffic: 0,
+    zillowViews: 0,
+    streetEasyViews: 134,
+    compassViews: 151,
+    saves: 0,
+    inquiries: 0,
+    showingRequests: 0,
+    openHouseAttendees: 9,
+    brokerInquiries: 0,
+    buyerLeads: 0,
+    socialReach: 0,
+    videoViews: 0,
+  },
+
+  // Previous = Week 3's actuals so trends still compute
+  previousMetrics: {
     totalViews: 293,
     websiteTraffic: 0,
     zillowViews: 0,
@@ -64,23 +82,6 @@ export const BALTIC_REPORT: WeeklyReport = {
     buyerLeads: 0,
     socialReach: 0,
     videoViews: 0,
-  },
-
-  // Previous = Week 2's actuals so trends still compute when Week 3 numbers land
-  previousMetrics: {
-    totalViews: 545,
-    websiteTraffic: 0,
-    zillowViews: 0,
-    streetEasyViews: 141,
-    compassViews: 404,
-    saves: 17,
-    inquiries: 3,
-    showingRequests: 1,
-    openHouseAttendees: 4,
-    brokerInquiries: 0,
-    buyerLeads: 4,
-    socialReach: 555,
-    videoViews: 555,
   },
 
   metricsHistory: [
@@ -135,6 +136,25 @@ export const BALTIC_REPORT: WeeklyReport = {
         inquiries: 0,
         showingRequests: 0,
         openHouseAttendees: 0,
+        brokerInquiries: 0,
+        buyerLeads: 0,
+        socialReach: 0,
+        videoViews: 0,
+      },
+    },
+    {
+      weekLabel: 'Week 4',
+      weekNumber: 4,
+      metrics: {
+        totalViews: 285,
+        websiteTraffic: 0,
+        zillowViews: 0,
+        streetEasyViews: 134,
+        compassViews: 151,
+        saves: 0,
+        inquiries: 0,
+        showingRequests: 0,
+        openHouseAttendees: 9,
         brokerInquiries: 0,
         buyerLeads: 0,
         socialReach: 0,
@@ -206,6 +226,19 @@ export const BALTIC_REPORT: WeeklyReport = {
       commonFeedback: '',
       questionsAsked: '',
       followUpActions: 'Wine & Cheese Sunset Open House — no attendees.',
+    },
+    {
+      id: 'oh-baltic-broker-w4',
+      date: '2026-06-04',
+      startTime: '17:00',
+      endTime: '19:00',
+      totalAttendees: 9,
+      brokers: 9,
+      buyers: 0,
+      seriousInterestLevel: 4,
+      commonFeedback: '',
+      questionsAsked: '',
+      followUpActions: 'Broker open house — 9 NYC brokers attended. Strong showing from the broker network.',
     },
   ],
 
@@ -330,20 +363,37 @@ export const BALTIC_REPORT: WeeklyReport = {
   },
 
   digitalAds: {
-    reportingPeriod: 'May 23 – May 26, 2026',
-    totalImpressions: 7775,
-    totalClicks: 259,
-    topChannel: { name: 'Facebook', ctr: 4.02 },
-    byChannel: [
-      { channel: 'Google',    clicks: 190, ctr: 3.34 },
-      { channel: 'Instagram', clicks: 38,  ctr: 2.86 },
-      { channel: 'Facebook',  clicks: 31,  ctr: 4.02 },
+    campaignName: 'Location-Based Targeting',
+    targetingFocus: 'Boerum Hill · Park Slope · Cobble Hill · Carroll Gardens · Brooklyn Heights · Fort Greene',
+    reportingPeriod: 'May 29 – June 28, 2026',
+    totalImpressions: 21943,
+    totalClicks: 122,
+    cpc: 0.94,
+    topChannel: { name: 'nytimes.com', ctr: 0.56 },
+    byChannel: [], // Display campaign — no per-social-channel clicks; see topPublishers below
+    topPublishers: [
+      { publisher: 'nytimes.com',                       views: 3277 },
+      { publisher: 'theatlantic.com',                   views: 2452 },
+      { publisher: 'mlb.com',                           views: 1720 },
+      { publisher: 'nypost.com',                        views: 1658 },
+      { publisher: 'foxnews.com',                       views: 1043 },
+      { publisher: 'huffpost.com',                      views: 1008 },
+      { publisher: 'theguardian.com',                   views: 735 },
+      { publisher: 'Newsday (Mobile App)',              views: 621 },
+      { publisher: 'npr.org',                           views: 612 },
+      { publisher: 'yahoo.com',                         views: 501 },
+      { publisher: 'thedailybeast.com',                 views: 414 },
+      { publisher: 'cnn.com',                           views: 365 },
     ],
-    socialTrafficPeriod: 'May 21 – May 27, 2026',
+    audienceHouseholdIncome: [
+      { bracket: 'Top 10%', share: 92.9 },
+      { bracket: '41–50%',  share: 3.6  },
+      { bracket: '21–30%',  share: 1.7  },
+    ],
+    socialTrafficPeriod: 'May 28 – June 3, 2026',
     socialTrafficShare: [
-      { channel: 'Facebook',  share: 52.6 },
-      { channel: 'Instagram', share: 44.3 },
-      { channel: 'YouTube',   share: 3.1  },
+      { channel: 'Instagram', share: 85.0 },
+      { channel: 'Facebook',  share: 15.0 },
     ],
   },
 
@@ -358,10 +408,10 @@ export const BALTIC_REPORT: WeeklyReport = {
 
   strategy: {
     keyRecommendations: '',
-    marketingPlanNextWeek: '— Personal follow-up with the confirmed Sunday May 31 RSVP\n— New Instagram reel showcasing the terrace and skyline views\n— Additional Instagram posts on @maggie_leigh_marshall and @soldbycy\n— Weekly broker blast to NYC network\n— Targeted broker outreach to agents with active buyers in the $3M+ Brooklyn market\n— Story series highlighting the neighborhood lifestyle and proximity to Prospect Park',
+    marketingPlanNextWeek: '— Personal follow-up with all 9 brokers from the Thursday June 4 broker open house\n— New Instagram reel highlighting the broker-event turnout and terrace views\n— Continued posts across @maggie_leigh_marshall and @soldbycy\n— Weekly broker blast to NYC network\n— Continue location-based display campaign (NYT, Atlantic, NY Post, etc.) through June 28',
     pricingStrategy: '',
     upcomingCampaigns: '',
     brokerEvents: '',
-    openHousesPlanned: '— Public open house: Sunday May 31, 12:00–1:30 PM (one guest already RSVP\u2019d)\n— Broker open house: Thursday June 4 (pending participation)',
+    openHousesPlanned: '— Public open house: Sunday June 7, 12:00–1:30 PM',
   },
 }

@@ -197,6 +197,16 @@ export interface SocialTrafficShare {
   share: number
 }
 
+export interface PublisherViews {
+  publisher: string
+  views: number
+}
+
+export interface AudienceBracket {
+  bracket: string
+  share: number
+}
+
 export interface DigitalAdsSection {
   reportingPeriod: string
   totalImpressions: number
@@ -205,6 +215,12 @@ export interface DigitalAdsSection {
   byChannel: AdChannelStat[]
   socialTrafficPeriod: string
   socialTrafficShare: SocialTrafficShare[]
+  // Optional — for display / location-based campaigns
+  campaignName?: string
+  targetingFocus?: string
+  cpc?: number
+  topPublishers?: PublisherViews[]
+  audienceHouseholdIncome?: AudienceBracket[]
 }
 
 export interface WeeklyReport {

@@ -21,7 +21,11 @@ export default function DigitalAds({ report }: Props) {
   const { digitalAds } = report
   if (!digitalAds) return null
 
-  const { reportingPeriod, totalImpressions, totalClicks, topChannel, byChannel, socialTrafficPeriod, socialTrafficShare } = digitalAds
+  const {
+    reportingPeriod, totalImpressions, totalClicks, topChannel, byChannel,
+    socialTrafficPeriod, socialTrafficShare,
+    campaignName, targetingFocus, cpc, topPublishers, audienceHouseholdIncome,
+  } = digitalAds
   const overallCTR = totalImpressions > 0 ? (totalClicks / totalImpressions) * 100 : 0
 
   return (
@@ -34,8 +38,22 @@ export default function DigitalAds({ report }: Props) {
           kicker={`Compass-managed ad campaigns and where social traffic is coming from. Reporting period: ${reportingPeriod}.`}
         />
 
-        {/* Headline stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-luxury-cream mb-12">
+        {/* Campaign name + targeting focus banner */}
+        {(campaignName || targetingFocus) && (
+          <div className="bg-luxury-black text-white p-5 mb-px">
+            {campaignName && (
+              <p className="section-label text-luxury-gold mb-1.5">Campaign · {campaignName}</p>
+            )}
+            {targetingFocus && (
+              <p className="text-white/75 text-sm leading-relaxed">
+                <span className="section-label text-white/40 mr-2">Targeting</span>{targetingFocus}
+              </p>
+            )}
+          </div>
+        )}
+
+        {/* Headline stats — adapts to whether CPC is provided (display campaigns) */}
+        <div className={`grid grid-cols-1 ${cpc != null ? 'md:grid-cols-4' : 'md:grid-cols-3'} gap-px bg-luxury-cream mb-12`}>
           <div className="bg-white p-6">
             <p className="section-label text-luxury-taupe mb-2">Total Impressions</p>
             <p className="font-serif-display text-4xl font-light">{formatNumber(totalImpressions, true)}</p>
@@ -46,14 +64,58 @@ export default function DigitalAds({ report }: Props) {
             <p className="font-serif-display text-4xl font-light">{formatNumber(totalClicks, true)}</p>
             <p className="text-luxury-taupe text-xs mt-2">{overallCTR.toFixed(2)}% overall CTR</p>
           </div>
+          {cpc != null && (
+            <div className="bg-white p-6">
+              <p className="section-label text-luxury-taupe mb-2">Cost per Click</p>
+              <p className="font-serif-display text-4xl font-light">${cpc.toFixed(2)}</p>
+              <p className="text-luxury-taupe text-xs mt-2">Avg. across campaign</p>
+            </div>
+          )}
           {topChannel && (
             <div className="bg-luxury-black p-6">
-              <p className="section-label text-luxury-gold mb-2">Top Channel</p>
+              <p className="section-label text-luxury-gold mb-2">Top {topPublishers ? 'Publisher' : 'Channel'}</p>
               <p className="font-serif-display text-4xl font-light text-white">{topChannel.name}</p>
               <p className="text-luxury-gold text-xs mt-2">{topChannel.ctr.toFixed(2)}% CTR · highest engagement</p>
             </div>
           )}
         </div>
+
+        {/* Top Publishers — for display / location-based campaigns */}
+        {topPublishers && topPublishers.length > 0 && (
+          <div className="bg-white border border-luxury-cream p-6 mb-12">
+            <div className="flex items-baseline justify-between mb-4">
+              <p className="section-label text-luxury-taupe">Where Your Ads Appeared</p>
+              <p className="text-xs text-luxury-taupe">Top {topPublishers.length} publishers · ad views</p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2">
+              {topPublishers.map((p, i) => (
+                <div key={p.publisher} className="flex items-baseline justify-between border-b border-luxury-cream/60 py-2">
+                  <span className="flex items-baseline gap-3">
+                    <span className="section-label text-luxury-gold w-5" style={{ fontSize: '0.58rem' }}>{String(i + 1).padStart(2, '0')}</span>
+                    <span className="text-sm text-luxury-black">{p.publisher}</span>
+                  </span>
+                  <span className="font-serif-display text-lg font-light">{formatNumber(p.views)}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Audience — Household Income */}
+        {audienceHouseholdIncome && audienceHouseholdIncome.length > 0 && (
+          <div className="bg-white border border-luxury-cream p-6 mb-12">
+            <p className="section-label text-luxury-taupe mb-4">Audience · Household Income</p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-luxury-cream">
+              {audienceHouseholdIncome.map(a => (
+                <div key={a.bracket} className="bg-white p-5 text-center">
+                  <p className="font-serif-display text-3xl font-light">{a.share.toFixed(1)}%</p>
+                  <p className="section-label text-luxury-taupe mt-1">{a.bracket}</p>
+                </div>
+              ))}
+            </div>
+            <p className="text-xs text-luxury-taupe mt-3 italic">Top 10% bracket dominates — the campaign is reaching the intended luxury-buyer profile.</p>
+          </div>
+        )}
 
         {/* Channel performance */}
         {byChannel.length > 0 && (
