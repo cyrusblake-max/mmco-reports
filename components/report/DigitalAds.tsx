@@ -24,7 +24,7 @@ export default function DigitalAds({ report }: Props) {
   const {
     reportingPeriod, totalImpressions, totalClicks, topChannel, byChannel,
     socialTrafficPeriod, socialTrafficShare,
-    campaignName, targetingFocus, cpc, topPublishers, audienceHouseholdIncome,
+    campaignName, targetingFocus, topPublishers, audienceHouseholdIncome,
   } = digitalAds
   const overallCTR = totalImpressions > 0 ? (totalClicks / totalImpressions) * 100 : 0
 
@@ -52,8 +52,8 @@ export default function DigitalAds({ report }: Props) {
           </div>
         )}
 
-        {/* Headline stats — adapts to whether CPC is provided (display campaigns) */}
-        <div className={`grid grid-cols-1 ${cpc != null ? 'md:grid-cols-4' : 'md:grid-cols-3'} gap-px bg-luxury-cream mb-12`}>
+        {/* Headline stats */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-luxury-cream mb-12">
           <div className="bg-white p-6">
             <p className="section-label text-luxury-taupe mb-2">Total Impressions</p>
             <p className="font-serif-display text-4xl font-light">{formatNumber(totalImpressions, true)}</p>
@@ -64,13 +64,6 @@ export default function DigitalAds({ report }: Props) {
             <p className="font-serif-display text-4xl font-light">{formatNumber(totalClicks, true)}</p>
             <p className="text-luxury-taupe text-xs mt-2">{overallCTR.toFixed(2)}% overall CTR</p>
           </div>
-          {cpc != null && (
-            <div className="bg-white p-6">
-              <p className="section-label text-luxury-taupe mb-2">Cost per Click</p>
-              <p className="font-serif-display text-4xl font-light">${cpc.toFixed(2)}</p>
-              <p className="text-luxury-taupe text-xs mt-2">Avg. across campaign</p>
-            </div>
-          )}
           {topChannel && (
             <div className="bg-luxury-black p-6">
               <p className="section-label text-luxury-gold mb-2">Top {topPublishers ? 'Publisher' : 'Channel'}</p>

@@ -60,7 +60,7 @@ export const BALTIC_REPORT: WeeklyReport = {
     saves: 0,
     inquiries: 0,
     showingRequests: 0,
-    openHouseAttendees: 9,
+    openHouseAttendees: 11,
     brokerInquiries: 0,
     buyerLeads: 0,
     socialReach: 0,
@@ -154,7 +154,7 @@ export const BALTIC_REPORT: WeeklyReport = {
         saves: 0,
         inquiries: 0,
         showingRequests: 0,
-        openHouseAttendees: 9,
+        openHouseAttendees: 11,
         brokerInquiries: 0,
         buyerLeads: 0,
         socialReach: 0,
@@ -219,13 +219,13 @@ export const BALTIC_REPORT: WeeklyReport = {
       date: '2026-05-28',
       startTime: '18:30',
       endTime: '20:30',
-      totalAttendees: 9,
-      brokers: 9,
+      totalAttendees: 11,
+      brokers: 11,
       buyers: 0,
       seriousInterestLevel: 4,
       commonFeedback: '',
       questionsAsked: '',
-      followUpActions: 'Broker Open House — 9 NYC brokers attended. Strong showing from the broker network.',
+      followUpActions: 'Broker Open House — 11 NYC brokers attended. Strong showing from the broker network.',
     },
   ],
 
@@ -355,7 +355,6 @@ export const BALTIC_REPORT: WeeklyReport = {
     reportingPeriod: 'May 29 – June 28, 2026',
     totalImpressions: 21943,
     totalClicks: 122,
-    cpc: 0.94,
     topChannel: { name: 'nytimes.com', ctr: 0.56 },
     byChannel: [], // Display campaign — no per-social-channel clicks; see topPublishers below
     topPublishers: [
@@ -395,7 +394,7 @@ export const BALTIC_REPORT: WeeklyReport = {
 
   strategy: {
     keyRecommendations: '',
-    marketingPlanNextWeek: '— Personal follow-up with all 9 brokers from the Thursday May 28 broker open house\n— New Instagram reel highlighting the broker-event turnout and terrace views\n— Continued posts across @maggie_leigh_marshall and @soldbycy\n— Weekly broker blast to NYC network\n— Continue location-based display campaign (NYT, Atlantic, NY Post, etc.) through June 28',
+    marketingPlanNextWeek: '— Personal follow-up with all 11 brokers from the Thursday May 28 broker open house\n— New Instagram reel highlighting the broker-event turnout and terrace views\n— Continued posts across @maggie_leigh_marshall and @soldbycy\n— Weekly broker blast to NYC network\n— Continue location-based display campaign (NYT, Atlantic, NY Post, etc.) through June 28',
     pricingStrategy: '',
     upcomingCampaigns: '',
     brokerEvents: '',
