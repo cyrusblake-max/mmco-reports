@@ -7,11 +7,21 @@ import SectionMast from './SectionMast'
 interface Props { report: WeeklyReport }
 
 function EventCard({ event }: { event: OpenHouseEvent }) {
+  const isBrokerEvent = event.brokers > 0 && event.buyers === 0
+  const tiles = isBrokerEvent
+    ? [{ icon: Users, label: 'Total Attendees', value: event.totalAttendees, accent: true }]
+    : [
+        { icon: Users,     label: 'Total',         value: event.totalAttendees, accent: true },
+        { icon: Users,     label: 'Represented',   value: event.buyers,         accent: false },
+        { icon: Briefcase, label: 'Unrepresented', value: event.brokers,        accent: false },
+      ]
   return (
     <div className="card-luxury p-6 md:p-8">
       <div className="flex items-start justify-between mb-6">
         <div>
-          <p className="section-label text-luxury-taupe mb-1">Open House</p>
+          <p className="section-label text-luxury-taupe mb-1">
+            {isBrokerEvent ? 'Broker Open House' : 'Open House'}
+          </p>
           <p className="font-serif-display text-2xl font-light">
             {formatDate(event.date, 'short')}
           </p>
@@ -21,13 +31,9 @@ function EventCard({ event }: { event: OpenHouseEvent }) {
         </div>
       </div>
 
-      {/* Attendee breakdown */}
-      <div className="grid grid-cols-3 gap-px bg-luxury-cream mb-6">
-        {[
-          { icon: Users,     label: 'Total',         value: event.totalAttendees, accent: true },
-          { icon: Users,     label: 'Represented',   value: event.buyers,         accent: false },
-          { icon: Briefcase, label: 'Unrepresented', value: event.brokers,        accent: false },
-        ].map(({ icon: Icon, label, value, accent }) => (
+      {/* Attendee breakdown — single tile for broker events, 3-up for public open houses */}
+      <div className={`grid ${isBrokerEvent ? 'grid-cols-1' : 'grid-cols-3'} gap-px bg-luxury-cream mb-6`}>
+        {tiles.map(({ icon: Icon, label, value, accent }) => (
           <div key={label} className={`p-4 text-center ${accent ? 'bg-luxury-black' : 'bg-white'}`}>
             <Icon className={`w-4 h-4 mx-auto mb-1.5 ${accent ? 'text-luxury-gold' : 'text-luxury-taupe'}`} strokeWidth={1.5} />
             <p className={`font-serif-display text-3xl font-light ${accent ? 'text-white' : ''}`}>{value}</p>
