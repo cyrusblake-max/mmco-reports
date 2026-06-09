@@ -6,6 +6,7 @@ import { saveReport } from '@/lib/store'
 import { v4 as uuidv4 } from 'uuid'
 import { Plus, Trash2, ChevronDown, ChevronUp, Save, Eye, Upload } from 'lucide-react'
 import { DEFAULT_INCLUDED_SECTIONS, SECTION_DISPLAY, type IncludedSections } from '@/lib/types'
+import ImageDrop from './ImageDrop'
 
 interface Props { initial: WeeklyReport }
 
@@ -277,55 +278,82 @@ export default function ReportForm({ initial }: Props) {
   const [lookupStatus, setLookupStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
   const [lookupMsg, setLookupMsg] = useState<string>('')
 
+  // Review modal — populated by runLookup, applied only when user confirms
+  interface LookupHit {
+    beds?: number; baths?: number; sqft?: number; price?: number
+    description?: string; mainImageUrl?: string; listingDate?: string
+    agentName?: string; agentTitle?: string; agentPhone?: string; agentEmail?: string; agentPhotoUrl?: string
+    source?: string; sourceUrl?: string
+  }
+  const [lookupPreview, setLookupPreview] = useState<LookupHit | null>(null)
+  const [lookupChecks,  setLookupChecks]  = useState<Record<string, boolean>>({})
+
   async function runLookup(params: { address?: string; url?: string }) {
     if (!params.address && !params.url) return
     setLookupStatus('loading')
     setLookupMsg(params.url ? 'Fetching listing page…' : 'Searching the web for listing details…')
     try {
-      // Always pass current address as context — lets the API normalise
-      // Compass insights URLs (just an ID) into a public listing URL.
       const ctx = [report.property.address, report.property.unit, report.property.city, report.property.state, report.property.zip]
         .filter(Boolean).join(' ')
       const qs = params.url
         ? `url=${encodeURIComponent(params.url)}&addressContext=${encodeURIComponent(ctx)}`
         : `address=${encodeURIComponent(params.address!)}`
       const res  = await fetch(`/api/lookup-property?${qs}`)
-      const data = await res.json()
+      const data: LookupHit & { error?: string } = await res.json()
       if (!res.ok) {
         setLookupStatus('error')
         setLookupMsg(data.error || 'Lookup failed')
         return
       }
-      const filled: string[] = []
-      setReport(r => {
-        const p = { ...r.property }
-        const a = { ...p.agent }
-        if (data.beds         && !p.beds)         { p.beds         = data.beds;         filled.push('beds') }
-        if (data.baths        && !p.baths)        { p.baths        = data.baths;        filled.push('baths') }
-        if (data.sqft         && !p.sqft)         { p.sqft         = data.sqft;         filled.push('sqft') }
-        if (data.price        && !p.price)        { p.price        = data.price;        filled.push('price') }
-        if (data.description  && !p.description)  { p.description  = data.description;  filled.push('description') }
-        if (data.mainImageUrl && !p.mainImageUrl) { p.mainImageUrl = data.mainImageUrl; filled.push('photo') }
-        // Listing date from the URL is authoritative — always overwrite for accurate DOM
-        if (data.listingDate)                     { p.listingDate  = data.listingDate;  filled.push('listing date') }
-        if (data.agentName    && !a.name)         { a.name         = data.agentName;    filled.push('agent name') }
-        if (data.agentTitle   && !a.title)        { a.title        = data.agentTitle;   filled.push('agent title') }
-        if (data.agentPhone   && !a.phone)        { a.phone        = data.agentPhone;   filled.push('agent phone') }
-        if (data.agentEmail   && !a.email)        { a.email        = data.agentEmail;   filled.push('agent email') }
-        if (data.agentPhotoUrl && !a.photoUrl)    { a.photoUrl     = data.agentPhotoUrl; filled.push('agent photo') }
-        p.agent = a
-        return { ...r, property: p }
+      // Show review modal — DON'T auto-apply. Default-check fields where ours is empty.
+      const p = report.property
+      const a = p.agent
+      setLookupPreview(data)
+      setLookupChecks({
+        beds:          !!data.beds         && !p.beds,
+        baths:         !!data.baths        && !p.baths,
+        sqft:          !!data.sqft         && !p.sqft,
+        price:         !!data.price        && !p.price,
+        description:   !!data.description  && !p.description,
+        mainImageUrl:  !!data.mainImageUrl && !p.mainImageUrl,
+        listingDate:   !!data.listingDate,                       // authoritative — always default ON
+        agentName:     !!data.agentName    && !a.name,
+        agentTitle:    !!data.agentTitle   && !a.title,
+        agentPhone:    !!data.agentPhone   && !a.phone,
+        agentEmail:    !!data.agentEmail   && !a.email,
+        agentPhotoUrl: !!data.agentPhotoUrl && !a.photoUrl,
       })
       setLookupStatus('success')
-      setLookupMsg(
-        filled.length
-          ? `Found ${filled.join(', ')} from ${data.source}`
-          : `Listing found on ${data.source} — fields already populated`
-      )
+      setLookupMsg(`Found data on ${data.source ?? 'web'} — review what to apply`)
     } catch (e) {
       setLookupStatus('error')
       setLookupMsg(e instanceof Error ? e.message : 'Network error')
     }
+  }
+
+  function applyLookupSelection() {
+    const data = lookupPreview
+    if (!data) return
+    setReport(r => {
+      const p = { ...r.property }
+      const a = { ...p.agent }
+      if (lookupChecks.beds         && data.beds)         p.beds         = data.beds
+      if (lookupChecks.baths        && data.baths)        p.baths        = data.baths
+      if (lookupChecks.sqft         && data.sqft)         p.sqft         = data.sqft
+      if (lookupChecks.price        && data.price)        p.price        = data.price
+      if (lookupChecks.description  && data.description)  p.description  = data.description
+      if (lookupChecks.mainImageUrl && data.mainImageUrl) p.mainImageUrl = data.mainImageUrl
+      if (lookupChecks.listingDate  && data.listingDate)  p.listingDate  = data.listingDate
+      if (lookupChecks.agentName    && data.agentName)    a.name         = data.agentName
+      if (lookupChecks.agentTitle   && data.agentTitle)   a.title        = data.agentTitle
+      if (lookupChecks.agentPhone   && data.agentPhone)   a.phone        = data.agentPhone
+      if (lookupChecks.agentEmail   && data.agentEmail)   a.email        = data.agentEmail
+      if (lookupChecks.agentPhotoUrl && data.agentPhotoUrl) a.photoUrl   = data.agentPhotoUrl
+      p.agent = a
+      return { ...r, property: p }
+    })
+    setLookupPreview(null)
+    setLookupMsg('Applied selected fields')
   }
 
   const lookupProperty = (address: string) => runLookup({ address })
@@ -595,11 +623,11 @@ export default function ReportForm({ initial }: Props) {
               <Field label="Phone"       name="phone"      value={report.property.agent.phone}      onChange={v => setAgent('phone', v)} type="tel" />
               <Field label="Email"       name="email"      value={report.property.agent.email}      onChange={v => setAgent('email', v)} type="email" />
               <div className="md:col-span-2">
-                <Field label="Agent Photo URL" name="photoUrl" value={report.property.agent.photoUrl ?? ''} onChange={v => setAgent('photoUrl', v)} placeholder="/headshot.jpg or https://..." />
-                {report.property.agent.photoUrl && (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={report.property.agent.photoUrl} alt="" className="mt-2 w-12 h-12 rounded-full object-cover border border-luxury-cream" />
-                )}
+                <ImageDrop
+                  label="Agent Headshot"
+                  value={report.property.agent.photoUrl ?? ''}
+                  onChange={v => setAgent('photoUrl', v)}
+                />
               </div>
             </div>
           </div>
@@ -643,7 +671,11 @@ export default function ReportForm({ initial }: Props) {
                       <Field label="Phone"     name={`co${i}phone`} value={co.phone}               onChange={v => setCoAgent(i, 'phone', v)} type="tel" />
                       <Field label="Email"     name={`co${i}email`} value={co.email}               onChange={v => setCoAgent(i, 'email', v)} type="email" />
                       <div className="md:col-span-2">
-                        <Field label="Headshot URL" name={`co${i}photo`} value={co.photoUrl ?? ''} onChange={v => setCoAgent(i, 'photoUrl', v)} placeholder="/headshot.jpg or https://..." />
+                        <ImageDrop
+                          label="Headshot"
+                          value={co.photoUrl ?? ''}
+                          onChange={v => setCoAgent(i, 'photoUrl', v)}
+                        />
                       </div>
                     </div>
                   </div>
@@ -1017,6 +1049,90 @@ export default function ReportForm({ initial }: Props) {
           Save & View Report
         </button>
       </div>
+
+      {/* === LOOKUP REVIEW MODAL — confirms scraped data before applying === */}
+      {lookupPreview && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-luxury-black/70" onClick={() => setLookupPreview(null)}>
+          <div className="bg-white border border-luxury-cream max-w-2xl w-full max-h-[85vh] overflow-auto" onClick={e => e.stopPropagation()}>
+            <div className="p-5 border-b border-luxury-cream flex items-start justify-between gap-4">
+              <div>
+                <p className="section-label text-luxury-gold">Review fetched data</p>
+                <p className="text-xs text-luxury-taupe mt-1">
+                  Found on <span className="font-medium">{lookupPreview.source || 'web'}</span>.
+                  Uncheck anything that looks wrong — only checked fields will apply.
+                </p>
+                {lookupPreview.sourceUrl && (
+                  <a href={lookupPreview.sourceUrl} target="_blank" rel="noopener noreferrer" className="text-xs text-luxury-gold hover:underline mt-1 inline-block break-all">
+                    {lookupPreview.sourceUrl}
+                  </a>
+                )}
+              </div>
+              <button type="button" onClick={() => setLookupPreview(null)} className="p-1 text-luxury-taupe hover:text-luxury-black">
+                <Trash2 className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="p-5 space-y-2">
+              {([
+                ['beds',          'Bedrooms',          lookupPreview.beds],
+                ['baths',         'Bathrooms',         lookupPreview.baths],
+                ['sqft',          'Square Feet',       lookupPreview.sqft?.toLocaleString()],
+                ['price',         'List Price',        lookupPreview.price ? `$${lookupPreview.price.toLocaleString()}` : undefined],
+                ['listingDate',   'Listing Date',      lookupPreview.listingDate],
+                ['description',   'Description',       lookupPreview.description ? lookupPreview.description.slice(0, 200) + (lookupPreview.description.length > 200 ? '…' : '') : undefined],
+                ['mainImageUrl',  'Cover Photo',       lookupPreview.mainImageUrl],
+                ['agentName',     'Agent Name',        lookupPreview.agentName],
+                ['agentTitle',    'Agent Title',       lookupPreview.agentTitle],
+                ['agentPhone',    'Agent Phone',       lookupPreview.agentPhone],
+                ['agentEmail',    'Agent Email',       lookupPreview.agentEmail],
+                ['agentPhotoUrl', 'Agent Photo',       lookupPreview.agentPhotoUrl],
+              ] as const).filter(([, , v]) => v != null && v !== '').map(([key, label, value]) => (
+                <label key={key} className={`flex items-start gap-3 p-3 border cursor-pointer transition-colors ${
+                  lookupChecks[key] ? 'border-luxury-gold/40 bg-luxury-gold/5' : 'border-luxury-cream hover:border-luxury-sand'
+                }`}>
+                  <input
+                    type="checkbox"
+                    checked={!!lookupChecks[key]}
+                    onChange={e => setLookupChecks(c => ({ ...c, [key]: e.target.checked }))}
+                    className="accent-luxury-gold mt-1 flex-shrink-0"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <p className="section-label text-luxury-taupe" style={{ fontSize: '0.58rem' }}>{label}</p>
+                    {key === 'mainImageUrl' || key === 'agentPhotoUrl' ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={String(value)} alt="" className="mt-1.5 max-h-24 max-w-full object-cover border border-luxury-cream" />
+                    ) : (
+                      <p className="text-sm break-words mt-0.5">{String(value)}</p>
+                    )}
+                  </div>
+                </label>
+              ))}
+              {Object.entries(lookupChecks).every(([k, v]) => !v) && (
+                <p className="text-xs text-luxury-taupe italic text-center py-4">No fields selected — click anything above to apply.</p>
+              )}
+            </div>
+
+            <div className="p-5 border-t border-luxury-cream flex items-center justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setLookupPreview(null)}
+                className="px-4 py-2 text-xs section-label text-luxury-taupe border border-luxury-cream hover:bg-luxury-off transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={applyLookupSelection}
+                disabled={Object.values(lookupChecks).every(v => !v)}
+                className="flex items-center gap-1.5 px-4 py-2 text-xs bg-luxury-black text-white hover:bg-luxury-dark disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                <Save className="w-3.5 h-3.5" />
+                Apply selected
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
