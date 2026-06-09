@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server'
 // Google Gemini Flash — free tier: 15 requests/min, 1500/day, 1M tokens/day.
 // Get a key at https://aistudio.google.com/app/apikey and set GOOGLE_AI_KEY
 // (locally in .env.local, in Vercel under Project Settings → Environment Variables).
-const MODEL = 'gemini-1.5-flash-latest'
+const MODEL = 'gemini-2.0-flash'
 
 interface SummarizeInput {
   property: { address: string; unit?: string; weekNumber: number; reportingPeriod: string }

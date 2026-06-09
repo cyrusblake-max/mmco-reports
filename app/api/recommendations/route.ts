@@ -13,7 +13,7 @@ import { NextRequest } from 'next/server'
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
-const MODEL = 'gemini-1.5-flash-latest'
+const MODEL = 'gemini-2.0-flash'
 
 interface IncomingPayload {
   property: {

@@ -12,7 +12,7 @@ export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 export const maxDuration = 60
 
-const MODEL = 'gemini-1.5-flash-latest'
+const MODEL = 'gemini-2.0-flash'
 
 // Supported by Gemini inline file uploads
 const SUPPORTED_TYPES = new Set([
