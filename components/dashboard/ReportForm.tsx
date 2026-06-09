@@ -1,5 +1,5 @@
 'use client'
-import { useState, useRef } from 'react'
+import { useCallback, useState, useRef } from 'react'
 import { useRouter }  from 'next/navigation'
 import { WeeklyReport, WeeklyMetrics, METRIC_LABELS, MARKETING_LABELS, MarketingType } from '@/lib/types'
 import { saveReport } from '@/lib/store'
@@ -7,8 +7,15 @@ import { v4 as uuidv4 } from 'uuid'
 import { Plus, Trash2, ChevronDown, ChevronUp, Save, Eye, Upload } from 'lucide-react'
 import { DEFAULT_INCLUDED_SECTIONS, SECTION_DISPLAY, type IncludedSections } from '@/lib/types'
 import ImageDrop from './ImageDrop'
+import GalleryDrop from './GalleryDrop'
 
-interface Props { initial: WeeklyReport }
+interface Props {
+  initial: WeeklyReport
+  /** Fires on every change — lets the parent show a live preview + dirty state. */
+  onChange?: (next: WeeklyReport) => void
+  /** Fires after a successful save. */
+  onSaved?: () => void
+}
 
 type Section = 'property' | 'metrics' | 'openhouses' | 'marketing' | 'social' | 'feedback' | 'market' | 'strategy'
 
@@ -271,10 +278,19 @@ function PhotoUpload({ value, onChange }: { value: string; onChange: (url: strin
   )
 }
 
-export default function ReportForm({ initial }: Props) {
+export default function ReportForm({ initial, onChange, onSaved }: Props) {
   const router = useRouter()
-  const [report, setReport] = useState<WeeklyReport>(initial)
+  const [report, setReportState] = useState<WeeklyReport>(initial)
   const [saving, setSaving] = useState(false)
+
+  // Wrap setReport so the parent gets every state change for live preview / dirty tracking
+  const setReport: typeof setReportState = useCallback((updater: React.SetStateAction<WeeklyReport>) => {
+    setReportState(prev => {
+      const next = typeof updater === 'function' ? (updater as (p: WeeklyReport) => WeeklyReport)(prev) : updater
+      onChange?.(next)
+      return next
+    })
+  }, [onChange])
   const [lookupStatus, setLookupStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
   const [lookupMsg, setLookupMsg] = useState<string>('')
 
@@ -468,6 +484,7 @@ export default function ReportForm({ initial }: Props) {
     setSaving(true)
     try {
       await saveReport(report)
+      onSaved?.()
     } catch (e) {
       alert(`Save failed: ${e instanceof Error ? e.message : 'unknown error'}`)
       setSaving(false)
@@ -607,6 +624,13 @@ export default function ReportForm({ initial }: Props) {
             <PhotoUpload
               value={report.property.mainImageUrl ?? ''}
               onChange={v => setProperty('mainImageUrl', v)}
+            />
+          </div>
+          <div className="md:col-span-2">
+            <GalleryDrop
+              label="Gallery Photos (shown on the cover under Selected Imagery)"
+              value={report.property.galleryImages ?? []}
+              onChange={v => setReport(r => ({ ...r, property: { ...r.property, galleryImages: v } }))}
             />
           </div>
           <div className="md:col-span-2">
