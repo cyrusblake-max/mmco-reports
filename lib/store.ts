@@ -16,7 +16,9 @@ import { v4 as uuidv4 } from 'uuid'
 
 const STORAGE_KEY = 'luxury_reports_v3'
 
-const SEEDS: WeeklyReport[] = [BALTIC_REPORT, MOCK_REPORT]
+// Only Baltic shows on the dashboard. MOCK_REPORT stays imported because
+// createBlankReport() uses its shape as a template for new properties.
+const SEEDS: WeeklyReport[] = [BALTIC_REPORT]
 const SEED_IDS = new Set(SEEDS.map(r => r.id))
 
 interface RemoteRow {
