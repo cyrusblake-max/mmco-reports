@@ -5,9 +5,6 @@ import { WeeklyReport, WeeklyMetrics, METRIC_LABELS, MARKETING_LABELS, Marketing
 import { saveReport } from '@/lib/store'
 import { v4 as uuidv4 } from 'uuid'
 import { Plus, Trash2, ChevronDown, ChevronUp, Save, Eye, Upload } from 'lucide-react'
-import CompassUpload from './CompassUpload'
-import AIImport, { type ExtractedPayload } from './AIImport'
-import type { ParsedCompassData } from '@/lib/compass-parser'
 import { DEFAULT_INCLUDED_SECTIONS, SECTION_DISPLAY, type IncludedSections } from '@/lib/types'
 
 interface Props { initial: WeeklyReport }
@@ -335,71 +332,40 @@ export default function ReportForm({ initial }: Props) {
   const lookupByUrl    = (url: string)     => runLookup({ url })
   const [listingUrlInput, setListingUrlInput] = useState('')
 
-  const [recStatus, setRecStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
-  const [recMsg,    setRecMsg]    = useState<string>('')
-
-  async function generateRecommendations() {
-    setRecStatus('loading')
-    setRecMsg('')
-    try {
-      const feedbackThemes = [
-        report.feedback?.commonObjections,
-        report.feedback?.pricingFeedback,
-        report.feedback?.brokerSentiment,
-      ].filter(Boolean).join(' | ')
-      const res = await fetch('/api/recommendations', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          property: {
-            address:      report.property.address,
-            unit:         report.property.unit,
-            neighborhood: report.property.neighborhood,
-            city:         report.property.city,
-            price:        report.property.price,
-            beds:         report.property.beds,
-            baths:        report.property.baths,
-            sqft:         report.property.sqft,
-            listingDate:  report.property.listingDate,
-            description:  report.property.description,
-          },
-          weekNumber: report.weekNumber,
-          currentMetrics:  report.currentMetrics,
-          previousMetrics: report.previousMetrics,
-          openHouseCount:  report.openHouses?.length ?? 0,
-          feedbackThemes,
-        }),
-      })
-      const data = await res.json()
-      if (!res.ok) {
-        setRecStatus('error')
-        setRecMsg(data.error || 'Failed to generate recommendations')
-        return
-      }
-      const filled: string[] = []
-      setReport(r => {
-        const s = { ...r.strategy }
-        if (data.keyRecommendations    && !s.keyRecommendations)    { s.keyRecommendations    = data.keyRecommendations;    filled.push('key recommendations') }
-        if (data.marketingPlanNextWeek && !s.marketingPlanNextWeek) { s.marketingPlanNextWeek = data.marketingPlanNextWeek; filled.push('marketing plan') }
-        if (data.pricingStrategy       && !s.pricingStrategy)       { s.pricingStrategy       = data.pricingStrategy;       filled.push('pricing strategy') }
-        if (data.upcomingCampaigns     && !s.upcomingCampaigns)     { s.upcomingCampaigns     = data.upcomingCampaigns;     filled.push('campaigns') }
-        if (data.brokerEvents          && !s.brokerEvents)          { s.brokerEvents          = data.brokerEvents;          filled.push('broker events') }
-        if (data.openHousesPlanned     && !s.openHousesPlanned)     { s.openHousesPlanned     = data.openHousesPlanned;     filled.push('open houses') }
-        return { ...r, strategy: s }
-      })
-      setRecStatus('success')
-      setRecMsg(filled.length ? `Filled ${filled.join(', ')}` : 'All sections already filled — recommendations not overwritten')
-    } catch (e) {
-      setRecStatus('error')
-      setRecMsg(e instanceof Error ? e.message : 'Network error')
-    }
-  }
-
   function setProperty(key: string, value: string | number) {
     setReport(r => ({ ...r, property: { ...r.property, [key]: value } }))
   }
   function setAgent(key: string, value: string) {
     setReport(r => ({ ...r, property: { ...r.property, agent: { ...r.property.agent, [key]: value } } }))
+  }
+  function setCoAgent(i: number, key: string, value: string) {
+    setReport(r => {
+      const arr = [...(r.property.coAgents ?? [])]
+      arr[i] = { ...arr[i], [key]: value }
+      return { ...r, property: { ...r.property, coAgents: arr } }
+    })
+  }
+  function addCoAgent() {
+    setReport(r => ({
+      ...r,
+      property: {
+        ...r.property,
+        coAgents: [...(r.property.coAgents ?? []), {
+          name: '', title: 'Licensed Real Estate Salesperson',
+          team: r.property.agent.team, brokerage: r.property.agent.brokerage,
+          phone: '', email: '', photoUrl: '', logoUrl: r.property.agent.logoUrl,
+        }],
+      },
+    }))
+  }
+  function removeCoAgent(i: number) {
+    setReport(r => ({
+      ...r,
+      property: {
+        ...r.property,
+        coAgents: (r.property.coAgents ?? []).filter((_, idx) => idx !== i),
+      },
+    }))
   }
   function setMetric(key: keyof WeeklyMetrics, value: string) {
     const num = parseInt(value) || 0
@@ -491,189 +457,8 @@ export default function ReportForm({ initial }: Props) {
   const igIdx = report.socialMedia?.findIndex(s => s.platform === 'instagram') ?? -1
   const ttIdx = report.socialMedia?.findIndex(s => s.platform === 'tiktok') ?? -1
 
-  function handleCompassApply(data: ParsedCompassData) {
-    setReport(r => ({
-      ...r,
-      property: {
-        ...r.property,
-        ...(data.address && { address: data.address }),
-        ...(data.price   && { price:   data.price }),
-      },
-      currentMetrics: { ...r.currentMetrics, ...data.metrics },
-    }))
-    // Prefer URL-based lookup (most reliable); fall back to address search
-    if (data.listingUrl)      lookupByUrl(data.listingUrl)
-    else if (data.address)    lookupProperty(data.address)
-  }
-
-  /**
-   * Merge an AI-extracted payload into the report. Tries to be smart about routing:
-   * - web metrics → currentMetrics
-   * - ad numbers → digitalAds (replacing reportingPeriod if new one provided)
-   * - social traffic share → digitalAds.socialTrafficShare
-   * - open-house attendance → updates last openHouse OR appends new one
-   * - instagram stats → socialMedia[]
-   *
-   * Existing non-zero / non-empty values are preserved.
-   */
-  function handleAIExtract(payload: ExtractedPayload) {
-    const e = payload.extracted as Record<string, unknown>
-    const num = (k: string): number | undefined => {
-      const v = e[k]
-      return typeof v === 'number' && Number.isFinite(v) ? v : undefined
-    }
-    const str = (k: string): string | undefined => {
-      const v = e[k]
-      return typeof v === 'string' && v.trim() ? v.trim() : undefined
-    }
-    const arr = <T,>(k: string): T[] | undefined => {
-      const v = e[k]
-      return Array.isArray(v) && v.length ? (v as T[]) : undefined
-    }
-    const obj = (k: string): Record<string, unknown> | undefined => {
-      const v = e[k]
-      return v && typeof v === 'object' && !Array.isArray(v) ? (v as Record<string, unknown>) : undefined
-    }
-
-    setReport(r => {
-      const next = { ...r }
-
-      // --- Currentweekly metrics (only fill where existing value is 0/empty) ---
-      const metricUpdates: Record<string, number> = {}
-      const tryFill = (key: keyof typeof r.currentMetrics, val: number | undefined) => {
-        if (val == null) return
-        if ((r.currentMetrics[key] ?? 0) === 0) metricUpdates[key] = val
-      }
-      tryFill('totalViews',          num('totalViews'))
-      tryFill('compassViews',        num('compassViews'))
-      tryFill('streetEasyViews',     num('streetEasyViews'))
-      tryFill('zillowViews',         num('zillowViews'))
-      tryFill('saves',               num('saves'))
-      tryFill('inquiries',           num('inquiries'))
-      tryFill('showingRequests',     num('showingRequests'))
-      tryFill('openHouseAttendees',  num('openHouseAttendees'))
-      if (Object.keys(metricUpdates).length) {
-        next.currentMetrics = { ...r.currentMetrics, ...metricUpdates }
-      }
-
-      // --- Digital ads merge ---
-      const existingAds = r.digitalAds
-      const adsUpdates: Partial<NonNullable<typeof r.digitalAds>> = {}
-      const period = str('reportingPeriod')
-      if (period && !existingAds?.reportingPeriod)               adsUpdates.reportingPeriod = period
-      if (num('totalImpressions') && !existingAds?.totalImpressions) adsUpdates.totalImpressions = num('totalImpressions')!
-      if (num('totalClicks')      && !existingAds?.totalClicks)      adsUpdates.totalClicks      = num('totalClicks')!
-      const tc = obj('topChannel')
-      if (tc && !existingAds?.topChannel) {
-        const name = typeof tc.name === 'string' ? tc.name : ''
-        const ctr  = typeof tc.ctr  === 'number' ? tc.ctr  : 0
-        if (name) adsUpdates.topChannel = { name, ctr }
-      }
-      const byCh = arr<{ channel?: string; clicks?: number; ctr?: number }>('byChannel')
-      if (byCh && (!existingAds?.byChannel || existingAds.byChannel.length === 0)) {
-        adsUpdates.byChannel = byCh
-          .filter(c => c.channel && typeof c.clicks === 'number')
-          .map(c => ({ channel: String(c.channel), clicks: Number(c.clicks), ctr: Number(c.ctr ?? 0) }))
-      }
-      const sts = arr<{ channel?: string; share?: number }>('socialTrafficShare')
-      if (sts && (!existingAds?.socialTrafficShare || existingAds.socialTrafficShare.length === 0)) {
-        adsUpdates.socialTrafficShare = sts
-          .filter(s => s.channel && typeof s.share === 'number')
-          .map(s => ({ channel: String(s.channel), share: Number(s.share) }))
-      }
-      const pubs = arr<{ publisher?: string; views?: number }>('topPublishers')
-      if (pubs && (!existingAds?.topPublishers || existingAds.topPublishers.length === 0)) {
-        adsUpdates.topPublishers = pubs
-          .filter(p => p.publisher && typeof p.views === 'number')
-          .map(p => ({ publisher: String(p.publisher), views: Number(p.views) }))
-      }
-      if (Object.keys(adsUpdates).length) {
-        next.digitalAds = {
-          reportingPeriod:     '',
-          totalImpressions:    0,
-          totalClicks:         0,
-          byChannel:           [],
-          socialTrafficPeriod: '',
-          socialTrafficShare:  [],
-          ...existingAds,
-          ...adsUpdates,
-        }
-      }
-
-      // --- Open house attendance ---
-      const ohDate     = str('openHouseDate')
-      const ohAttendees = num('openHouseAttendees')
-      const ohBrokers   = num('openHouseBrokers')
-      const ohBuyers    = num('openHouseBuyers')
-      if (ohDate && (ohAttendees != null || ohBrokers != null || ohBuyers != null)) {
-        const existing = (r.openHouses ?? []).find(o => o.date === ohDate)
-        if (existing) {
-          next.openHouses = (r.openHouses ?? []).map(o => o.date === ohDate ? {
-            ...o,
-            totalAttendees: ohAttendees ?? o.totalAttendees,
-            brokers:        ohBrokers   ?? o.brokers,
-            buyers:         ohBuyers    ?? o.buyers,
-          } : o)
-        } else {
-          next.openHouses = [...(r.openHouses ?? []), {
-            id: `oh-ai-${Date.now()}`,
-            date: ohDate,
-            startTime: '12:00',
-            endTime: '13:30',
-            totalAttendees: ohAttendees ?? 0,
-            brokers: ohBrokers ?? 0,
-            buyers:  ohBuyers  ?? 0,
-            seriousInterestLevel: 3,
-            commonFeedback: '',
-            questionsAsked: '',
-            followUpActions: '',
-          }]
-        }
-      }
-
-      // --- Instagram social media stats ---
-      const igMetrics = {
-        reelViews: num('instagramReelViews'),
-        likes:     num('instagramLikes'),
-        comments:  num('instagramComments'),
-        shares:    num('instagramShares'),
-        saves:     num('instagramSaves'),
-      }
-      if (Object.values(igMetrics).some(v => v != null)) {
-        const idx = (r.socialMedia ?? []).findIndex(s => s.platform === 'instagram')
-        const base = idx >= 0 ? r.socialMedia[idx] : {
-          platform: 'instagram' as const,
-          reelViews: 0, likes: 0, comments: 0, shares: 0, saves: 0,
-          engagementRate: 0, followerGrowth: 0,
-        }
-        const merged = {
-          ...base,
-          reelViews: base.reelViews || igMetrics.reelViews || 0,
-          likes:     base.likes     || igMetrics.likes     || 0,
-          comments:  base.comments  || igMetrics.comments  || 0,
-          shares:    base.shares    || igMetrics.shares    || 0,
-          saves:     base.saves     || igMetrics.saves     || 0,
-        }
-        const arr2 = [...(r.socialMedia ?? [])]
-        if (idx >= 0) arr2[idx] = merged
-        else arr2.push(merged)
-        next.socialMedia = arr2
-      }
-
-      return next
-    })
-  }
-
   return (
     <div className="space-y-2">
-
-      {/* === AI DROP ZONE — any screenshot/PDF, auto-extract === */}
-      <AIImport onApply={handleAIExtract} />
-
-      {/* === COMPASS IMPORT (legacy parser for the specific Compass HTML/JSON shape) === */}
-      <div className="mb-6">
-        <CompassUpload onApply={handleCompassApply} />
-      </div>
 
       {/* === SECTIONS TO INCLUDE === */}
       <div className="border border-luxury-cream bg-white p-6 mb-6">
@@ -801,7 +586,7 @@ export default function ReportForm({ initial }: Props) {
           </div>
 
           <div className="md:col-span-2 pt-4 border-t border-luxury-cream">
-            <p className="section-label text-luxury-taupe mb-4">Agent Information</p>
+            <p className="section-label text-luxury-taupe mb-4">Primary Agent</p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Field label="Agent Name"  name="agentName"  value={report.property.agent.name}       onChange={v => setAgent('name', v)} />
               <Field label="Title"       name="agentTitle" value={report.property.agent.title}      onChange={v => setAgent('title', v)} />
@@ -809,8 +594,62 @@ export default function ReportForm({ initial }: Props) {
               <Field label="Brokerage"   name="brokerage"  value={report.property.agent.brokerage}  onChange={v => setAgent('brokerage', v)} />
               <Field label="Phone"       name="phone"      value={report.property.agent.phone}      onChange={v => setAgent('phone', v)} type="tel" />
               <Field label="Email"       name="email"      value={report.property.agent.email}      onChange={v => setAgent('email', v)} type="email" />
-              <Field label="Agent Photo URL" name="photoUrl" value={report.property.agent.photoUrl ?? ''} onChange={v => setAgent('photoUrl', v)} placeholder="https://..." />
+              <div className="md:col-span-2">
+                <Field label="Agent Photo URL" name="photoUrl" value={report.property.agent.photoUrl ?? ''} onChange={v => setAgent('photoUrl', v)} placeholder="/headshot.jpg or https://..." />
+                {report.property.agent.photoUrl && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={report.property.agent.photoUrl} alt="" className="mt-2 w-12 h-12 rounded-full object-cover border border-luxury-cream" />
+                )}
+              </div>
             </div>
+          </div>
+
+          <div className="md:col-span-2 pt-4 border-t border-luxury-cream">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <p className="section-label text-luxury-taupe">Co-Agents</p>
+                <p className="text-xs text-luxury-taupe/70 mt-1">Co-listing agents shown alongside the primary on the cover.</p>
+              </div>
+              <button type="button" onClick={addCoAgent} className="flex items-center gap-1.5 px-3 py-1.5 text-xs section-label text-luxury-gold hover:text-luxury-sand border border-luxury-cream hover:border-luxury-sand transition-colors">
+                <Plus className="w-3.5 h-3.5" /> Add co-agent
+              </button>
+            </div>
+
+            {(report.property.coAgents ?? []).length === 0 ? (
+              <p className="text-xs text-luxury-taupe/70 italic">No co-agents on this listing yet.</p>
+            ) : (
+              <div className="space-y-5">
+                {(report.property.coAgents ?? []).map((co, i) => (
+                  <div key={i} className="bg-luxury-off border border-luxury-cream p-4">
+                    <div className="flex items-center justify-between mb-3 gap-3">
+                      <div className="flex items-center gap-3 min-w-0">
+                        {co.photoUrl ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src={co.photoUrl} alt="" className="w-10 h-10 rounded-full object-cover border border-luxury-cream flex-shrink-0" />
+                        ) : (
+                          <div className="w-10 h-10 rounded-full bg-luxury-cream flex items-center justify-center text-luxury-taupe text-xs flex-shrink-0">{i + 2}</div>
+                        )}
+                        <p className="section-label text-luxury-gold truncate">{co.name || `Co-Agent ${i + 2}`}</p>
+                      </div>
+                      <button type="button" onClick={() => removeCoAgent(i)} className="text-luxury-taupe hover:text-danger p-1 flex-shrink-0" title="Remove">
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      <Field label="Name"      name={`co${i}name`}  value={co.name}                onChange={v => setCoAgent(i, 'name', v)} />
+                      <Field label="Title"     name={`co${i}title`} value={co.title}               onChange={v => setCoAgent(i, 'title', v)} />
+                      <Field label="Team"      name={`co${i}team`}  value={co.team}                onChange={v => setCoAgent(i, 'team', v)} />
+                      <Field label="Brokerage" name={`co${i}bk`}    value={co.brokerage}           onChange={v => setCoAgent(i, 'brokerage', v)} />
+                      <Field label="Phone"     name={`co${i}phone`} value={co.phone}               onChange={v => setCoAgent(i, 'phone', v)} type="tel" />
+                      <Field label="Email"     name={`co${i}email`} value={co.email}               onChange={v => setCoAgent(i, 'email', v)} type="email" />
+                      <div className="md:col-span-2">
+                        <Field label="Headshot URL" name={`co${i}photo`} value={co.photoUrl ?? ''} onChange={v => setCoAgent(i, 'photoUrl', v)} placeholder="/headshot.jpg or https://..." />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="md:col-span-2 pt-4 border-t border-luxury-cream">
@@ -1148,32 +987,6 @@ export default function ReportForm({ initial }: Props) {
       {/* === STRATEGY === */}
       <SectionPanel title="Agent Strategy & Next Steps" num="08">
         <div className="mt-4 space-y-4">
-          <div className="flex items-start justify-between gap-4 bg-luxury-off border border-luxury-cream p-4">
-            <div>
-              <p className="font-medium text-sm">AI Recommendations</p>
-              <p className="text-xs text-luxury-taupe mt-0.5">
-                Generate next-step recommendations from this week's metrics. Only empty fields are filled — your existing notes are preserved.
-              </p>
-            </div>
-            <button
-              type="button"
-              onClick={generateRecommendations}
-              disabled={recStatus === 'loading'}
-              className="h-[38px] px-4 bg-luxury-gold text-luxury-black text-xs whitespace-nowrap hover:bg-luxury-gold/80 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-1.5 flex-shrink-0"
-            >
-              {recStatus === 'loading' ? (
-                <>
-                  <span className="inline-block w-3 h-3 border-2 border-luxury-black/30 border-t-luxury-black rounded-full animate-spin" />
-                  Generating…
-                </>
-              ) : (
-                <>Generate with AI</>
-              )}
-            </button>
-          </div>
-          {recMsg && (
-            <p className={`text-xs ${recStatus === 'error' ? 'text-danger' : 'text-luxury-taupe'}`}>{recMsg}</p>
-          )}
           <Field label="Key Recommendations (one per line)"      name="rec"      value={report.strategy?.keyRecommendations ?? ''}   rows={4} onChange={v => setStrategy('keyRecommendations', v)} />
           <Field label="Marketing Plan — Next Week (one per line)" name="mktplan" value={report.strategy?.marketingPlanNextWeek ?? ''} rows={4} onChange={v => setStrategy('marketingPlanNextWeek', v)} />
           <Field label="Pricing Strategy"                         name="pricing"  value={report.strategy?.pricingStrategy ?? ''}      rows={3} onChange={v => setStrategy('pricingStrategy', v)} />
