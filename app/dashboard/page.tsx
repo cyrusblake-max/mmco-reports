@@ -11,10 +11,12 @@ export default function DashboardPage() {
   const router = useRouter()
   const [reports, setReports] = useState<WeeklyReport[]>([])
   const [search, setSearch] = useState('')
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    setReports(getReports())
+    getReports().then(rs => { setReports(rs); setLoading(false) })
   }, [])
+  const refresh = () => getReports().then(setReports)
 
   // Group reports by property (most-recent week first within each group)
   const groups = useMemo(() => {
@@ -38,23 +40,23 @@ export default function DashboardPage() {
       .sort((a, b) => (b[0].reportDate ?? '').localeCompare(a[0].reportDate ?? ''))
   }, [reports, search])
 
-  function handleNew() {
-    const r = createBlankReport()
+  async function handleNew() {
+    const r = await createBlankReport()
     router.push(`/dashboard/edit/${r.id}`)
   }
 
-  function handleDuplicate(id: string) {
-    const r = duplicateReport(id)
+  async function handleDuplicate(id: string) {
+    const r = await duplicateReport(id)
     if (r) {
-      setReports(getReports())
+      await refresh()
       router.push(`/dashboard/edit/${r.id}`)
     }
   }
 
-  function handleDelete(id: string) {
+  async function handleDelete(id: string) {
     if (!confirm('Delete this report? This cannot be undone.')) return
-    deleteReport(id)
-    setReports(getReports())
+    await deleteReport(id)
+    await refresh()
   }
 
   return (

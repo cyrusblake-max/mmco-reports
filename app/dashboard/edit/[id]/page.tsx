@@ -14,10 +14,14 @@ export default function EditReportPage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const r = getReport(id)
-    if (!r) { router.push('/dashboard'); return }
-    setReport(r)
-    setLoading(false)
+    let cancelled = false
+    getReport(id).then(r => {
+      if (cancelled) return
+      if (!r) { router.push('/dashboard'); return }
+      setReport(r)
+      setLoading(false)
+    }).catch(() => { if (!cancelled) router.push('/dashboard') })
+    return () => { cancelled = true }
   }, [id, router])
 
   if (loading || !report) {

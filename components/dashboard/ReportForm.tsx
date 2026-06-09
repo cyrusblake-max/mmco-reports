@@ -472,7 +472,13 @@ export default function ReportForm({ initial }: Props) {
 
   async function handleSave(andView = false) {
     setSaving(true)
-    saveReport(report)
+    try {
+      await saveReport(report)
+    } catch (e) {
+      alert(`Save failed: ${e instanceof Error ? e.message : 'unknown error'}`)
+      setSaving(false)
+      return
+    }
     if (andView) {
       router.push(`/report/${report.id}`)
     } else {

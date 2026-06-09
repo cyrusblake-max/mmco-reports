@@ -1,58 +1,121 @@
-'use client'
+/**
+ * Report store.
+ *
+ *  • Seed reports (Baltic, Mock) ALWAYS come from the source file.
+ *    Updates to the fixture land for everyone on the next deploy.
+ *  • User-created reports go to Supabase if configured (multi-device sync).
+ *  • If Supabase env vars are missing, falls back to localStorage so dev
+ *    still works.
+ */
+
 import { WeeklyReport } from './types'
 import { MOCK_REPORT } from './mock-data'
 import { BALTIC_REPORT } from './baltic-report'
+import { sb, supabaseConfigured } from './supabase'
 import { v4 as uuidv4 } from 'uuid'
 
-const STORAGE_KEY = 'luxury_reports_v2'
+const STORAGE_KEY = 'luxury_reports_v3'
 
-function seed(): WeeklyReport[] {
-  return [BALTIC_REPORT, MOCK_REPORT]
+const SEEDS: WeeklyReport[] = [BALTIC_REPORT, MOCK_REPORT]
+const SEED_IDS = new Set(SEEDS.map(r => r.id))
+
+interface RemoteRow {
+  id: string
+  data: WeeklyReport
+  updated_at?: string
 }
 
-export function getReports(): WeeklyReport[] {
-  if (typeof window === 'undefined') return seed()
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    if (!raw) {
-      const initial = seed()
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(initial))
-      return initial
+// -- localStorage fallback ------------------------------------------------
+function lsLoad(): WeeklyReport[] {
+  if (typeof window === 'undefined') return []
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) ?? '[]') }
+  catch { return [] }
+}
+function lsSave(arr: WeeklyReport[]) {
+  if (typeof window === 'undefined') return
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(arr))
+}
+
+// -- Public API -----------------------------------------------------------
+export async function getReports(): Promise<WeeklyReport[]> {
+  let userReports: WeeklyReport[] = []
+  if (supabaseConfigured) {
+    try {
+      const rows = await sb<RemoteRow[]>('/reports?select=id,data,updated_at&order=updated_at.desc')
+      userReports = rows.map(r => r.data)
+    } catch (e) {
+      console.warn('[store] Supabase read failed, falling back to localStorage:', e)
+      userReports = lsLoad()
     }
-    return JSON.parse(raw) as WeeklyReport[]
-  } catch {
-    return seed()
-  }
-}
-
-export function getReport(id: string): WeeklyReport | null {
-  // Seed reports (Baltic, Mock) always come from source — so edits to the
-  // fixture file land for everyone instead of being shadowed by stale localStorage.
-  const seedMatch = seed().find(r => r.id === id)
-  if (seedMatch) return seedMatch
-  return getReports().find(r => r.id === id) ?? null
-}
-
-export function saveReport(report: WeeklyReport): void {
-  if (typeof window === 'undefined') return
-  const reports = getReports()
-  const idx = reports.findIndex(r => r.id === report.id)
-  if (idx >= 0) {
-    reports[idx] = report
   } else {
-    reports.unshift(report)
+    userReports = lsLoad()
   }
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(reports))
+  // Seeds always win — drop any DB copy with the same id
+  const filtered = userReports.filter(r => !SEED_IDS.has(r.id))
+  return [...SEEDS, ...filtered]
 }
 
-export function deleteReport(id: string): void {
-  if (typeof window === 'undefined') return
-  const reports = getReports().filter(r => r.id !== id)
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(reports))
+export async function getReport(id: string): Promise<WeeklyReport | null> {
+  // Seed reports always come from source — code change = everyone sees it
+  const seed = SEEDS.find(r => r.id === id)
+  if (seed) return seed
+
+  if (supabaseConfigured) {
+    try {
+      const rows = await sb<RemoteRow[]>(`/reports?id=eq.${encodeURIComponent(id)}&select=data&limit=1`)
+      return rows[0]?.data ?? null
+    } catch (e) {
+      console.warn('[store] Supabase fetch failed:', e)
+      return lsLoad().find(r => r.id === id) ?? null
+    }
+  }
+  return lsLoad().find(r => r.id === id) ?? null
 }
 
-export function duplicateReport(id: string): WeeklyReport | null {
-  const original = getReport(id)
+export async function saveReport(report: WeeklyReport): Promise<void> {
+  // Block writes to seed ids — those are source-of-truth in code
+  if (SEED_IDS.has(report.id)) {
+    console.warn('[store] refusing to overwrite seed report', report.id, '— edit the fixture file instead')
+    return
+  }
+
+  if (supabaseConfigured) {
+    try {
+      await sb(`/reports?on_conflict=id`, {
+        method: 'POST',
+        headers: { Prefer: 'resolution=merge-duplicates,return=minimal' },
+        body: JSON.stringify({
+          id: report.id,
+          data: report,
+          updated_at: new Date().toISOString(),
+        }),
+      })
+      return
+    } catch (e) {
+      console.warn('[store] Supabase write failed, falling back to localStorage:', e)
+    }
+  }
+
+  const arr = lsLoad()
+  const i = arr.findIndex(r => r.id === report.id)
+  if (i >= 0) arr[i] = report
+  else arr.unshift(report)
+  lsSave(arr)
+}
+
+export async function deleteReport(id: string): Promise<void> {
+  if (SEED_IDS.has(id)) return
+  if (supabaseConfigured) {
+    try {
+      await sb(`/reports?id=eq.${encodeURIComponent(id)}`, { method: 'DELETE' })
+    } catch (e) { console.warn('[store] Supabase delete failed:', e) }
+  }
+  // Always remove from local fallback too
+  lsSave(lsLoad().filter(r => r.id !== id))
+}
+
+export async function duplicateReport(id: string): Promise<WeeklyReport | null> {
+  const original = await getReport(id)
   if (!original) return null
   const newReport: WeeklyReport = {
     ...original,
@@ -62,11 +125,11 @@ export function duplicateReport(id: string): WeeklyReport | null {
     previousMetrics: original.currentMetrics,
     metricsHistory: [...original.metricsHistory],
   }
-  saveReport(newReport)
+  await saveReport(newReport)
   return newReport
 }
 
-export function createBlankReport(): WeeklyReport {
+export async function createBlankReport(): Promise<WeeklyReport> {
   const today = new Date().toISOString().split('T')[0]
   const blank: WeeklyReport = {
     ...MOCK_REPORT,
@@ -114,6 +177,6 @@ export function createBlankReport(): WeeklyReport {
     strategy: { keyRecommendations: '', marketingPlanNextWeek: '', pricingStrategy: '', upcomingCampaigns: '', brokerEvents: '', openHousesPlanned: '' },
     marketActivity: { newListings: [], priceReductions: [], underContract: [], recentSales: [], neighborhoodTrends: '' },
   }
-  saveReport(blank)
+  await saveReport(blank)
   return blank
 }

@@ -13,19 +13,18 @@ export default function ReportPage() {
   const [state, setState] = useState<'loading' | 'ready' | 'missing'>('loading')
 
   useEffect(() => {
-    const r = getReport(id)
-    if (!r) {
-      // Don't auto-redirect — a recipient of a share link may not have access to /dashboard.
-      // Show a friendly "not found" instead so the URL is still safe to share.
-      setState('missing')
-      return
-    }
-    setReport(r)
-    setState('ready')
+    let cancelled = false
+    getReport(id).then(r => {
+      if (cancelled) return
+      if (!r) { setState('missing'); return }
+      setReport(r)
+      setState('ready')
+    }).catch(() => { if (!cancelled) setState('missing') })
+    return () => { cancelled = true }
   }, [id])
 
-  function handleDuplicate() {
-    const r = duplicateReport(id)
+  async function handleDuplicate() {
+    const r = await duplicateReport(id)
     if (r) router.push(`/dashboard/edit/${r.id}`)
   }
 
