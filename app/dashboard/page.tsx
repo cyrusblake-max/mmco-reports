@@ -55,41 +55,45 @@ export default function DashboardPage() {
 
   async function handleDelete(id: string) {
     if (!confirm('Delete this report? This cannot be undone.')) return
-    await deleteReport(id)
-    await refresh()
+    try {
+      await deleteReport(id)
+      await refresh()
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : 'Delete failed'
+      alert(`Couldn\u2019t delete: ${msg}`)
+    }
   }
 
   return (
     <div className="min-h-screen bg-luxury-off">
       {/* Top header */}
-      <header className="bg-luxury-black text-white px-8 py-6">
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div>
-              <p className="section-label text-luxury-gold mb-1">MM<span style={{letterSpacing:'-0.02em'}}>&</span>co · Compass</p>
-              <h1 className="font-serif-display text-3xl font-light">Seller Report System</h1>
-            </div>
+      <header className="bg-luxury-black text-white px-4 sm:px-6 md:px-8 py-4 sm:py-6">
+        <div className="max-w-6xl mx-auto flex items-center justify-between gap-3 flex-wrap">
+          <div className="min-w-0">
+            <p className="section-label text-luxury-gold mb-0.5 sm:mb-1">MM<span style={{letterSpacing:'-0.02em'}}>&</span>co · Compass</p>
+            <h1 className="font-serif-display text-xl sm:text-2xl md:text-3xl font-light truncate">Seller Report System</h1>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-shrink-0">
             <Link
               href="/dashboard/assets"
-              className="flex items-center gap-2 px-4 py-2.5 border border-white/20 text-white text-sm hover:bg-white/10 transition-colors"
+              className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 border border-white/20 text-white text-xs sm:text-sm hover:bg-white/10 transition-colors"
             >
               <ImageIcon className="w-4 h-4" />
-              Assets
+              <span className="hidden xs:inline sm:inline">Assets</span>
             </Link>
             <button
               onClick={handleNew}
-              className="flex items-center gap-2 px-4 py-2.5 bg-luxury-gold text-luxury-black text-sm font-medium hover:bg-luxury-sand transition-colors"
+              className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 bg-luxury-gold text-luxury-black text-xs sm:text-sm font-medium hover:bg-luxury-sand transition-colors"
             >
               <Plus className="w-4 h-4" />
-              New Report
+              <span className="hidden xs:inline sm:inline">New Report</span>
+              <span className="xs:hidden sm:hidden">New</span>
             </button>
           </div>
         </div>
       </header>
 
-      <main className="max-w-6xl mx-auto px-8 py-12">
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 md:px-8 py-6 sm:py-10 md:py-12">
         {reports.length === 0 ? (
           <div className="text-center py-24">
             <FileText className="w-12 h-12 text-luxury-cream mx-auto mb-4" />
@@ -158,58 +162,58 @@ function PropertyGroup({
 
   return (
     <div className="bg-white border border-luxury-cream hover:border-luxury-sand transition-colors">
-      {/* Latest week — full row */}
-      <div className="flex items-center gap-6 p-5">
-        <div className="w-20 h-16 flex-shrink-0 overflow-hidden bg-luxury-beige">
-          {latest.property.mainImageUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={latest.property.mainImageUrl} alt="" className="w-full h-full object-cover" />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center">
-              <FileText className="w-5 h-5 text-luxury-cream" />
-            </div>
-          )}
-        </div>
+      {/* Latest week — wraps cleanly on mobile */}
+      <div className="p-4 sm:p-5">
+        <div className="flex items-start gap-3 sm:gap-5">
+          <div className="w-14 h-14 sm:w-20 sm:h-16 flex-shrink-0 overflow-hidden bg-luxury-beige">
+            {latest.property.mainImageUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={latest.property.mainImageUrl} alt="" className="w-full h-full object-cover" />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center">
+                <FileText className="w-5 h-5 text-luxury-cream" />
+              </div>
+            )}
+          </div>
 
-        <div className="flex-1 min-w-0">
-          <div className="flex items-start gap-4 flex-wrap">
-            <div className="min-w-0">
-              <p className="font-medium text-sm truncate">
-                {latest.property.address}{latest.property.unit ? `, ${latest.property.unit}` : ''}
-              </p>
-              <p className="text-luxury-taupe text-xs mt-0.5 truncate">
-                {latest.property.neighborhood} · {formatCurrency(latest.property.price)}
-              </p>
-            </div>
-            <div className="flex items-center gap-3 flex-wrap">
-              <span className="section-label text-luxury-gold border border-luxury-gold/30 px-2 py-0.5">
+          <div className="flex-1 min-w-0">
+            <p className="font-medium text-sm leading-tight">
+              {latest.property.address}{latest.property.unit ? `, ${latest.property.unit}` : ''}
+            </p>
+            <p className="text-luxury-taupe text-xs mt-0.5">
+              {latest.property.neighborhood} · {formatCurrency(latest.property.price)}
+            </p>
+            <div className="flex items-center gap-2 sm:gap-3 mt-2 flex-wrap">
+              <span className="section-label text-luxury-gold border border-luxury-gold/30 px-1.5 py-0.5" style={{ fontSize: '0.55rem' }}>
                 Week {latest.weekNumber} — latest
               </span>
               <span className="text-luxury-taupe text-xs">{formatDate(latest.reportDate, 'short')}</span>
               <span className="text-luxury-taupe text-xs">{dom} DOM</span>
             </div>
           </div>
-
-          <div className="flex items-center gap-5 mt-3 flex-wrap">
-            {[
-              { label: 'Views',     value: latest.currentMetrics.totalViews.toLocaleString() },
-              { label: 'Inquiries', value: latest.currentMetrics.inquiries },
-              { label: 'Shows',     value: latest.currentMetrics.showingRequests },
-              { label: 'Leads',     value: latest.currentMetrics.buyerLeads },
-            ].map(({ label, value }) => (
-              <div key={label}>
-                <p className="section-label text-luxury-taupe" style={{ fontSize: '0.58rem' }}>{label}</p>
-                <p className="font-serif-display text-xl font-light">{value}</p>
-              </div>
-            ))}
-          </div>
         </div>
 
-        <div className="flex items-center gap-1 flex-shrink-0">
-          <button onClick={() => onView(latest.id)}      title="View"      className="p-2 text-luxury-taupe hover:text-luxury-black transition-colors"><Eye     className="w-4 h-4" /></button>
-          <button onClick={() => onEdit(latest.id)}      title="Edit"      className="p-2 text-luxury-taupe hover:text-luxury-black transition-colors"><Edit2   className="w-4 h-4" /></button>
-          <button onClick={() => onDuplicate(latest.id)} title="New week (duplicate)" className="p-2 text-luxury-taupe hover:text-luxury-black transition-colors"><Copy className="w-4 h-4" /></button>
-          <button onClick={() => onDelete(latest.id)}    title="Delete"    className="p-2 text-luxury-taupe hover:text-danger transition-colors"     ><Trash2  className="w-4 h-4" /></button>
+        {/* Stat row — full width below the header on all screens */}
+        <div className="grid grid-cols-4 gap-2 sm:gap-5 mt-4 border-t border-luxury-cream/50 pt-3">
+          {[
+            { label: 'Views',     value: latest.currentMetrics.totalViews.toLocaleString() },
+            { label: 'Inquiries', value: latest.currentMetrics.inquiries },
+            { label: 'Shows',     value: latest.currentMetrics.showingRequests },
+            { label: 'Leads',     value: latest.currentMetrics.buyerLeads },
+          ].map(({ label, value }) => (
+            <div key={label} className="min-w-0">
+              <p className="section-label text-luxury-taupe truncate" style={{ fontSize: '0.55rem' }}>{label}</p>
+              <p className="font-serif-display text-lg sm:text-xl font-light truncate">{value}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* Actions — properly spaced row on mobile, right-aligned on desktop */}
+        <div className="flex items-center justify-end gap-1 mt-3 -mr-2">
+          <button onClick={() => onView(latest.id)}      title="View"      className="p-2.5 text-luxury-taupe hover:text-luxury-black transition-colors"><Eye     className="w-4 h-4" /></button>
+          <button onClick={() => onEdit(latest.id)}      title="Edit"      className="p-2.5 text-luxury-taupe hover:text-luxury-black transition-colors"><Edit2   className="w-4 h-4" /></button>
+          <button onClick={() => onDuplicate(latest.id)} title="New week (duplicate)" className="p-2.5 text-luxury-taupe hover:text-luxury-black transition-colors"><Copy className="w-4 h-4" /></button>
+          <button onClick={() => onDelete(latest.id)}    title="Delete"    className="p-2.5 text-luxury-taupe hover:text-danger transition-colors"     ><Trash2  className="w-4 h-4" /></button>
         </div>
       </div>
 
@@ -217,16 +221,16 @@ function PropertyGroup({
       {olderWeeks.length > 0 && (
         <div className="border-t border-luxury-cream/60 bg-luxury-off/50">
           {olderWeeks.map(r => (
-            <div key={r.id} className="flex items-center gap-3 px-5 py-2.5 border-b border-luxury-cream/40 last:border-0">
-              <span className="section-label text-luxury-taupe w-20 flex-shrink-0">Week {r.weekNumber}</span>
-              <span className="text-xs text-luxury-taupe flex-shrink-0">{formatDate(r.reportDate, 'short')}</span>
+            <div key={r.id} className="flex items-center gap-2 sm:gap-3 px-4 sm:px-5 py-2.5 border-b border-luxury-cream/40 last:border-0">
+              <span className="section-label text-luxury-taupe w-16 sm:w-20 flex-shrink-0" style={{ fontSize: '0.55rem' }}>Week {r.weekNumber}</span>
+              <span className="text-xs text-luxury-taupe flex-shrink-0 hidden sm:inline">{formatDate(r.reportDate, 'short')}</span>
               <span className="text-xs text-luxury-taupe/70 truncate flex-1">
-                {r.currentMetrics.totalViews.toLocaleString()} views · {r.currentMetrics.inquiries} inquiries · {r.currentMetrics.showingRequests} shows
+                {r.currentMetrics.totalViews.toLocaleString()} views · {r.currentMetrics.inquiries} inq · {r.currentMetrics.showingRequests} shows
               </span>
-              <div className="flex items-center gap-1 flex-shrink-0">
-                <button onClick={() => onView(r.id)} title="View" className="p-1.5 text-luxury-taupe hover:text-luxury-black transition-colors"><Eye className="w-3.5 h-3.5" /></button>
-                <button onClick={() => onEdit(r.id)} title="Edit" className="p-1.5 text-luxury-taupe hover:text-luxury-black transition-colors"><Edit2 className="w-3.5 h-3.5" /></button>
-                <button onClick={() => onDelete(r.id)} title="Delete" className="p-1.5 text-luxury-taupe hover:text-danger transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
+              <div className="flex items-center gap-0.5 flex-shrink-0 -mr-1">
+                <button onClick={() => onView(r.id)} title="View" className="p-2 text-luxury-taupe hover:text-luxury-black transition-colors"><Eye className="w-3.5 h-3.5" /></button>
+                <button onClick={() => onEdit(r.id)} title="Edit" className="p-2 text-luxury-taupe hover:text-luxury-black transition-colors"><Edit2 className="w-3.5 h-3.5" /></button>
+                <button onClick={() => onDelete(r.id)} title="Delete" className="p-2 text-luxury-taupe hover:text-danger transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
               </div>
             </div>
           ))}

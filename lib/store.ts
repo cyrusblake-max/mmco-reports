@@ -106,11 +106,15 @@ export async function saveReport(report: WeeklyReport): Promise<void> {
 }
 
 export async function deleteReport(id: string): Promise<void> {
-  if (SEED_IDS.has(id)) return
+  if (SEED_IDS.has(id)) {
+    throw new Error('This is a built-in template report and can\u2019t be deleted from the UI. Edit lib/baltic-report.ts in the source code instead.')
+  }
   if (supabaseConfigured) {
-    try {
-      await sb(`/reports?id=eq.${encodeURIComponent(id)}`, { method: 'DELETE' })
-    } catch (e) { console.warn('[store] Supabase delete failed:', e) }
+    // Surface failures — don't swallow. Caller can show the message.
+    await sb(`/reports?id=eq.${encodeURIComponent(id)}`, {
+      method: 'DELETE',
+      headers: { Prefer: 'return=minimal' },
+    })
   }
   // Always remove from local fallback too
   lsSave(lsLoad().filter(r => r.id !== id))
