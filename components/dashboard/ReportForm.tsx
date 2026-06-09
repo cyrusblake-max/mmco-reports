@@ -6,6 +6,7 @@ import { saveReport } from '@/lib/store'
 import { v4 as uuidv4 } from 'uuid'
 import { Plus, Trash2, ChevronDown, ChevronUp, Save, Eye, Upload } from 'lucide-react'
 import CompassUpload from './CompassUpload'
+import AIImport, { type ExtractedPayload } from './AIImport'
 import type { ParsedCompassData } from '@/lib/compass-parser'
 import { DEFAULT_INCLUDED_SECTIONS, SECTION_DISPLAY, type IncludedSections } from '@/lib/types'
 
@@ -499,10 +500,171 @@ export default function ReportForm({ initial }: Props) {
     else if (data.address)    lookupProperty(data.address)
   }
 
+  /**
+   * Merge an AI-extracted payload into the report. Tries to be smart about routing:
+   * - web metrics → currentMetrics
+   * - ad numbers → digitalAds (replacing reportingPeriod if new one provided)
+   * - social traffic share → digitalAds.socialTrafficShare
+   * - open-house attendance → updates last openHouse OR appends new one
+   * - instagram stats → socialMedia[]
+   *
+   * Existing non-zero / non-empty values are preserved.
+   */
+  function handleAIExtract(payload: ExtractedPayload) {
+    const e = payload.extracted as Record<string, unknown>
+    const num = (k: string): number | undefined => {
+      const v = e[k]
+      return typeof v === 'number' && Number.isFinite(v) ? v : undefined
+    }
+    const str = (k: string): string | undefined => {
+      const v = e[k]
+      return typeof v === 'string' && v.trim() ? v.trim() : undefined
+    }
+    const arr = <T,>(k: string): T[] | undefined => {
+      const v = e[k]
+      return Array.isArray(v) && v.length ? (v as T[]) : undefined
+    }
+    const obj = (k: string): Record<string, unknown> | undefined => {
+      const v = e[k]
+      return v && typeof v === 'object' && !Array.isArray(v) ? (v as Record<string, unknown>) : undefined
+    }
+
+    setReport(r => {
+      const next = { ...r }
+
+      // --- Currentweekly metrics (only fill where existing value is 0/empty) ---
+      const metricUpdates: Record<string, number> = {}
+      const tryFill = (key: keyof typeof r.currentMetrics, val: number | undefined) => {
+        if (val == null) return
+        if ((r.currentMetrics[key] ?? 0) === 0) metricUpdates[key] = val
+      }
+      tryFill('totalViews',          num('totalViews'))
+      tryFill('compassViews',        num('compassViews'))
+      tryFill('streetEasyViews',     num('streetEasyViews'))
+      tryFill('zillowViews',         num('zillowViews'))
+      tryFill('saves',               num('saves'))
+      tryFill('inquiries',           num('inquiries'))
+      tryFill('showingRequests',     num('showingRequests'))
+      tryFill('openHouseAttendees',  num('openHouseAttendees'))
+      if (Object.keys(metricUpdates).length) {
+        next.currentMetrics = { ...r.currentMetrics, ...metricUpdates }
+      }
+
+      // --- Digital ads merge ---
+      const existingAds = r.digitalAds
+      const adsUpdates: Partial<NonNullable<typeof r.digitalAds>> = {}
+      const period = str('reportingPeriod')
+      if (period && !existingAds?.reportingPeriod)               adsUpdates.reportingPeriod = period
+      if (num('totalImpressions') && !existingAds?.totalImpressions) adsUpdates.totalImpressions = num('totalImpressions')!
+      if (num('totalClicks')      && !existingAds?.totalClicks)      adsUpdates.totalClicks      = num('totalClicks')!
+      const tc = obj('topChannel')
+      if (tc && !existingAds?.topChannel) {
+        const name = typeof tc.name === 'string' ? tc.name : ''
+        const ctr  = typeof tc.ctr  === 'number' ? tc.ctr  : 0
+        if (name) adsUpdates.topChannel = { name, ctr }
+      }
+      const byCh = arr<{ channel?: string; clicks?: number; ctr?: number }>('byChannel')
+      if (byCh && (!existingAds?.byChannel || existingAds.byChannel.length === 0)) {
+        adsUpdates.byChannel = byCh
+          .filter(c => c.channel && typeof c.clicks === 'number')
+          .map(c => ({ channel: String(c.channel), clicks: Number(c.clicks), ctr: Number(c.ctr ?? 0) }))
+      }
+      const sts = arr<{ channel?: string; share?: number }>('socialTrafficShare')
+      if (sts && (!existingAds?.socialTrafficShare || existingAds.socialTrafficShare.length === 0)) {
+        adsUpdates.socialTrafficShare = sts
+          .filter(s => s.channel && typeof s.share === 'number')
+          .map(s => ({ channel: String(s.channel), share: Number(s.share) }))
+      }
+      const pubs = arr<{ publisher?: string; views?: number }>('topPublishers')
+      if (pubs && (!existingAds?.topPublishers || existingAds.topPublishers.length === 0)) {
+        adsUpdates.topPublishers = pubs
+          .filter(p => p.publisher && typeof p.views === 'number')
+          .map(p => ({ publisher: String(p.publisher), views: Number(p.views) }))
+      }
+      if (Object.keys(adsUpdates).length) {
+        next.digitalAds = {
+          reportingPeriod:     '',
+          totalImpressions:    0,
+          totalClicks:         0,
+          byChannel:           [],
+          socialTrafficPeriod: '',
+          socialTrafficShare:  [],
+          ...existingAds,
+          ...adsUpdates,
+        }
+      }
+
+      // --- Open house attendance ---
+      const ohDate     = str('openHouseDate')
+      const ohAttendees = num('openHouseAttendees')
+      const ohBrokers   = num('openHouseBrokers')
+      const ohBuyers    = num('openHouseBuyers')
+      if (ohDate && (ohAttendees != null || ohBrokers != null || ohBuyers != null)) {
+        const existing = (r.openHouses ?? []).find(o => o.date === ohDate)
+        if (existing) {
+          next.openHouses = (r.openHouses ?? []).map(o => o.date === ohDate ? {
+            ...o,
+            totalAttendees: ohAttendees ?? o.totalAttendees,
+            brokers:        ohBrokers   ?? o.brokers,
+            buyers:         ohBuyers    ?? o.buyers,
+          } : o)
+        } else {
+          next.openHouses = [...(r.openHouses ?? []), {
+            id: `oh-ai-${Date.now()}`,
+            date: ohDate,
+            startTime: '12:00',
+            endTime: '13:30',
+            totalAttendees: ohAttendees ?? 0,
+            brokers: ohBrokers ?? 0,
+            buyers:  ohBuyers  ?? 0,
+            seriousInterestLevel: 3,
+            commonFeedback: '',
+            questionsAsked: '',
+            followUpActions: '',
+          }]
+        }
+      }
+
+      // --- Instagram social media stats ---
+      const igMetrics = {
+        reelViews: num('instagramReelViews'),
+        likes:     num('instagramLikes'),
+        comments:  num('instagramComments'),
+        shares:    num('instagramShares'),
+        saves:     num('instagramSaves'),
+      }
+      if (Object.values(igMetrics).some(v => v != null)) {
+        const idx = (r.socialMedia ?? []).findIndex(s => s.platform === 'instagram')
+        const base = idx >= 0 ? r.socialMedia[idx] : {
+          platform: 'instagram' as const,
+          reelViews: 0, likes: 0, comments: 0, shares: 0, saves: 0,
+          engagementRate: 0, followerGrowth: 0,
+        }
+        const merged = {
+          ...base,
+          reelViews: base.reelViews || igMetrics.reelViews || 0,
+          likes:     base.likes     || igMetrics.likes     || 0,
+          comments:  base.comments  || igMetrics.comments  || 0,
+          shares:    base.shares    || igMetrics.shares    || 0,
+          saves:     base.saves     || igMetrics.saves     || 0,
+        }
+        const arr2 = [...(r.socialMedia ?? [])]
+        if (idx >= 0) arr2[idx] = merged
+        else arr2.push(merged)
+        next.socialMedia = arr2
+      }
+
+      return next
+    })
+  }
+
   return (
     <div className="space-y-2">
 
-      {/* === COMPASS IMPORT === */}
+      {/* === AI DROP ZONE — any screenshot/PDF, auto-extract === */}
+      <AIImport onApply={handleAIExtract} />
+
+      {/* === COMPASS IMPORT (legacy parser for the specific Compass HTML/JSON shape) === */}
       <div className="mb-6">
         <CompassUpload onApply={handleCompassApply} />
       </div>
@@ -525,14 +687,14 @@ export default function ReportForm({ initial }: Props) {
             {SECTION_DISPLAY.every(s => (report.includedSections ?? DEFAULT_INCLUDED_SECTIONS)[s.key]) ? 'deselect all' : 'select all'}
           </button>
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
           {SECTION_DISPLAY.map(({ key, num, label }) => {
             const inc = report.includedSections ?? DEFAULT_INCLUDED_SECTIONS
             const on = inc[key]
             return (
               <label
                 key={key}
-                className={`flex items-center gap-2 px-3 py-2 border cursor-pointer transition-colors ${
+                className={`flex items-center gap-3 px-3 py-2.5 border cursor-pointer transition-colors ${
                   on ? 'border-luxury-gold/40 bg-luxury-gold/5' : 'border-luxury-cream hover:border-luxury-sand'
                 }`}
               >
@@ -543,11 +705,11 @@ export default function ReportForm({ initial }: Props) {
                     ...r,
                     includedSections: { ...(r.includedSections ?? DEFAULT_INCLUDED_SECTIONS), [key]: e.target.checked },
                   }))}
-                  className="accent-luxury-gold"
+                  className="accent-luxury-gold flex-shrink-0 w-4 h-4"
                 />
-                <div className="flex-1 min-w-0">
-                  <span className="section-label text-luxury-gold">{num}</span>
-                  <span className="text-xs text-luxury-black ml-2 truncate">{label}</span>
+                <div className="flex-1 min-w-0 leading-tight">
+                  <p className="section-label text-luxury-gold" style={{ fontSize: '0.55rem' }}>{num}</p>
+                  <p className="text-xs text-luxury-black truncate mt-0.5">{label}</p>
                 </div>
               </label>
             )
