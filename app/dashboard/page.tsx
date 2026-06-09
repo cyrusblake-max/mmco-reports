@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { WeeklyReport } from '@/lib/types'
 import { getReports, deleteReport, duplicateReport, createBlankReport } from '@/lib/store'
 import { formatCurrency, formatDate, daysOnMarket } from '@/lib/utils'
-import { Plus, Eye, Edit2, Copy, Trash2, FileText } from 'lucide-react'
+import { Plus, Eye, Edit2, Copy, Trash2, FileText, Image as ImageIcon } from 'lucide-react'
 
 export default function DashboardPage() {
   const router = useRouter()
@@ -45,13 +45,22 @@ export default function DashboardPage() {
               <h1 className="font-serif-display text-3xl font-light">Seller Report System</h1>
             </div>
           </div>
-          <button
-            onClick={handleNew}
-            className="flex items-center gap-2 px-4 py-2.5 bg-luxury-gold text-luxury-black text-sm font-medium hover:bg-luxury-sand transition-colors"
-          >
-            <Plus className="w-4 h-4" />
-            New Report
-          </button>
+          <div className="flex items-center gap-2">
+            <Link
+              href="/dashboard/assets"
+              className="flex items-center gap-2 px-4 py-2.5 border border-white/20 text-white text-sm hover:bg-white/10 transition-colors"
+            >
+              <ImageIcon className="w-4 h-4" />
+              Assets
+            </Link>
+            <button
+              onClick={handleNew}
+              className="flex items-center gap-2 px-4 py-2.5 bg-luxury-gold text-luxury-black text-sm font-medium hover:bg-luxury-sand transition-colors"
+            >
+              <Plus className="w-4 h-4" />
+              New Report
+            </button>
+          </div>
         </div>
       </header>
 

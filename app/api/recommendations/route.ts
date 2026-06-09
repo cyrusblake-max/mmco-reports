@@ -1,18 +1,19 @@
 /**
- * AI-generated agent recommendations.
+ * AI-generated agent recommendations — powered by Google Gemini 1.5 Flash (free tier).
  *
- * Takes the report data (metrics + week-over-week trend + property context),
- * asks Claude to produce concrete next-step recommendations in the same six
- * buckets as the Agent Strategy form section, and returns them as JSON.
+ * Takes report data (metrics + WoW trend + property context) and asks Gemini for
+ * concrete next-step recommendations in the same six strategy buckets used by the
+ * editor form. Returns parsed JSON ready to merge into report.strategy.
+ *
+ * Setup: get a free key at https://aistudio.google.com/app/apikey and set GOOGLE_AI_KEY.
  */
 
 import { NextRequest } from 'next/server'
-import Anthropic from '@anthropic-ai/sdk'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
-const MODEL = 'claude-sonnet-4-6'
+const MODEL = 'gemini-1.5-flash-latest'
 
 interface IncomingPayload {
   property: {
@@ -44,10 +45,10 @@ interface Recommendations {
 }
 
 export async function POST(req: NextRequest) {
-  const apiKey = process.env.ANTHROPIC_API_KEY
+  const apiKey = process.env.GOOGLE_AI_KEY
   if (!apiKey) {
     return Response.json({
-      error: 'ANTHROPIC_API_KEY not configured. Add it to .env.local in the project root and restart the dev server.',
+      error: 'GOOGLE_AI_KEY not configured. Get a free key at https://aistudio.google.com/app/apikey and add it to your environment (Vercel Settings → Environment Variables, or .env.local for local dev).',
     }, { status: 500 })
   }
 
@@ -58,35 +59,48 @@ export async function POST(req: NextRequest) {
     return Response.json({ error: 'Invalid JSON body' }, { status: 400 })
   }
 
-  const client = new Anthropic({ apiKey })
+  const systemPreamble =
+    'You are an experienced NYC luxury real estate advisor writing concrete, ' +
+    'actionable next-step recommendations for the listing agent based on the ' +
+    "past week's performance data. Your output is in plain text suitable for " +
+    'pasting into a seller report — no markdown headers, no emojis. Each section ' +
+    'should contain 3-5 bullet-style lines, one idea per line, written in a ' +
+    'confident professional voice. Be specific (mention platforms, channels, ' +
+    'price ranges, specific events) — avoid generic advice.'
 
-  const prompt = buildPrompt(payload)
+  const prompt = `${systemPreamble}\n\n${buildPrompt(payload)}`
 
   try {
-    const msg = await client.messages.create({
-      model: MODEL,
-      max_tokens: 2000,
-      system:
-        'You are an experienced NYC luxury real estate advisor writing concrete, ' +
-        'actionable next-step recommendations for the listing agent based on the ' +
-        'past week\'s performance data. Your output is in plain text suitable for ' +
-        'pasting into a seller report — no markdown headers, no emojis. Each section ' +
-        'should contain 3-5 bullet-style lines, one idea per line, written in a ' +
-        'confident professional voice. Be specific (mention platforms, channels, ' +
-        'price ranges, specific events) — avoid generic advice.',
-      messages: [{ role: 'user', content: prompt }],
-    })
+    const res = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${apiKey}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ role: 'user', parts: [{ text: prompt }] }],
+          generationConfig: { temperature: 0.6, maxOutputTokens: 2000 },
+        }),
+      },
+    )
 
-    const text = msg.content
-      .filter(b => b.type === 'text')
-      .map(b => (b as { text: string }).text)
-      .join('\n')
+    if (!res.ok) {
+      const detail = await res.text().catch(() => '')
+      return Response.json(
+        { error: `Gemini API ${res.status}`, detail },
+        { status: 502 },
+      )
+    }
+
+    const data = await res.json() as {
+      candidates?: { content?: { parts?: { text?: string }[] } }[]
+    }
+    const text = data.candidates?.[0]?.content?.parts?.map(p => p.text).join('') ?? ''
 
     const parsed = parseRecommendations(text)
     return Response.json(parsed)
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e)
-    return Response.json({ error: `Claude API call failed: ${msg}` }, { status: 500 })
+    return Response.json({ error: `Gemini API call failed: ${msg}` }, { status: 500 })
   }
 }
 

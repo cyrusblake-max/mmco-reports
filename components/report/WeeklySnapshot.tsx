@@ -1,6 +1,6 @@
 'use client'
 import {
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
+  XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, Legend, Area, AreaChart,
 } from 'recharts'
 import { WeeklyReport } from '@/lib/types'
@@ -18,21 +18,8 @@ export default function WeeklySnapshot({ report }: Props) {
   const scorecards = scorecardsFor(currentMetrics, previous)
   const hero = heroPick(currentMetrics, previous, property.price)
 
-  const chartData = metricsHistory.map(snap => ({
-    week: snap.weekLabel,
-    'Total Views':  snap.metrics.totalViews,
-    'Inquiries':    snap.metrics.inquiries,
-    'Buyer Leads':  snap.metrics.buyerLeads,
-    'Saves':        snap.metrics.saves,
-    'Social Reach': snap.metrics.socialReach,
-  }))
-
-  const inPersonData = metricsHistory.map(snap => ({
-    week: snap.weekLabel,
-    'Open House':  snap.metrics.openHouseAttendees,
-    'Showings':    snap.metrics.showingRequests,
-    'Total':       snap.metrics.openHouseAttendees + snap.metrics.showingRequests,
-  }))
+  // Gate the Platform Views chart on having more than 1 week of history
+  const hasChartData = metricsHistory.length > 1
 
   return (
     <section className="report-section-beige print-page-break">
@@ -93,7 +80,7 @@ export default function WeeklySnapshot({ report }: Props) {
         )}
 
         {/* ── CHARTS ── */}
-        {chartData.length > 1 && (
+        {hasChartData && (
           <div>
 <div className="mt-6">
               <p className="section-label text-luxury-taupe mb-4">Platform Views — Cumulative Since Listing</p>

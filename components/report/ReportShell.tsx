@@ -1,5 +1,5 @@
 'use client'
-import { useRef, useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { WeeklyReport, DEFAULT_INCLUDED_SECTIONS } from '@/lib/types'
 import CoverPage        from './CoverPage'
 import PropertyOverview from './PropertyOverview'
@@ -32,7 +32,6 @@ const NAV_ITEMS: { label: string; href: string; key: keyof import('@/lib/types')
 export default function ReportShell({ report, onDuplicate }: Props) {
   const [copied, setCopied] = useState(false)
   const [shareView, setShareView] = useState(false)
-  const reportRef = useRef<HTMLDivElement>(null)
   const inc = report.includedSections ?? DEFAULT_INCLUDED_SECTIONS
 
   // Detect share view from URL (?share=1) — read on mount so SSR matches CSR
@@ -125,7 +124,7 @@ export default function ReportShell({ report, onDuplicate }: Props) {
       )}
 
       {/* Report body */}
-      <div ref={reportRef} id="report-root">
+      <div id="report-root">
         <CoverPage report={report} />
 
         {inc.propertyOverview && (

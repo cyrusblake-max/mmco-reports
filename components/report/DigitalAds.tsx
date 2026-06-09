@@ -14,7 +14,7 @@ const CHANNEL_COLORS: Record<string, string> = {
   Facebook:  '#8B7D6B',
   Google:    '#1A211B',
   YouTube:   '#B8AC97',
-  TikTok:    '#1A1A1A',
+  TikTok:    '#2A2B23',
 }
 
 export default function DigitalAds({ report }: Props) {
