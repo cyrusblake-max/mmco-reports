@@ -30,6 +30,7 @@ export default function AIImport({ onApply }: Props) {
   const [status, setStatus] = useState<'idle' | 'loading' | 'ready' | 'error'>('idle')
   const [result, setResult] = useState<ExtractedPayload | null>(null)
   const [errorMsg, setErrorMsg] = useState('')
+  const [errorDetail, setErrorDetail] = useState('')
   const [filename, setFilename] = useState('')
 
   const handleFile = useCallback(async (file: File) => {
@@ -47,6 +48,7 @@ export default function AIImport({ onApply }: Props) {
       if (!res.ok) {
         setStatus('error')
         setErrorMsg(data.error ?? `Server returned ${res.status}`)
+        setErrorDetail(typeof data.detail === 'string' ? data.detail : '')
         return
       }
       setResult(data as ExtractedPayload)
@@ -54,6 +56,7 @@ export default function AIImport({ onApply }: Props) {
     } catch (e) {
       setStatus('error')
       setErrorMsg(e instanceof Error ? e.message : 'Upload failed')
+      setErrorDetail('')
     }
   }, [])
 
@@ -61,6 +64,7 @@ export default function AIImport({ onApply }: Props) {
     setStatus('idle')
     setResult(null)
     setErrorMsg('')
+    setErrorDetail('')
     setFilename('')
     if (inputRef.current) inputRef.current.value = ''
   }
@@ -136,6 +140,11 @@ export default function AIImport({ onApply }: Props) {
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-danger">Couldn&apos;t extract data</p>
               <p className="text-xs text-luxury-taupe mt-1 break-words">{errorMsg}</p>
+              {errorDetail && (
+                <pre className="text-[10px] text-luxury-taupe/80 mt-2 p-2 bg-white border border-luxury-cream overflow-auto max-h-40 whitespace-pre-wrap break-words font-mono">
+                  {errorDetail}
+                </pre>
+              )}
               <button type="button" onClick={reset} className="text-xs section-label text-luxury-gold hover:text-luxury-sand mt-2">
                 try again
               </button>
