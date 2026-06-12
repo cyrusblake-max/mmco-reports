@@ -11,14 +11,15 @@
 import { WeeklyReport } from './types'
 import { MOCK_REPORT } from './mock-data'
 import { BALTIC_REPORT } from './baltic-report'
+import { WEST71_REPORT } from './west71-report'
 import { sb, supabaseConfigured } from './supabase'
 import { v4 as uuidv4 } from 'uuid'
 
 const STORAGE_KEY = 'luxury_reports_v3'
 
-// Only Baltic shows on the dashboard. MOCK_REPORT stays imported because
+// Active listings shipped via source code. MOCK_REPORT stays imported because
 // createBlankReport() uses its shape as a template for new properties.
-const SEEDS: WeeklyReport[] = [BALTIC_REPORT]
+const SEEDS: WeeklyReport[] = [BALTIC_REPORT, WEST71_REPORT]
 const SEED_IDS = new Set(SEEDS.map(r => r.id))
 
 interface RemoteRow {

@@ -135,7 +135,7 @@ export default function ReportShell({ report, onDuplicate }: Props) {
           <div id="weekly-snapshot"><WeeklySnapshot report={report} /></div>
         )}
 
-        {inc.openHouses && report.openHouses && report.openHouses.length > 0 && (
+        {inc.openHouses && ((report.openHouses && report.openHouses.length > 0) || (report.currentMetrics?.showingRequests ?? 0) > 0) && (
           <div id="open-house"><OpenHouseReport report={report} /></div>
         )}
 

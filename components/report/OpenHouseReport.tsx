@@ -69,18 +69,24 @@ function EventCard({ event }: { event: OpenHouseEvent }) {
 
 export default function OpenHouseReport({ report }: Props) {
   const { openHouses, currentMetrics, weekStartDate, weekEndDate } = report
-  if (!openHouses || openHouses.length === 0) return null
+  const showings = currentMetrics?.showingRequests ?? 0
+  // Render whenever we have either an open-house event or private showings this week
+  if ((!openHouses || openHouses.length === 0) && showings === 0) return null
 
   // Filter to events that occurred during THIS reporting week.
   // Falls back to the latest event if the week range is misconfigured.
-  const weekEvents = weekStartDate && weekEndDate
+  const weekEvents = openHouses && weekStartDate && weekEndDate
     ? openHouses.filter(oh => oh.date >= weekStartDate && oh.date <= weekEndDate)
     : []
-  const eventsToShow = weekEvents.length > 0 ? weekEvents : [openHouses[openHouses.length - 1]]
+  const eventsToShow = weekEvents.length > 0
+    ? weekEvents
+    : openHouses && openHouses.length > 0 ? [openHouses[openHouses.length - 1]] : []
 
   const weekTotalAttendees = eventsToShow.reduce((s, oh) => s + oh.totalAttendees, 0)
   const weekAvgAttendance  = eventsToShow.length > 0 ? Math.round(weekTotalAttendees / eventsToShow.length) : 0
-  const peak = eventsToShow.reduce((best, oh) => oh.totalAttendees > best.totalAttendees ? oh : best, eventsToShow[0])
+  const peak = eventsToShow.length > 0
+    ? eventsToShow.reduce((best, oh) => oh.totalAttendees > best.totalAttendees ? oh : best, eventsToShow[0])
+    : null
 
   return (
     <section className="report-section bg-white print-page-break">
@@ -100,14 +106,14 @@ export default function OpenHouseReport({ report }: Props) {
             <p className="section-label text-white/40 mt-1">This Week</p>
           </div>
           <div className="bg-luxury-off p-6">
-            <p className="section-label text-luxury-taupe mb-2">Repeat Visitors</p>
-            <p className="font-serif-display text-4xl font-light">{currentMetrics?.showingRequests ?? 0}</p>
-            <p className="section-label text-luxury-taupe mt-1">Family returned Sunday — 2nd visit</p>
+            <p className="section-label text-luxury-taupe mb-2">Private Showings</p>
+            <p className="font-serif-display text-4xl font-light">{showings}</p>
+            <p className="section-label text-luxury-taupe mt-1">This Week</p>
           </div>
         </div>
 
         {/* ── Peak event callout — only if we had real attendance ── */}
-        {eventsToShow.length > 1 && peak.totalAttendees > 0 && (
+        {peak && eventsToShow.length > 1 && peak.totalAttendees > 0 && (
           <div className="flex items-center gap-3 mb-6 px-5 py-3 border-l-2 border-luxury-gold bg-luxury-off">
             <TrendingUp className="w-4 h-4 text-luxury-gold flex-shrink-0" />
             <p className="text-sm text-luxury-taupe">
