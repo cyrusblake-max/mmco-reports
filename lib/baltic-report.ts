@@ -366,6 +366,18 @@ export const BALTIC_REPORT: WeeklyReport = {
       notes:
         'Instagram post highlighting the recent price adjustment to $3,249,000 (down from $3,500,000). Drives new buyer attention and re-engages prior viewers.',
     },
+    {
+      id: 'mkt-baltic-w5-broker-blast',
+      type: 'broker_outreach',
+      name: 'Price Drop Broker Blast — NYC Network',
+      date: '2026-06-09',
+      impressions: 0,
+      engagement: 0,
+      clicks: 0,
+      reach: 8000,
+      notes:
+        'Targeted email blast to the full NYC broker community announcing the price adjustment to $3,249,000. Reactivates brokers with $3M–$3.5M buyers who may not have looked at the higher price.',
+    },
   ],
 
   socialMedia: [
