@@ -42,12 +42,12 @@ export const WEST71_REPORT: WeeklyReport = {
       {
         name: 'Jonathan Banks',
         title: 'Licensed Real Estate Salesperson',
-        team: 'MM&Co.',
+        team: '',                       // Not on MM&Co. — just Compass
         brokerage: 'Compass',
         phone: '917-657-2252',
         email: '',
-        photoUrl: '',                       // Drop Jonathan's headshot via the editor's Co-Agents section
-        logoUrl: '/mmco-logo.png',
+        photoUrl: '/jonathan-banks.jpg',
+        logoUrl: '',
       },
     ],
   },

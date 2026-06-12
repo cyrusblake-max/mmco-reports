@@ -10,9 +10,9 @@ import {
 } from '@/lib/derived-metrics'
 import SectionMast from './SectionMast'
 
-interface Props { report: WeeklyReport }
+interface Props { report: WeeklyReport; sectionNum?: string }
 
-export default function WeeklySnapshot({ report }: Props) {
+export default function WeeklySnapshot({ report, sectionNum = '02' }: Props) {
   const { currentMetrics, previousMetrics, metricsHistory, property } = report
   const previous = synthesisePrevious(currentMetrics, previousMetrics)
   const scorecards = scorecardsFor(currentMetrics, previous)
@@ -25,8 +25,8 @@ export default function WeeklySnapshot({ report }: Props) {
     <section className="report-section-beige print-page-break">
       <div className="max-w-6xl mx-auto px-6 md:px-12">
         <SectionMast
-          num="02"
-          eyebrow="02 — Performance Snapshot"
+          num={sectionNum}
+          eyebrow={`${sectionNum} — Performance Snapshot`}
           title="The Week in Numbers"
           kicker="A reading of audience reach, buyer engagement, and channel performance across the listing platforms."
         />

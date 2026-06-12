@@ -3,9 +3,9 @@ import { WeeklyReport } from '@/lib/types'
 import { formatCurrency, formatDate, daysOnMarket } from '@/lib/utils'
 import SectionMast from './SectionMast'
 
-interface Props { report: WeeklyReport }
+interface Props { report: WeeklyReport; sectionNum?: string }
 
-export default function PropertyOverview({ report }: Props) {
+export default function PropertyOverview({ report, sectionNum = '01' }: Props) {
   const { property } = report
   const dom = daysOnMarket(property.listingDate)
 
@@ -14,8 +14,8 @@ export default function PropertyOverview({ report }: Props) {
       <div className="max-w-6xl mx-auto px-6 md:px-12">
 
         <SectionMast
-          num="01"
-          eyebrow="01 — Property Overview"
+          num={sectionNum}
+          eyebrow={`${sectionNum} — Property Overview`}
           title="The Residence"
           kicker={`A ${property.beds}-bedroom, ${property.baths}-bath ${property.neighborhood} home presented with discretion and precision.`}
         />

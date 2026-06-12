@@ -4,7 +4,7 @@ import { formatCurrency, formatNumber } from '@/lib/utils'
 import { TrendingDown, ArrowRight } from 'lucide-react'
 import SectionMast from './SectionMast'
 
-interface Props { report: WeeklyReport }
+interface Props { report: WeeklyReport; sectionNum?: string }
 
 const STATUS_CONFIG = {
   active:   { label: 'Active',           dot: 'bg-luxury-gold',  text: 'text-luxury-gold' },
@@ -62,7 +62,7 @@ function CompsTable({ title, listings, showChange = false }: {
   )
 }
 
-export default function MarketActivity({ report }: Props) {
+export default function MarketActivity({ report, sectionNum = '07' }: Props) {
   const { marketActivity } = report
   if (!marketActivity) return null
 
@@ -72,8 +72,8 @@ export default function MarketActivity({ report }: Props) {
     <section className="report-section bg-white print-page-break">
       <div className="max-w-6xl mx-auto px-6 md:px-12">
         <SectionMast
-          num="07"
-          eyebrow="07 — Market Activity"
+          num={sectionNum}
+          eyebrow={`${sectionNum} — Market Activity`}
           title="The Competitive Landscape"
           kicker="New listings, contracts, and closed sales across the immediate competitive set."
         />

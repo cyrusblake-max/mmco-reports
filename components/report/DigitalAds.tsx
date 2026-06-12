@@ -7,7 +7,7 @@ import { WeeklyReport } from '@/lib/types'
 import { formatNumber } from '@/lib/utils'
 import SectionMast from './SectionMast'
 
-interface Props { report: WeeklyReport }
+interface Props { report: WeeklyReport; sectionNum?: string }
 
 const CHANNEL_COLORS: Record<string, string> = {
   Instagram: '#C4A882',
@@ -17,7 +17,7 @@ const CHANNEL_COLORS: Record<string, string> = {
   TikTok:    '#2A2B23',
 }
 
-export default function DigitalAds({ report }: Props) {
+export default function DigitalAds({ report, sectionNum = '05' }: Props) {
   const { digitalAds } = report
   if (!digitalAds) return null
 
@@ -32,8 +32,8 @@ export default function DigitalAds({ report }: Props) {
     <section className="report-section bg-luxury-off print-page-break">
       <div className="max-w-6xl mx-auto px-6 md:px-12">
         <SectionMast
-          num="05"
-          eyebrow="05 — Digital Ads & Reach"
+          num={sectionNum}
+          eyebrow={`${sectionNum} — Digital Ads & Reach`}
           title="Paid Performance"
           kicker={`Compass-managed ad campaigns and where social traffic is coming from. Reporting period: ${reportingPeriod}.`}
         />

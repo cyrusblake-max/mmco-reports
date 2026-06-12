@@ -4,7 +4,7 @@ import { WeeklyReport, OpenHouseEvent } from '@/lib/types'
 import { formatDate } from '@/lib/utils'
 import SectionMast from './SectionMast'
 
-interface Props { report: WeeklyReport }
+interface Props { report: WeeklyReport; sectionNum?: string }
 
 function EventCard({ event }: { event: OpenHouseEvent }) {
   const isBrokerEvent = event.brokers > 0 && event.buyers === 0
@@ -67,7 +67,7 @@ function EventCard({ event }: { event: OpenHouseEvent }) {
   )
 }
 
-export default function OpenHouseReport({ report }: Props) {
+export default function OpenHouseReport({ report, sectionNum = '03' }: Props) {
   const { openHouses, currentMetrics, weekStartDate, weekEndDate } = report
   const showings = currentMetrics?.showingRequests ?? 0
   // Render whenever we have either an open-house event or private showings this week
@@ -92,8 +92,8 @@ export default function OpenHouseReport({ report }: Props) {
     <section className="report-section bg-white print-page-break">
       <div className="max-w-6xl mx-auto px-6 md:px-12">
         <SectionMast
-          num="03"
-          eyebrow="03 — Open House Reporting"
+          num={sectionNum}
+          eyebrow={`${sectionNum} — Open House Reporting`}
           title="In-Person Engagement"
           kicker="A summary of the week's open houses, broker previews, and the quality of buyer interest observed at each."
         />

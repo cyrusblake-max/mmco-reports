@@ -59,29 +59,23 @@ export async function getReports(): Promise<WeeklyReport[]> {
 }
 
 export async function getReport(id: string): Promise<WeeklyReport | null> {
-  // Seed reports always come from source — code change = everyone sees it
-  const seed = SEEDS.find(r => r.id === id)
-  if (seed) return seed
-
+  // Supabase first — any edits made through the dashboard win.
+  // Source-code seeds act as factory defaults when there's no DB copy yet.
   if (supabaseConfigured) {
     try {
       const rows = await sb<RemoteRow[]>(`/reports?id=eq.${encodeURIComponent(id)}&select=data&limit=1`)
-      return rows[0]?.data ?? null
+      if (rows[0]?.data) return rows[0].data
     } catch (e) {
-      console.warn('[store] Supabase fetch failed:', e)
-      return lsLoad().find(r => r.id === id) ?? null
+      console.warn('[store] Supabase fetch failed, falling back to seed/local:', e)
     }
   }
+  const seed = SEEDS.find(r => r.id === id)
+  if (seed) return seed
   return lsLoad().find(r => r.id === id) ?? null
 }
 
 export async function saveReport(report: WeeklyReport): Promise<void> {
-  // Block writes to seed ids — those are source-of-truth in code
-  if (SEED_IDS.has(report.id)) {
-    console.warn('[store] refusing to overwrite seed report', report.id, '— edit the fixture file instead')
-    return
-  }
-
+  // Edits to seed reports are allowed — they save to Supabase and override the source.
   if (supabaseConfigured) {
     try {
       await sb(`/reports?on_conflict=id`, {
@@ -107,9 +101,6 @@ export async function saveReport(report: WeeklyReport): Promise<void> {
 }
 
 export async function deleteReport(id: string): Promise<void> {
-  if (SEED_IDS.has(id)) {
-    throw new Error('This is a built-in template report and can\u2019t be deleted from the UI. Edit lib/baltic-report.ts in the source code instead.')
-  }
   if (supabaseConfigured) {
     // Surface failures — don't swallow. Caller can show the message.
     await sb(`/reports?id=eq.${encodeURIComponent(id)}`, {

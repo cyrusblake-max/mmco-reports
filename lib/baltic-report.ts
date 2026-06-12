@@ -246,19 +246,6 @@ export const BALTIC_REPORT: WeeklyReport = {
       questionsAsked: '',
       followUpActions: 'Broker Open House — 11 NYC brokers attended. Strong showing from the broker network.',
     },
-    {
-      id: 'oh-baltic-004-w5',
-      date: '2026-06-07',
-      startTime: '12:00',
-      endTime: '13:30',
-      totalAttendees: 0,
-      brokers: 0,
-      buyers: 0,
-      seriousInterestLevel: 1,
-      commonFeedback: '',
-      questionsAsked: '',
-      followUpActions: 'Public open house — no attendees. Followed by price adjustment to $3.249M two days later.',
-    },
   ],
 
   marketing: [

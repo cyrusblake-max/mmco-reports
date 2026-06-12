@@ -3,7 +3,7 @@ import { WeeklyReport } from '@/lib/types'
 import { CheckCircle2, Calendar, Megaphone, DollarSign, Users } from 'lucide-react'
 import SectionMast from './SectionMast'
 
-interface Props { report: WeeklyReport }
+interface Props { report: WeeklyReport; sectionNum?: string }
 
 function StrategyBlock({
   icon: Icon, title, content, accent = false,
@@ -33,7 +33,7 @@ function StrategyBlock({
   )
 }
 
-export default function AgentStrategy({ report }: Props) {
+export default function AgentStrategy({ report, sectionNum = '08' }: Props) {
   const { strategy, property } = report
   if (!strategy) return null
 
@@ -41,8 +41,8 @@ export default function AgentStrategy({ report }: Props) {
     <section className="report-section-dark print-page-break">
       <div className="max-w-6xl mx-auto px-6 md:px-12">
         <SectionMast
-          num="06"
-          eyebrow="06 — Strategy & Next Steps"
+          num={sectionNum}
+          eyebrow={`${sectionNum} — Strategy & Next Steps`}
           title="Our Plan Forward"
           kicker="Recommendations, upcoming initiatives, and a calibrated schedule for the week ahead."
           tone="dark"

@@ -123,42 +123,44 @@ export default function ReportShell({ report, onDuplicate }: Props) {
         </nav>
       )}
 
-      {/* Report body */}
+      {/* Report body — sequential section numbers assigned at render time so
+          there are no gaps if some sections are turned off for a property. */}
       <div id="report-root">
         <CoverPage report={report} />
+        {(() => {
+          type Sec = { id: string; render: (n: string) => React.ReactNode }
+          const sections: Sec[] = []
 
-        {inc.propertyOverview && (
-          <div id="property-overview"><PropertyOverview report={report} /></div>
-        )}
+          if (inc.propertyOverview) {
+            sections.push({ id: 'property-overview', render: n => <PropertyOverview report={report} sectionNum={n} /> })
+          }
+          if (inc.weeklySnapshot) {
+            sections.push({ id: 'weekly-snapshot', render: n => <WeeklySnapshot report={report} sectionNum={n} /> })
+          }
+          if (inc.openHouses && ((report.openHouses && report.openHouses.length > 0) || (report.currentMetrics?.showingRequests ?? 0) > 0)) {
+            sections.push({ id: 'open-house', render: n => <OpenHouseReport report={report} sectionNum={n} /> })
+          }
+          if (inc.marketing && report.marketing && report.marketing.length > 0) {
+            sections.push({ id: 'marketing', render: n => <MarketingActivities report={report} sectionNum={n} /> })
+          }
+          if (inc.socialMedia && report.digitalAds) {
+            sections.push({ id: 'social', render: n => <DigitalAds report={report} sectionNum={n} /> })
+          }
+          if (inc.feedback) {
+            sections.push({ id: 'feedback', render: n => <BuyerFeedback report={report} sectionNum={n} /> })
+          }
+          if (inc.marketActivity) {
+            sections.push({ id: 'market', render: n => <MarketActivity report={report} sectionNum={n} /> })
+          }
+          if (inc.strategy) {
+            sections.push({ id: 'strategy', render: n => <AgentStrategy report={report} sectionNum={n} /> })
+          }
 
-        {inc.weeklySnapshot && (
-          <div id="weekly-snapshot"><WeeklySnapshot report={report} /></div>
-        )}
-
-        {inc.openHouses && ((report.openHouses && report.openHouses.length > 0) || (report.currentMetrics?.showingRequests ?? 0) > 0) && (
-          <div id="open-house"><OpenHouseReport report={report} /></div>
-        )}
-
-        {inc.marketing && report.marketing && report.marketing.length > 0 && (
-          <div id="marketing"><MarketingActivities report={report} /></div>
-        )}
-
-        {inc.socialMedia && report.digitalAds && (
-          <div id="social"><DigitalAds report={report} /></div>
-        )}
-
-        {inc.feedback && (
-          <div id="feedback"><BuyerFeedback report={report} /></div>
-        )}
-
-        {inc.marketActivity && (
-          <div id="market"><MarketActivity report={report} /></div>
-        )}
-
-        {inc.strategy && (
-          <div id="strategy"><AgentStrategy report={report} /></div>
-        )}
-
+          return sections.map((s, i) => {
+            const num = String(i + 1).padStart(2, '0')
+            return <div key={s.id} id={s.id}>{s.render(num)}</div>
+          })
+        })()}
       </div>
     </>
   )

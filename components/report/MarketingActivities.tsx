@@ -4,7 +4,7 @@ import { formatNumber, formatDate } from '@/lib/utils'
 import { ExternalLink, Instagram, Mail, Radio, Globe, Printer, Video, Megaphone } from 'lucide-react'
 import SectionMast from './SectionMast'
 
-interface Props { report: WeeklyReport }
+interface Props { report: WeeklyReport; sectionNum?: string }
 
 const typeIcons: Record<string, React.ElementType> = {
   instagram_post:      Instagram,
@@ -91,7 +91,7 @@ function ActivityRow({ activity }: { activity: MarketingActivity }) {
   )
 }
 
-export default function MarketingActivities({ report }: Props) {
+export default function MarketingActivities({ report, sectionNum = '04' }: Props) {
   const { marketing, weekStartDate, weekEndDate } = report
   if (!marketing || marketing.length === 0) return null
 
@@ -105,8 +105,8 @@ export default function MarketingActivities({ report }: Props) {
     <section className="report-section-dark print-page-break">
       <div className="max-w-6xl mx-auto px-6 md:px-12">
         <SectionMast
-          num="04"
-          eyebrow="04 — Marketing Activities"
+          num={sectionNum}
+          eyebrow={`${sectionNum} — Marketing Activities`}
           title="Where We Showed Up"
           kicker="Owned content and curated outreach driving qualified eyes to the listing."
           tone="dark"

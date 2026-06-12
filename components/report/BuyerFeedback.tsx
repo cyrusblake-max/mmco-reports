@@ -3,7 +3,7 @@ import { WeeklyReport, FeedbackItem } from '@/lib/types'
 import { Quote, ThumbsUp, ThumbsDown, Minus, User, Briefcase } from 'lucide-react'
 import SectionMast from './SectionMast'
 
-interface Props { report: WeeklyReport }
+interface Props { report: WeeklyReport; sectionNum?: string }
 
 function FeedbackCard({ item }: { item: FeedbackItem }) {
   const sentimentConfig = {
@@ -38,7 +38,7 @@ function InsightBlock({ label, content, accent = false }: { label: string; conte
   )
 }
 
-export default function BuyerFeedback({ report }: Props) {
+export default function BuyerFeedback({ report, sectionNum = '06' }: Props) {
   const { feedback } = report
   if (!feedback) return null
 
@@ -50,8 +50,8 @@ export default function BuyerFeedback({ report }: Props) {
     <section className="report-section bg-luxury-beige print-page-break">
       <div className="max-w-6xl mx-auto px-6 md:px-12">
         <SectionMast
-          num="06"
-          eyebrow="06 — Buyer & Broker Feedback"
+          num={sectionNum}
+          eyebrow={`${sectionNum} — Buyer & Broker Feedback`}
           title="What the Market Is Saying"
           kicker="A curated synthesis of buyer and broker reactions gathered through open houses, private showings, and outreach."
         />
