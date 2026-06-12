@@ -1,69 +1,113 @@
-'use client'
-import { useEffect, useState } from 'react'
-import { useParams, useRouter } from 'next/navigation'
-import Link from 'next/link'
+import type { Metadata } from 'next'
 import { WeeklyReport } from '@/lib/types'
-import { getReport, duplicateReport } from '@/lib/store'
-import ReportShell from '@/components/report/ReportShell'
+import { BALTIC_REPORT } from '@/lib/baltic-report'
+import { WEST71_REPORT } from '@/lib/west71-report'
+import ReportClient from './ReportClient'
 
-export default function ReportPage() {
-  const { id } = useParams<{ id: string }>()
-  const router = useRouter()
-  const [report, setReport] = useState<WeeklyReport | null>(null)
-  const [state, setState] = useState<'loading' | 'ready' | 'missing'>('loading')
+const SEEDS: WeeklyReport[] = [BALTIC_REPORT, WEST71_REPORT]
 
-  useEffect(() => {
-    let cancelled = false
-    getReport(id).then(r => {
-      if (cancelled) return
-      if (!r) { setState('missing'); return }
-      setReport(r)
-      setState('ready')
-    }).catch(() => { if (!cancelled) setState('missing') })
-    return () => { cancelled = true }
-  }, [id])
+const FALLBACK_IMAGE = '/613-baltic-listing.jpg'
 
-  async function handleDuplicate() {
-    const r = await duplicateReport(id)
-    if (r) router.push(`/dashboard/edit/${r.id}`)
+function siteOrigin(): string {
+  // Prefer an explicit production URL, then Vercel's, then localhost for dev.
+  const explicit = process.env.NEXT_PUBLIC_SITE_URL
+  if (explicit) return explicit.startsWith('http') ? explicit : `https://${explicit}`
+  const vercel = process.env.VERCEL_URL
+  if (vercel) return `https://${vercel}`
+  return 'http://localhost:3000'
+}
+
+function toAbsolute(url: string | undefined | null): string {
+  const origin = siteOrigin()
+  if (!url) return `${origin}${FALLBACK_IMAGE}`
+  // Data URLs and blob URLs cannot be used by Twitter/Facebook crawlers
+  if (url.startsWith('data:') || url.startsWith('blob:')) return `${origin}${FALLBACK_IMAGE}`
+  if (url.startsWith('http://') || url.startsWith('https://')) return url
+  if (url.startsWith('/')) return `${origin}${url}`
+  return `${origin}/${url}`
+}
+
+/**
+ * Server-side report fetch for metadata.
+ * Tries Supabase first (any dashboard edits override the seed), falls back
+ * to the in-repo seed. Never throws — metadata generation must not 500 the page.
+ */
+async function fetchReportForMeta(id: string): Promise<WeeklyReport | null> {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  if (url && key) {
+    try {
+      const res = await fetch(
+        `${url}/rest/v1/reports?id=eq.${encodeURIComponent(id)}&select=data&limit=1`,
+        {
+          headers: { apikey: key, Authorization: `Bearer ${key}` },
+          // Always get the freshest version when generating share metadata
+          cache: 'no-store',
+        },
+      )
+      if (res.ok) {
+        const rows = (await res.json()) as Array<{ data: WeeklyReport }>
+        if (rows[0]?.data) return rows[0].data
+      }
+    } catch {
+      // fall through to seed
+    }
+  }
+  return SEEDS.find(r => r.id === id) ?? null
+}
+
+export async function generateMetadata(
+  { params }: { params: Promise<{ id: string }> },
+): Promise<Metadata> {
+  const { id } = await params
+  const report = await fetchReportForMeta(id)
+
+  if (!report) {
+    return {
+      title: 'Seller Performance Report',
+      openGraph: {
+        title: 'MM&Co · Seller Performance Report',
+        images: [{ url: toAbsolute(FALLBACK_IMAGE), width: 1200, height: 630 }],
+      },
+      twitter: { card: 'summary_large_image', images: [toAbsolute(FALLBACK_IMAGE)] },
+    }
   }
 
-  if (state === 'loading') {
-    return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--ink)' }}>
-        <div className="text-center">
-          <div className="w-12 h-px bg-luxury-gold mx-auto mb-5 animate-pulse" />
-          <p className="section-label text-luxury-gold">Loading report</p>
-        </div>
-      </div>
-    )
-  }
+  const { property } = report
+  const addressLine = property.unit
+    ? `${property.address}, ${property.unit}`
+    : property.address
+  const title = `${addressLine} — Week ${report.weekNumber} Report`
+  const description = property.neighborhood
+    ? `Weekly seller performance brief for ${addressLine} · ${property.neighborhood}`
+    : `Weekly seller performance brief for ${addressLine}`
 
-  if (state === 'missing') {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center px-6" style={{ background: 'var(--ink)' }}>
-        <div className="text-center max-w-md">
-          <p className="section-label text-luxury-gold mb-6">Report unavailable</p>
-          <h1
-            className="font-serif-display text-white font-light leading-none mb-6"
-            style={{ fontSize: 'clamp(2.25rem, 5vw, 3.5rem)', letterSpacing: '-0.02em' }}
-          >
-            This report isn&rsquo;t<br />on this device
-          </h1>
-          <p className="text-white/55 text-sm leading-relaxed mb-8">
-            Reports are private and stored per-browser until we move them to a shared database.
-            If you&rsquo;re a team member, open this link on the laptop where the report was created — or ask the agent who sent it for a fresh share link.
-          </p>
-          <Link
-            href="/dashboard"
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-luxury-gold text-luxury-black text-sm font-medium hover:bg-luxury-sand transition-colors"
-          >
-            Back to Dashboard
-          </Link>
-        </div>
-      </div>
-    )
-  }
+  // Always route the OG image through our API so user-uploaded photos
+  // (stored as base64 data URLs in Supabase) work as link previews.
+  const heroAbsolute = `${siteOrigin()}/api/og-image/${encodeURIComponent(id)}`
 
-  return <ReportShell report={report!} onDuplicate={handleDuplicate} />
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      siteName: 'MM&Co Reports',
+      type: 'website',
+      images: [{ url: heroAbsolute, width: 1200, height: 630, alt: addressLine }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: [heroAbsolute],
+    },
+  }
+}
+
+export default async function ReportPage(
+  { params }: { params: Promise<{ id: string }> },
+) {
+  const { id } = await params
+  return <ReportClient id={id} />
 }

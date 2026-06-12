@@ -9,8 +9,9 @@ export const WEST71_REPORT: WeeklyReport = {
   id: 'west71-266-w1',
   weekNumber: 1,
   reportDate: '2026-06-11',
-  weekStartDate: '2026-06-04',
-  weekEndDate: '2026-06-10',
+  // Reporting window: since listing date (June 2 – June 11, 2026)
+  weekStartDate: '2026-06-02',
+  weekEndDate: '2026-06-11',
 
   property: {
     address: '266 West 71st Street',
@@ -52,7 +53,7 @@ export const WEST71_REPORT: WeeklyReport = {
     ],
   },
 
-  // Week 1 (June 4 – 10): four private showings — all positive feedback.
+  // Since listing (June 2 – June 11): four private showings + one preview — all positive feedback.
   // Compass Insights: 831 total views, 54 unique visitors,
   // 96 Compass / 280 Realtor / 453 StreetEasy / 2 Other.
   // Top traffic source: Compass (88%); top social channel: Instagram (100%).
@@ -64,7 +65,7 @@ export const WEST71_REPORT: WeeklyReport = {
     compassViews: 96,
     saves: 0,
     inquiries: 0,
-    showingRequests: 4,
+    showingRequests: 5,
     openHouseAttendees: 0,
     brokerInquiries: 0,
     buyerLeads: 0,
@@ -86,7 +87,7 @@ export const WEST71_REPORT: WeeklyReport = {
         compassViews: 96,
         saves: 0,
         inquiries: 0,
-        showingRequests: 4,
+        showingRequests: 5,
         openHouseAttendees: 0,
         brokerInquiries: 0,
         buyerLeads: 0,
@@ -107,7 +108,21 @@ export const WEST71_REPORT: WeeklyReport = {
     strategy:         true,
   },
 
-  openHouses: [],
+  openHouses: [
+    {
+      id: 'oh-west71-preview',
+      date: '2026-06-03',
+      startTime: '14:00',
+      endTime: '14:45',
+      totalAttendees: 1,
+      brokers: 0,
+      buyers: 1,
+      seriousInterestLevel: 3,
+      commonFeedback: '',
+      questionsAsked: '',
+      followUpActions: 'Private preview — one prospective buyer previewed the home.',
+    },
+  ],
 
   marketing: [],
 
@@ -119,7 +134,7 @@ export const WEST71_REPORT: WeeklyReport = {
     pricingFeedback: '',
     layoutFeedback: '',
     competingProperties: '',
-    brokerSentiment: 'Four private showings this week — all reported positive feedback. Strong engagement and continued interest from prospective buyers.',
+    brokerSentiment: 'Since listing: four private showings plus one preview — all reported positive feedback. Strong engagement and continued interest from prospective buyers.',
     recommendedAdjustments: '',
   },
 
@@ -133,7 +148,7 @@ export const WEST71_REPORT: WeeklyReport = {
 
   strategy: {
     keyRecommendations: '',
-    marketingPlanNextWeek: '— Maintain private showing momentum (4 strong showings this week with positive feedback)\n— Continue to leverage StreetEasy as the primary traffic source (453 views this week)\n— Build out Instagram presence — currently driving 100% of social traffic\n— Targeted broker outreach to agents with active Upper West Side buyers',
+    marketingPlanNextWeek: '— Maintain private showing momentum (4 private showings + 1 preview since listing, all positive feedback)\n— Continue to leverage StreetEasy as the primary traffic source (453 views since listing)\n— Build out Instagram presence — currently driving 100% of social traffic\n— Targeted broker outreach to agents with active Upper West Side buyers',
     pricingStrategy: '',
     upcomingCampaigns: '',
     brokerEvents: '',
