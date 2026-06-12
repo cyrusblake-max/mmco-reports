@@ -2,10 +2,10 @@ import { WeeklyReport } from './types'
 
 export const BALTIC_REPORT: WeeklyReport = {
   id: 'baltic-613-9c-w1',
-  weekNumber: 4,
-  reportDate: '2026-06-04',
-  weekStartDate: '2026-05-28',
-  weekEndDate: '2026-06-03',
+  weekNumber: 5,
+  reportDate: '2026-06-11',
+  weekStartDate: '2026-06-04',
+  weekEndDate: '2026-06-10',
 
   property: {
     address: '613 Baltic Street',
@@ -14,7 +14,7 @@ export const BALTIC_REPORT: WeeklyReport = {
     city: 'Brooklyn',
     state: 'NY',
     zip: '11217',
-    price: 3_500_000,
+    price: 3_249_000,
     beds: 3,
     baths: 3.5,
     sqft: 1789,
@@ -47,11 +47,28 @@ export const BALTIC_REPORT: WeeklyReport = {
     ],
   },
 
-  // Week 4 (May 28 – June 3): broker open house Thursday with 9 attendees.
-  // Compass Insights (May 28 – June 3): 285 total views, 117 unique visitors,
-  // 151 Compass / 134 StreetEasy. 86% of Compass views from public visitors.
-  // Top traffic source: Social (43%); top social channel: Instagram (85%).
+  // Week 5 (June 4 – June 10): Price adjustment announced — listed at $3,249,000.
+  // Compass Insights (June 4 – June 10): 380 total views,
+  // 301 Compass / 79 StreetEasy.
+  // Top social channel: Facebook (77.1% of social traffic).
   currentMetrics: {
+    totalViews: 380,
+    websiteTraffic: 0,
+    zillowViews: 0,
+    streetEasyViews: 79,
+    compassViews: 301,
+    saves: 0,
+    inquiries: 0,
+    showingRequests: 0,
+    openHouseAttendees: 0,
+    brokerInquiries: 0,
+    buyerLeads: 0,
+    socialReach: 0,
+    videoViews: 0,
+  },
+
+  // Previous = Week 4's actuals so trends still compute
+  previousMetrics: {
     totalViews: 285,
     websiteTraffic: 0,
     zillowViews: 0,
@@ -61,23 +78,6 @@ export const BALTIC_REPORT: WeeklyReport = {
     inquiries: 0,
     showingRequests: 1,
     openHouseAttendees: 11,
-    brokerInquiries: 0,
-    buyerLeads: 0,
-    socialReach: 0,
-    videoViews: 0,
-  },
-
-  // Previous = Week 3's actuals so trends still compute
-  previousMetrics: {
-    totalViews: 293,
-    websiteTraffic: 0,
-    zillowViews: 0,
-    streetEasyViews: 117,
-    compassViews: 176,
-    saves: 0,
-    inquiries: 0,
-    showingRequests: 0,
-    openHouseAttendees: 0,
     brokerInquiries: 0,
     buyerLeads: 0,
     socialReach: 0,
@@ -153,8 +153,27 @@ export const BALTIC_REPORT: WeeklyReport = {
         compassViews: 151,
         saves: 0,
         inquiries: 0,
-        showingRequests: 0,
+        showingRequests: 1,
         openHouseAttendees: 11,
+        brokerInquiries: 0,
+        buyerLeads: 0,
+        socialReach: 0,
+        videoViews: 0,
+      },
+    },
+    {
+      weekLabel: 'Week 5',
+      weekNumber: 5,
+      metrics: {
+        totalViews: 380,
+        websiteTraffic: 0,
+        zillowViews: 0,
+        streetEasyViews: 79,
+        compassViews: 301,
+        saves: 0,
+        inquiries: 0,
+        showingRequests: 0,
+        openHouseAttendees: 0,
         brokerInquiries: 0,
         buyerLeads: 0,
         socialReach: 0,
@@ -226,6 +245,19 @@ export const BALTIC_REPORT: WeeklyReport = {
       commonFeedback: '',
       questionsAsked: '',
       followUpActions: 'Broker Open House — 11 NYC brokers attended. Strong showing from the broker network.',
+    },
+    {
+      id: 'oh-baltic-004-w5',
+      date: '2026-06-07',
+      startTime: '12:00',
+      endTime: '13:30',
+      totalAttendees: 0,
+      brokers: 0,
+      buyers: 0,
+      seriousInterestLevel: 1,
+      commonFeedback: '',
+      questionsAsked: '',
+      followUpActions: 'Public open house — no attendees. Followed by price adjustment to $3.249M two days later.',
     },
   ],
 
@@ -322,6 +354,18 @@ export const BALTIC_REPORT: WeeklyReport = {
       notes:
         'Posted on @compassny (Verified) and reshared across team accounts. Caption highlights corner 3BR/3.5BA, southwest exposures, outdoor space, parking + storage. Tagged @maggie_leigh_marshall.',
     },
+    {
+      id: 'mkt-baltic-w5-price-drop',
+      type: 'instagram_post',
+      name: '@maggie_leigh_marshall — Price Drop Announcement',
+      date: '2026-06-09',
+      impressions: 0,
+      engagement: 0,
+      clicks: 0,
+      reach: 0,
+      notes:
+        'Instagram post highlighting the recent price adjustment to $3,249,000 (down from $3,500,000). Drives new buyer attention and re-engages prior viewers.',
+    },
   ],
 
   socialMedia: [
@@ -353,33 +397,33 @@ export const BALTIC_REPORT: WeeklyReport = {
     campaignName: 'Location-Based Targeting',
     targetingFocus: 'Boerum Hill · Park Slope · Cobble Hill · Carroll Gardens · Brooklyn Heights · Fort Greene',
     reportingPeriod: 'May 29 – June 28, 2026',
-    totalImpressions: 21943,
-    totalClicks: 122,
-    topChannel: { name: 'nytimes.com', ctr: 0.56 },
-    byChannel: [], // Display campaign — no per-social-channel clicks; see topPublishers below
+    totalImpressions: 50126,
+    totalClicks: 313,
+    topChannel: { name: 'Instagram', ctr: 2.4 },
+    // This week's social ad clicks-by-channel breakdown (Compass Digital Ads, Jun 9)
+    byChannel: [
+      { channel: 'Google',    clicks: 88, ctr: 1.82 },
+      { channel: 'Facebook',  clicks: 19, ctr: 1.73 },
+      { channel: 'Instagram', clicks: 14, ctr: 2.48 },
+    ],
+    // Where the location-based display ads showed up (May 29 – Jun 28 running totals)
     topPublishers: [
-      { publisher: 'nytimes.com',                       views: 3277 },
-      { publisher: 'theatlantic.com',                   views: 2452 },
-      { publisher: 'mlb.com',                           views: 1720 },
-      { publisher: 'nypost.com',                        views: 1658 },
-      { publisher: 'foxnews.com',                       views: 1043 },
-      { publisher: 'huffpost.com',                      views: 1008 },
-      { publisher: 'theguardian.com',                   views: 735 },
-      { publisher: 'Newsday (Mobile App)',              views: 621 },
-      { publisher: 'npr.org',                           views: 612 },
-      { publisher: 'yahoo.com',                         views: 501 },
-      { publisher: 'thedailybeast.com',                 views: 414 },
-      { publisher: 'cnn.com',                           views: 365 },
+      { publisher: 'nytimes.com',     views: 13965 },
+      { publisher: 'theatlantic.com', views: 4869  },
+      { publisher: 'mlb.com',         views: 3795  },
+      { publisher: 'nypost.com',      views: 3058  },
+      { publisher: 'gothamist.com',   views: 2807  },
+      { publisher: 'huffpost.com',    views: 1914  },
     ],
     audienceHouseholdIncome: [
-      { bracket: 'Top 10%', share: 92.9 },
-      { bracket: '41–50%',  share: 3.6  },
-      { bracket: '21–30%',  share: 1.7  },
+      { bracket: 'Top 10%', share: 94.4 },
+      { bracket: '41–50%',  share: 2.9  },
+      { bracket: '21–30%',  share: 1.3  },
     ],
-    socialTrafficPeriod: 'May 28 – June 3, 2026',
+    socialTrafficPeriod: 'June 4 – June 10, 2026',
     socialTrafficShare: [
-      { channel: 'Instagram', share: 85.0 },
-      { channel: 'Facebook',  share: 15.0 },
+      { channel: 'Facebook',  share: 77.1 },
+      { channel: 'Instagram', share: 22.9 },
     ],
   },
 
@@ -394,10 +438,10 @@ export const BALTIC_REPORT: WeeklyReport = {
 
   strategy: {
     keyRecommendations: '',
-    marketingPlanNextWeek: '— Personal follow-up with all 11 brokers from the Thursday May 28 broker open house\n— New Instagram reel highlighting the broker-event turnout and terrace views\n— Continued posts across @maggie_leigh_marshall and @soldbycy\n— Weekly broker blast to NYC network\n— Continue location-based display campaign (NYT, Atlantic, NY Post, etc.) through June 28',
+    marketingPlanNextWeek: '— Price-adjustment announcement push: new "$3.25M" creative across all social and display ads\n— Re-engage all prior open-house attendees and broker contacts with the new price\n— Refreshed Instagram reel on @maggie_leigh_marshall and @soldbycy highlighting the new price\n— Weekly broker blast to NYC network with price adjustment\n— Location-based display campaign continues through June 28 (NYT, Atlantic, NY Post, Gothamist, etc.)',
     pricingStrategy: '',
     upcomingCampaigns: '',
     brokerEvents: '',
-    openHousesPlanned: '— Public open house: Sunday June 7, 12:00–1:30 PM',
+    openHousesPlanned: '— Public open house: Sunday June 14, 1:00–2:30 PM (first showing at new $3.25M price)',
   },
 }
