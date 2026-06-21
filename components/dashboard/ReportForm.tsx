@@ -1,11 +1,14 @@
 'use client'
 import { useCallback, useState, useRef } from 'react'
 import { useRouter }  from 'next/navigation'
-import { WeeklyReport, WeeklyMetrics, METRIC_LABELS, MARKETING_LABELS, MarketingType } from '@/lib/types'
+import {
+  WeeklyReport, WeeklyMetrics, METRIC_LABELS, MARKETING_LABELS, MarketingType,
+  DEFAULT_INCLUDED_SECTIONS, SECTION_DISPLAY, DEFAULT_SECTION_ORDER,
+  type IncludedSections, type SectionKey, type CustomSection,
+} from '@/lib/types'
 import { saveReport } from '@/lib/store'
 import { v4 as uuidv4 } from 'uuid'
-import { Plus, Trash2, ChevronDown, ChevronUp, Save, Eye, Upload } from 'lucide-react'
-import { DEFAULT_INCLUDED_SECTIONS, SECTION_DISPLAY, type IncludedSections } from '@/lib/types'
+import { Plus, Trash2, ChevronDown, ChevronUp, Save, Eye, Upload, ArrowUp, ArrowDown } from 'lucide-react'
 import ImageDrop from './ImageDrop'
 import GalleryDrop from './GalleryDrop'
 
@@ -278,6 +281,223 @@ function PhotoUpload({ value, onChange }: { value: string; onChange: (url: strin
   )
 }
 
+/**
+ * Layout & Sections — controls which sections render, in what order, and
+ * lets the agent add free-form custom sections. The report shell auto-numbers
+ * whatever survives the include filter, so reordering or hiding never leaves
+ * gaps in the section numbers.
+ */
+function LayoutSections({
+  report, onIncludeChange, onOrderChange, onCustomChange,
+}: {
+  report: WeeklyReport
+  onIncludeChange: (next: IncludedSections) => void
+  onOrderChange: (next: string[]) => void
+  onCustomChange: (next: CustomSection[]) => void
+}) {
+  const inc: IncludedSections = { ...DEFAULT_INCLUDED_SECTIONS, ...(report.includedSections ?? {}) }
+  const customSections = report.customSections ?? []
+  const customKeys = customSections.map(c => `custom:${c.id}`)
+  const baseOrder = report.sectionOrder && report.sectionOrder.length > 0
+    ? report.sectionOrder
+    : (DEFAULT_SECTION_ORDER as string[])
+  const order: string[] = [...baseOrder, ...customKeys.filter(k => !baseOrder.includes(k))]
+
+  function move(i: number, dir: -1 | 1) {
+    const j = i + dir
+    if (j < 0 || j >= order.length) return
+    const next = [...order]
+    ;[next[i], next[j]] = [next[j], next[i]]
+    onOrderChange(next)
+  }
+
+  function reset() {
+    onOrderChange([...(DEFAULT_SECTION_ORDER as string[]), ...customKeys])
+  }
+
+  function allOn() {
+    return SECTION_DISPLAY.every(s => inc[s.key])
+  }
+  function toggleAll() {
+    const v = !allOn()
+    onIncludeChange(Object.fromEntries(SECTION_DISPLAY.map(s => [s.key, v])) as unknown as IncludedSections)
+  }
+
+  function addCustom() {
+    const c: CustomSection = { id: uuidv4(), title: 'New Section', body: '', eyebrow: '' }
+    onCustomChange([...customSections, c])
+  }
+  function updateCustom(id: string, key: keyof CustomSection, value: string) {
+    onCustomChange(customSections.map(c => c.id === id ? { ...c, [key]: value } : c))
+  }
+  function removeCustom(id: string) {
+    onCustomChange(customSections.filter(c => c.id !== id))
+    onOrderChange(order.filter(k => k !== `custom:${id}`))
+  }
+
+  return (
+    <div className="border border-luxury-cream bg-white p-6 mb-6 space-y-6">
+      <div className="flex items-baseline justify-between">
+        <div>
+          <p className="font-medium text-sm">Layout & Sections</p>
+          <p className="text-xs text-luxury-taupe/70 mt-0.5">
+            Toggle visibility, rearrange, or add a custom section. Section numbers (01, 02 …)
+            auto-update — there will never be gaps.
+          </p>
+        </div>
+        <button type="button" onClick={toggleAll} className="section-label text-luxury-taupe hover:text-luxury-black transition-colors">
+          {allOn() ? 'hide all' : 'show all'}
+        </button>
+      </div>
+
+      {/* Ordered list — visibility + reorder controls per row.
+          The displayed number mirrors what the report will actually show:
+          sequential among VISIBLE sections only, so it stays gap-free. */}
+      <div className="space-y-1.5">
+        {(() => {
+          // Precompute the visible-only sequence so each row knows its
+          // final report number (or null if hidden).
+          let counter = 0
+          const numByKey = new Map<string, string | null>()
+          for (const key of order) {
+            if (key.startsWith('custom:')) {
+              counter += 1
+              numByKey.set(key, String(counter).padStart(2, '0'))
+            } else {
+              const k = key as SectionKey
+              if (inc[k]) {
+                counter += 1
+                numByKey.set(key, String(counter).padStart(2, '0'))
+              } else {
+                numByKey.set(key, null)
+              }
+            }
+          }
+          return order.map((key, i) => {
+          const isCustom = key.startsWith('custom:')
+          const num = numByKey.get(key) ?? null
+
+          if (isCustom) {
+            const id = key.slice('custom:'.length)
+            const c = customSections.find(s => s.id === id)
+            if (!c) return null
+            return (
+              <div
+                key={key}
+                className="flex items-center gap-3 px-3 py-2.5 border border-luxury-gold/40 bg-luxury-gold/5"
+              >
+                <span className="section-label text-luxury-gold w-6 flex-shrink-0" style={{ fontSize: '0.6rem' }}>{num}</span>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs text-luxury-black truncate font-medium">{c.title || 'Custom Section'}</p>
+                  <p className="text-luxury-taupe truncate" style={{ fontSize: '0.62rem' }}>Custom</p>
+                </div>
+                <div className="flex items-center gap-1 flex-shrink-0">
+                  <button type="button" disabled={i === 0} onClick={() => move(i, -1)} className="p-1 text-luxury-taupe hover:text-luxury-black disabled:opacity-30" title="Move up">
+                    <ArrowUp className="w-3.5 h-3.5" />
+                  </button>
+                  <button type="button" disabled={i === order.length - 1} onClick={() => move(i, 1)} className="p-1 text-luxury-taupe hover:text-luxury-black disabled:opacity-30" title="Move down">
+                    <ArrowDown className="w-3.5 h-3.5" />
+                  </button>
+                  <button type="button" onClick={() => removeCustom(id)} className="p-1 text-luxury-taupe hover:text-danger" title="Remove">
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+            )
+          }
+
+          const k = key as SectionKey
+          const meta = SECTION_DISPLAY.find(s => s.key === k)
+          if (!meta) return null
+          const on = inc[k]
+          return (
+            <div
+              key={key}
+              className={`flex items-center gap-3 px-3 py-2.5 border transition-colors ${
+                on ? 'border-luxury-cream bg-white' : 'border-luxury-cream bg-luxury-off/50'
+              }`}
+            >
+              <input
+                type="checkbox"
+                checked={on}
+                onChange={e => onIncludeChange({ ...inc, [k]: e.target.checked })}
+                className="accent-luxury-gold flex-shrink-0 w-4 h-4"
+                title={on ? 'Visible in report' : 'Hidden'}
+              />
+              <span className="section-label text-luxury-gold w-6 flex-shrink-0" style={{ fontSize: '0.6rem' }}>
+                {on ? num : '—'}
+              </span>
+              <p className={`flex-1 min-w-0 text-xs truncate ${on ? 'text-luxury-black' : 'text-luxury-taupe line-through'}`}>{meta.label}</p>
+              <div className="flex items-center gap-1 flex-shrink-0">
+                <button type="button" disabled={i === 0} onClick={() => move(i, -1)} className="p-1 text-luxury-taupe hover:text-luxury-black disabled:opacity-30" title="Move up">
+                  <ArrowUp className="w-3.5 h-3.5" />
+                </button>
+                <button type="button" disabled={i === order.length - 1} onClick={() => move(i, 1)} className="p-1 text-luxury-taupe hover:text-luxury-black disabled:opacity-30" title="Move down">
+                  <ArrowDown className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+          )
+        })
+        })()}
+      </div>
+
+      <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-luxury-cream">
+        <button type="button" onClick={addCustom} className="flex items-center gap-1.5 px-3 py-1.5 text-xs section-label text-luxury-gold hover:text-luxury-sand border border-luxury-cream hover:border-luxury-sand transition-colors">
+          <Plus className="w-3.5 h-3.5" /> Add custom section
+        </button>
+        <button type="button" onClick={reset} className="text-xs section-label text-luxury-taupe hover:text-luxury-black px-3 py-1.5 transition-colors">
+          Reset order
+        </button>
+      </div>
+
+      {/* Inline editor for each custom section's title + body */}
+      {customSections.length > 0 && (
+        <div className="space-y-4 pt-4 border-t border-luxury-cream">
+          <p className="section-label text-luxury-taupe">Custom Section Content</p>
+          {customSections.map((c) => (
+            <div key={c.id} className="border border-luxury-cream bg-luxury-off p-4 space-y-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div>
+                  <label className="section-label text-luxury-taupe block mb-1.5">Title</label>
+                  <input
+                    type="text"
+                    value={c.title}
+                    onChange={e => updateCustom(c.id, 'title', e.target.value)}
+                    placeholder="Agent Insight"
+                    className="w-full bg-white border border-luxury-cream px-3 py-2 text-sm focus:outline-none focus:border-luxury-gold transition-colors"
+                  />
+                </div>
+                <div>
+                  <label className="section-label text-luxury-taupe block mb-1.5">Eyebrow Label (optional)</label>
+                  <input
+                    type="text"
+                    value={c.eyebrow ?? ''}
+                    onChange={e => updateCustom(c.id, 'eyebrow', e.target.value)}
+                    placeholder="Memo · Strategy · etc."
+                    className="w-full bg-white border border-luxury-cream px-3 py-2 text-sm focus:outline-none focus:border-luxury-gold transition-colors"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="section-label text-luxury-taupe block mb-1.5">Body</label>
+                <textarea
+                  value={c.body}
+                  onChange={e => updateCustom(c.id, 'body', e.target.value)}
+                  rows={5}
+                  placeholder={'Write paragraphs separated by a blank line.\nStart a line with "- " for a bulleted list.'}
+                  className="w-full bg-white border border-luxury-cream px-3 py-2 text-sm focus:outline-none focus:border-luxury-gold transition-colors resize-y"
+                />
+                <p className="text-luxury-taupe/60 text-xs mt-1">Tip: a blank line starts a new paragraph. Lines starting with “- ” become bullets.</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
 export default function ReportForm({ initial, onChange, onSaved }: Props) {
   const router = useRouter()
   const [report, setReportState] = useState<WeeklyReport>(initial)
@@ -505,54 +725,13 @@ export default function ReportForm({ initial, onChange, onSaved }: Props) {
   return (
     <div className="space-y-2">
 
-      {/* === SECTIONS TO INCLUDE === */}
-      <div className="border border-luxury-cream bg-white p-6 mb-6">
-        <div className="flex items-baseline justify-between mb-4">
-          <p className="font-medium text-sm">Sections to Include in the Final Report</p>
-          <button
-            type="button"
-            onClick={() => {
-              const allOn = SECTION_DISPLAY.every(s => (report.includedSections ?? DEFAULT_INCLUDED_SECTIONS)[s.key])
-              setReport(r => ({
-                ...r,
-                includedSections: Object.fromEntries(SECTION_DISPLAY.map(s => [s.key, !allOn])) as unknown as IncludedSections,
-              }))
-            }}
-            className="section-label text-luxury-taupe hover:text-luxury-black transition-colors"
-          >
-            {SECTION_DISPLAY.every(s => (report.includedSections ?? DEFAULT_INCLUDED_SECTIONS)[s.key]) ? 'deselect all' : 'select all'}
-          </button>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
-          {SECTION_DISPLAY.map(({ key, num, label }) => {
-            const inc = report.includedSections ?? DEFAULT_INCLUDED_SECTIONS
-            const on = inc[key]
-            return (
-              <label
-                key={key}
-                className={`flex items-center gap-3 px-3 py-2.5 border cursor-pointer transition-colors ${
-                  on ? 'border-luxury-gold/40 bg-luxury-gold/5' : 'border-luxury-cream hover:border-luxury-sand'
-                }`}
-              >
-                <input
-                  type="checkbox"
-                  checked={on}
-                  onChange={e => setReport(r => ({
-                    ...r,
-                    includedSections: { ...(r.includedSections ?? DEFAULT_INCLUDED_SECTIONS), [key]: e.target.checked },
-                  }))}
-                  className="accent-luxury-gold flex-shrink-0 w-4 h-4"
-                />
-                <div className="flex-1 min-w-0 leading-tight">
-                  <p className="section-label text-luxury-gold" style={{ fontSize: '0.55rem' }}>{num}</p>
-                  <p className="text-xs text-luxury-black truncate mt-0.5">{label}</p>
-                </div>
-              </label>
-            )
-          })}
-        </div>
-        <p className="text-xs text-luxury-taupe/70 mt-3">The cover page is always included. Unchecked sections are hidden from the report and the PDF export.</p>
-      </div>
+      {/* === LAYOUT & SECTIONS === */}
+      <LayoutSections
+        report={report}
+        onIncludeChange={(next) => setReport(r => ({ ...r, includedSections: next }))}
+        onOrderChange={(next) => setReport(r => ({ ...r, sectionOrder: next }))}
+        onCustomChange={(next) => setReport(r => ({ ...r, customSections: next }))}
+      />
 
       {/* === PROPERTY === */}
       <SectionPanel title="Property & Agent" num="01" defaultOpen>

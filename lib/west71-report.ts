@@ -103,6 +103,7 @@ export const WEST71_REPORT: WeeklyReport = {
     openHouses:       true,
     marketing:        false,
     socialMedia:      false,
+    digitalAds:       false,
     feedback:         true,
     marketActivity:   false,
     strategy:         true,

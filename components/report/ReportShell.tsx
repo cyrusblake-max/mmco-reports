@@ -1,6 +1,12 @@
 'use client'
 import { useState, useEffect } from 'react'
-import { WeeklyReport, DEFAULT_INCLUDED_SECTIONS } from '@/lib/types'
+import {
+  WeeklyReport,
+  DEFAULT_INCLUDED_SECTIONS,
+  DEFAULT_SECTION_ORDER,
+  SectionKey,
+  IncludedSections,
+} from '@/lib/types'
 import CoverPage        from './CoverPage'
 import PropertyOverview from './PropertyOverview'
 import WeeklySnapshot   from './WeeklySnapshot'
@@ -10,6 +16,7 @@ import DigitalAds      from './DigitalAds'
 import BuyerFeedback    from './BuyerFeedback'
 import MarketActivity   from './MarketActivity'
 import AgentStrategy    from './AgentStrategy'
+import CustomSectionBlock from './CustomSectionBlock'
 import { Link as LinkIcon, ArrowLeft, Copy, Check } from 'lucide-react'
 import Link from 'next/link'
 
@@ -18,21 +25,37 @@ interface Props {
   onDuplicate?: () => void
 }
 
-const NAV_ITEMS: { label: string; href: string; key: keyof import('@/lib/types').IncludedSections }[] = [
-  { label: 'Overview',   href: '#property-overview', key: 'propertyOverview' },
-  { label: 'Snapshot',   href: '#weekly-snapshot',   key: 'weeklySnapshot' },
-  { label: 'Open House', href: '#open-house',        key: 'openHouses' },
-  { label: 'Marketing',  href: '#marketing',         key: 'marketing' },
-  { label: 'Social',     href: '#social',            key: 'socialMedia' },
-  { label: 'Feedback',   href: '#feedback',          key: 'feedback' },
-  { label: 'Market',     href: '#market',            key: 'marketActivity' },
-  { label: 'Strategy',   href: '#strategy',          key: 'strategy' },
-]
+const NAV_LABELS: Record<SectionKey, { label: string; href: string }> = {
+  propertyOverview: { label: 'Overview',    href: '#property-overview' },
+  weeklySnapshot:   { label: 'Snapshot',    href: '#weekly-snapshot' },
+  openHouses:       { label: 'Open House',  href: '#open-house' },
+  marketing:        { label: 'Marketing',   href: '#marketing' },
+  socialMedia:      { label: 'Social',      href: '#social' },
+  digitalAds:       { label: 'Ads',         href: '#digital-ads' },
+  feedback:         { label: 'Feedback',    href: '#feedback' },
+  marketActivity:   { label: 'Market',      href: '#market' },
+  strategy:         { label: 'Strategy',    href: '#strategy' },
+}
 
 export default function ReportShell({ report, onDuplicate }: Props) {
   const [copied, setCopied] = useState(false)
   const [shareView, setShareView] = useState(false)
-  const inc = report.includedSections ?? DEFAULT_INCLUDED_SECTIONS
+  // Older reports may have `includedSections` missing the digitalAds key —
+  // merge with defaults so toggling Digital Ads off doesn't silently fall back
+  // to "true" on legacy data.
+  const inc: IncludedSections = {
+    ...DEFAULT_INCLUDED_SECTIONS,
+    ...(report.includedSections ?? {}),
+  }
+  const customSections = report.customSections ?? []
+  const customKeys = customSections.map(c => `custom:${c.id}`)
+  const order: string[] = (report.sectionOrder && report.sectionOrder.length > 0
+    ? report.sectionOrder
+    : DEFAULT_SECTION_ORDER as string[])
+  // Always append any custom sections that aren't yet referenced in the order
+  // (e.g. just-added ones), so newly-added blocks render without requiring the
+  // user to manually re-save the order.
+  const finalOrder = [...order, ...customKeys.filter(k => !order.includes(k))]
 
   // Detect share view from URL (?share=1) — read on mount so SSR matches CSR
   useEffect(() => {
@@ -87,17 +110,38 @@ export default function ReportShell({ report, onDuplicate }: Props) {
             </div>
 
             <div className="flex items-center gap-2">
-              {/* Section links — desktop only */}
+              {/* Section links — desktop only. Reflects the chosen order so the
+                  nav matches the actual report layout. */}
               <div className="hidden lg:flex items-center gap-1">
-                {NAV_ITEMS.filter(item => inc[item.key]).map(({ label, href }) => (
-                  <a
-                    key={label}
-                    href={href}
-                    className="px-2.5 py-1 text-xs text-luxury-taupe hover:text-luxury-black transition-colors section-label"
-                  >
-                    {label}
-                  </a>
-                ))}
+                {finalOrder.map(key => {
+                  if (key.startsWith('custom:')) {
+                    const id = key.slice('custom:'.length)
+                    const c = customSections.find(s => s.id === id)
+                    if (!c) return null
+                    return (
+                      <a
+                        key={key}
+                        href={`#${key.replace(':', '-')}`}
+                        className="px-2.5 py-1 text-xs text-luxury-taupe hover:text-luxury-black transition-colors section-label"
+                      >
+                        {c.title.slice(0, 14) || 'Custom'}
+                      </a>
+                    )
+                  }
+                  const k = key as SectionKey
+                  if (!inc[k]) return null
+                  const nav = NAV_LABELS[k]
+                  if (!nav) return null
+                  return (
+                    <a
+                      key={key}
+                      href={nav.href}
+                      className="px-2.5 py-1 text-xs text-luxury-taupe hover:text-luxury-black transition-colors section-label"
+                    >
+                      {nav.label}
+                    </a>
+                  )
+                })}
               </div>
               <div className="w-px h-4 bg-luxury-cream hidden lg:block" />
 
@@ -124,36 +168,75 @@ export default function ReportShell({ report, onDuplicate }: Props) {
       )}
 
       {/* Report body — sequential section numbers assigned at render time so
-          there are no gaps if some sections are turned off for a property. */}
+          there are no gaps if some sections are turned off for a property.
+          `sectionOrder` lets the agent rearrange the built-ins and interleave
+          custom sections; the numbering follows whatever order survives the
+          include filters. */}
       <div id="report-root">
         <CoverPage report={report} />
         {(() => {
           type Sec = { id: string; render: (n: string) => React.ReactNode }
-          const sections: Sec[] = []
 
-          if (inc.propertyOverview) {
-            sections.push({ id: 'property-overview', render: n => <PropertyOverview report={report} sectionNum={n} /> })
+          const builtins: Record<SectionKey, () => Sec | null> = {
+            propertyOverview: () => inc.propertyOverview
+              ? { id: 'property-overview', render: n => <PropertyOverview report={report} sectionNum={n} /> }
+              : null,
+            weeklySnapshot:   () => inc.weeklySnapshot
+              ? { id: 'weekly-snapshot', render: n => <WeeklySnapshot report={report} sectionNum={n} /> }
+              : null,
+            openHouses:       () => inc.openHouses && (
+              (report.openHouses && report.openHouses.length > 0) ||
+              (report.currentMetrics?.showingRequests ?? 0) > 0
+            )
+              ? { id: 'open-house', render: n => <OpenHouseReport report={report} sectionNum={n} /> }
+              : null,
+            marketing:        () => inc.marketing && report.marketing && report.marketing.length > 0
+              ? { id: 'marketing', render: n => <MarketingActivities report={report} sectionNum={n} /> }
+              : null,
+            socialMedia:      () => inc.socialMedia && report.socialMedia && report.socialMedia.length > 0
+              ? { id: 'social', render: n => <DigitalAds report={report} sectionNum={n} /> }
+              : null,
+            digitalAds:       () => inc.digitalAds && report.digitalAds
+              ? { id: 'digital-ads', render: n => <DigitalAds report={report} sectionNum={n} /> }
+              : null,
+            feedback:         () => inc.feedback
+              ? { id: 'feedback', render: n => <BuyerFeedback report={report} sectionNum={n} /> }
+              : null,
+            marketActivity:   () => inc.marketActivity
+              ? { id: 'market', render: n => <MarketActivity report={report} sectionNum={n} /> }
+              : null,
+            strategy:         () => inc.strategy
+              ? { id: 'strategy', render: n => <AgentStrategy report={report} sectionNum={n} /> }
+              : null,
           }
-          if (inc.weeklySnapshot) {
-            sections.push({ id: 'weekly-snapshot', render: n => <WeeklySnapshot report={report} sectionNum={n} /> })
+
+          // socialMedia is the legacy slot that ALSO rendered DigitalAds.
+          // With the dedicated digitalAds toggle now in place, keep socialMedia
+          // rendering DigitalAds ONLY when the user hasn't separately enabled
+          // digitalAds, so we don't show the same section twice in a row.
+          if (inc.digitalAds && report.digitalAds) {
+            builtins.socialMedia = () => null
           }
-          if (inc.openHouses && ((report.openHouses && report.openHouses.length > 0) || (report.currentMetrics?.showingRequests ?? 0) > 0)) {
-            sections.push({ id: 'open-house', render: n => <OpenHouseReport report={report} sectionNum={n} /> })
-          }
-          if (inc.marketing && report.marketing && report.marketing.length > 0) {
-            sections.push({ id: 'marketing', render: n => <MarketingActivities report={report} sectionNum={n} /> })
-          }
-          if (inc.socialMedia && report.digitalAds) {
-            sections.push({ id: 'social', render: n => <DigitalAds report={report} sectionNum={n} /> })
-          }
-          if (inc.feedback) {
-            sections.push({ id: 'feedback', render: n => <BuyerFeedback report={report} sectionNum={n} /> })
-          }
-          if (inc.marketActivity) {
-            sections.push({ id: 'market', render: n => <MarketActivity report={report} sectionNum={n} /> })
-          }
-          if (inc.strategy) {
-            sections.push({ id: 'strategy', render: n => <AgentStrategy report={report} sectionNum={n} /> })
+
+          const seen = new Set<string>()
+          const sections: Sec[] = []
+          for (const key of finalOrder) {
+            if (seen.has(key)) continue
+            seen.add(key)
+            if (key.startsWith('custom:')) {
+              const id = key.slice('custom:'.length)
+              const c = customSections.find(s => s.id === id)
+              if (!c) continue
+              sections.push({
+                id: `custom-${id}`,
+                render: n => <CustomSectionBlock section={c} sectionNum={n} />,
+              })
+              continue
+            }
+            const builder = builtins[key as SectionKey]
+            if (!builder) continue
+            const sec = builder()
+            if (sec) sections.push(sec)
           }
 
           return sections.map((s, i) => {

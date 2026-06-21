@@ -223,6 +223,16 @@ export interface DigitalAdsSection {
   audienceHouseholdIncome?: AudienceBracket[]
 }
 
+export interface CustomSection {
+  id: string
+  title: string
+  /** Free-form markdown-lite — newlines become paragraphs, lines prefixed
+   *  with `- ` or `• ` render as bullets. */
+  body: string
+  /** Optional eyebrow line shown above the title (e.g. "AGENT INSIGHT") */
+  eyebrow?: string
+}
+
 export interface WeeklyReport {
   id: string
   weekNumber: number
@@ -241,6 +251,14 @@ export interface WeeklyReport {
   marketActivity: MarketActivitySection
   strategy: AgentStrategySection
   includedSections?: IncludedSections
+  /** User-added free-form sections, rendered after the built-ins. */
+  customSections?: CustomSection[]
+  /**
+   * Display order for sections. Each entry is either a built-in `SectionKey`
+   * or `custom:<id>`. Unknown keys are skipped. When omitted, the default
+   * order from `DEFAULT_SECTION_ORDER` is used.
+   */
+  sectionOrder?: string[]
 }
 
 export interface IncludedSections {
@@ -249,10 +267,13 @@ export interface IncludedSections {
   openHouses:       boolean
   marketing:        boolean
   socialMedia:      boolean
+  digitalAds:       boolean
   feedback:         boolean
   marketActivity:   boolean
   strategy:         boolean
 }
+
+export type SectionKey = keyof IncludedSections
 
 export const DEFAULT_INCLUDED_SECTIONS: IncludedSections = {
   propertyOverview: true,
@@ -260,18 +281,22 @@ export const DEFAULT_INCLUDED_SECTIONS: IncludedSections = {
   openHouses:       true,
   marketing:        true,
   socialMedia:      true,
+  digitalAds:       true,
   feedback:         true,
   marketActivity:   true,
   strategy:         true,
 }
 
-export const SECTION_DISPLAY: { key: keyof IncludedSections; num: string; label: string }[] = [
-  { key: 'propertyOverview', num: '01', label: 'Property Overview' },
-  { key: 'weeklySnapshot',   num: '02', label: 'Weekly Performance Snapshot' },
-  { key: 'openHouses',       num: '03', label: 'Open Houses' },
-  { key: 'marketing',        num: '04', label: 'Marketing Activities' },
-  { key: 'socialMedia',      num: '05', label: 'Social Media' },
-  { key: 'feedback',         num: '06', label: 'Buyer & Broker Feedback' },
-  { key: 'marketActivity',   num: '07', label: 'Market Activity' },
-  { key: 'strategy',         num: '08', label: 'Agent Strategy & Next Steps' },
+export const SECTION_DISPLAY: { key: SectionKey; label: string }[] = [
+  { key: 'propertyOverview', label: 'Property Overview' },
+  { key: 'weeklySnapshot',   label: 'Weekly Performance Snapshot' },
+  { key: 'openHouses',       label: 'Open Houses & Showings' },
+  { key: 'marketing',        label: 'Marketing Activities' },
+  { key: 'socialMedia',      label: 'Social Media' },
+  { key: 'digitalAds',       label: 'Digital Ads & Reach' },
+  { key: 'feedback',         label: 'Buyer & Broker Feedback' },
+  { key: 'marketActivity',   label: 'Market Activity' },
+  { key: 'strategy',         label: 'Agent Strategy & Next Steps' },
 ]
+
+export const DEFAULT_SECTION_ORDER: SectionKey[] = SECTION_DISPLAY.map(s => s.key)
