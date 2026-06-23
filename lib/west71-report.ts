@@ -7,11 +7,11 @@ import { WeeklyReport } from './types'
  */
 export const WEST71_REPORT: WeeklyReport = {
   id: 'west71-266-w1',
-  weekNumber: 1,
-  reportDate: '2026-06-11',
-  // Reporting window: since listing date (June 2 – June 11, 2026)
-  weekStartDate: '2026-06-02',
-  weekEndDate: '2026-06-11',
+  weekNumber: 2,
+  reportDate: '2026-06-23',
+  // Reporting window: this past week (June 15 – June 21, 2026)
+  weekStartDate: '2026-06-15',
+  weekEndDate: '2026-06-21',
 
   property: {
     address: '266 West 71st Street',
@@ -53,11 +53,29 @@ export const WEST71_REPORT: WeeklyReport = {
     ],
   },
 
-  // Since listing (June 2 – June 11): four private showings + one preview — all positive feedback.
-  // Compass Insights: 831 total views, 54 unique visitors,
-  // 96 Compass / 280 Realtor / 453 StreetEasy / 2 Other.
-  // Top traffic source: Compass (88%); top social channel: Instagram (100%).
+  // Week 2 (June 15 – 21):
+  //   • Sunday open house (Jun 21) — 4 attendees
+  //   • 3 private showings — including 2 visits from the same client (3rd scheduled)
+  // Compass Insights (Jun 11 – 17): 770 total views,
+  //   89 Compass / 415 Realtor / 264 StreetEasy / 2 Other.
   currentMetrics: {
+    totalViews: 770,
+    websiteTraffic: 0,
+    zillowViews: 0,
+    streetEasyViews: 264,
+    compassViews: 89,
+    saves: 0,
+    inquiries: 0,
+    showingRequests: 3,
+    openHouseAttendees: 4,
+    brokerInquiries: 0,
+    buyerLeads: 0,
+    socialReach: 0,
+    videoViews: 0,
+  },
+
+  // Previous = Week 1 (since-listing report, Jun 2 – Jun 11) so WoW trends compute.
+  previousMetrics: {
     totalViews: 831,
     websiteTraffic: 0,
     zillowViews: 0,
@@ -73,8 +91,6 @@ export const WEST71_REPORT: WeeklyReport = {
     videoViews: 0,
   },
 
-  previousMetrics: undefined,
-
   metricsHistory: [
     {
       weekLabel: 'Week 1',
@@ -89,6 +105,25 @@ export const WEST71_REPORT: WeeklyReport = {
         inquiries: 0,
         showingRequests: 5,
         openHouseAttendees: 0,
+        brokerInquiries: 0,
+        buyerLeads: 0,
+        socialReach: 0,
+        videoViews: 0,
+      },
+    },
+    {
+      weekLabel: 'Week 2',
+      weekNumber: 2,
+      metrics: {
+        totalViews: 770,
+        websiteTraffic: 0,
+        zillowViews: 0,
+        streetEasyViews: 264,
+        compassViews: 89,
+        saves: 0,
+        inquiries: 0,
+        showingRequests: 3,
+        openHouseAttendees: 4,
         brokerInquiries: 0,
         buyerLeads: 0,
         socialReach: 0,
@@ -123,6 +158,20 @@ export const WEST71_REPORT: WeeklyReport = {
       questionsAsked: '',
       followUpActions: 'Private preview — one prospective buyer previewed the home.',
     },
+    {
+      id: 'oh-west71-w2-sun',
+      kind: 'public',
+      date: '2026-06-21',
+      startTime: '13:00',
+      endTime: '14:30',
+      totalAttendees: 4,
+      brokers: 0,
+      buyers: 4,
+      seriousInterestLevel: 3,
+      commonFeedback: '',
+      questionsAsked: '',
+      followUpActions: '',
+    },
   ],
 
   marketing: [],
@@ -135,7 +184,7 @@ export const WEST71_REPORT: WeeklyReport = {
     pricingFeedback: '',
     layoutFeedback: '',
     competingProperties: '',
-    brokerSentiment: 'Since listing: four private showings plus one preview — all reported positive feedback. Strong engagement and continued interest from prospective buyers.',
+    brokerSentiment: 'Week 2: Sunday open house drew 4 attendees. Three additional private showings completed — including two visits from the same client with a third already scheduled. Repeat interest is the strongest signal so far.',
     recommendedAdjustments: '',
   },
 
@@ -149,10 +198,10 @@ export const WEST71_REPORT: WeeklyReport = {
 
   strategy: {
     keyRecommendations: '',
-    marketingPlanNextWeek: '— Maintain private showing momentum (4 private showings + 1 preview since listing, all positive feedback)\n— Continue to leverage StreetEasy as the primary traffic source (453 views since listing)\n— Build out Instagram presence — currently driving 100% of social traffic\n— Targeted broker outreach to agents with active Upper West Side buyers',
+    marketingPlanNextWeek: '— Convert the repeat client — third showing is on the books, push for an offer conversation\n— Sunday open house drew 4 — keep weekly cadence to build a wider buyer pool\n— Realtor.com is now the dominant traffic source (415 views vs. 264 StreetEasy / 89 Compass) — explore boosting StreetEasy + Compass presence to broaden the funnel\n— Targeted broker outreach to agents with active Upper West Side buyers',
     pricingStrategy: '',
     upcomingCampaigns: '',
     brokerEvents: '',
-    openHousesPlanned: '— No open house this weekend — focus on continued private appointment scheduling',
+    openHousesPlanned: '— Public open house: Sunday June 28, 1:00–2:30 PM\n— Third showing scheduled with the repeat-visit client',
   },
 }
