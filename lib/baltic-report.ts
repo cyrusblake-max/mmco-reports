@@ -2,10 +2,12 @@ import { WeeklyReport } from './types'
 
 export const BALTIC_REPORT: WeeklyReport = {
   id: 'baltic-613-9c-w1',
-  weekNumber: 5,
-  reportDate: '2026-06-11',
-  weekStartDate: '2026-06-04',
-  weekEndDate: '2026-06-10',
+  // Two-week catch-up: last week (Jun 14–20) wasn't sent. Window extends through
+  // Sun Jun 21 so this past Sunday's open house lands inside the reporting period.
+  weekNumber: 7,
+  reportDate: '2026-06-23',
+  weekStartDate: '2026-06-14',
+  weekEndDate: '2026-06-21',
 
   property: {
     address: '613 Baltic Street',
@@ -47,33 +49,35 @@ export const BALTIC_REPORT: WeeklyReport = {
     ],
   },
 
-  // Week 5 (June 4 – June 10): Price adjustment announced — listed at $3,249,000.
-  // Compass Insights (June 4 – June 10): 380 total views,
-  // 301 Compass / 79 StreetEasy.
-  // Top social channel: Facebook (77.1% of social traffic).
+  // Weeks 6–7 (June 7 – June 20, 2026): two-week catch-up window.
+  // Compass Insights (June 11 – June 17): 351 total views,
+  // 259 Compass / 92 StreetEasy. Top social channel flipped to Facebook
+  // (61.0% of social traffic) vs Instagram (39.0%).
   currentMetrics: {
-    totalViews: 380,
+    totalViews: 351,
     websiteTraffic: 0,
     zillowViews: 0,
-    streetEasyViews: 79,
-    compassViews: 301,
+    streetEasyViews: 92,
+    compassViews: 259,
     saves: 0,
     inquiries: 0,
     showingRequests: 0,
-    openHouseAttendees: 0,
+    // Three open houses across the two weeks — one couple at each (2 attendees × 3).
+    openHouseAttendees: 6,
     brokerInquiries: 0,
     buyerLeads: 0,
     socialReach: 0,
     videoViews: 0,
   },
 
-  // Previous = Week 4's actuals so trends still compute
+  // Previous = the prior comparable two weeks (Weeks 4 + 5, May 28 – June 10)
+  // so the % deltas reflect a fair two-week-to-two-week comparison.
   previousMetrics: {
-    totalViews: 285,
+    totalViews: 665,
     websiteTraffic: 0,
     zillowViews: 0,
-    streetEasyViews: 134,
-    compassViews: 151,
+    streetEasyViews: 213,
+    compassViews: 452,
     saves: 0,
     inquiries: 0,
     showingRequests: 1,
@@ -180,6 +184,27 @@ export const BALTIC_REPORT: WeeklyReport = {
         videoViews: 0,
       },
     },
+    {
+      // Week 6 was the missed week; using the Compass insights pull for
+      // Jun 11 – Jun 17 as the closest snapshot.
+      weekLabel: 'Week 6',
+      weekNumber: 6,
+      metrics: {
+        totalViews: 351,
+        websiteTraffic: 0,
+        zillowViews: 0,
+        streetEasyViews: 92,
+        compassViews: 259,
+        saves: 0,
+        inquiries: 0,
+        showingRequests: 0,
+        openHouseAttendees: 0,
+        brokerInquiries: 0,
+        buyerLeads: 0,
+        socialReach: 0,
+        videoViews: 0,
+      },
+    },
   ],
 
   includedSections: {
@@ -246,6 +271,49 @@ export const BALTIC_REPORT: WeeklyReport = {
       commonFeedback: '',
       questionsAsked: '',
       followUpActions: 'Broker Open House — 11 NYC brokers attended. Strong showing from the broker network.',
+    },
+    // Weeks 6–7 open houses — one couple at each of three events.
+    {
+      id: 'oh-baltic-w6-sun',
+      kind: 'public',
+      date: '2026-06-14',
+      startTime: '13:00',
+      endTime: '14:30',
+      totalAttendees: 2,
+      brokers: 0,
+      buyers: 2,
+      seriousInterestLevel: 3,
+      commonFeedback: '',
+      questionsAsked: '',
+      followUpActions: 'One couple attended — first showing at the new $3.25M price.',
+    },
+    {
+      id: 'oh-baltic-w6-wed',
+      kind: 'public',
+      date: '2026-06-17',
+      startTime: '12:00',
+      endTime: '13:30',
+      totalAttendees: 2,
+      brokers: 0,
+      buyers: 2,
+      seriousInterestLevel: 3,
+      commonFeedback: '',
+      questionsAsked: '',
+      followUpActions: 'Midweek open house — one couple attended.',
+    },
+    {
+      id: 'oh-baltic-w7-sun',
+      kind: 'public',
+      date: '2026-06-21',
+      startTime: '13:00',
+      endTime: '14:30',
+      totalAttendees: 2,
+      brokers: 0,
+      buyers: 2,
+      seriousInterestLevel: 3,
+      commonFeedback: '',
+      questionsAsked: '',
+      followUpActions: 'One couple attended — steady weekend interest at the new price.',
     },
   ],
 
@@ -396,34 +464,35 @@ export const BALTIC_REPORT: WeeklyReport = {
   digitalAds: {
     campaignName: 'Location-Based Targeting',
     targetingFocus: 'Boerum Hill · Park Slope · Cobble Hill · Carroll Gardens · Brooklyn Heights · Fort Greene',
-    reportingPeriod: 'May 29 – June 28, 2026',
-    totalImpressions: 50126,
-    totalClicks: 313,
-    topChannel: { name: 'Instagram', ctr: 2.4 },
-    // This week's social ad clicks-by-channel breakdown (Compass Digital Ads, Jun 9)
+    // Latest Compass Digital Ads pull — week of Jun 14 – Jun 20, 2026.
+    reportingPeriod: 'Jun 14 – Jun 20, 2026',
+    totalImpressions: 23345,
+    totalClicks: 133,
+    topChannel: { name: 'nytimes.com', ctr: 0.57 },
     byChannel: [
       { channel: 'Google',    clicks: 88, ctr: 1.82 },
       { channel: 'Facebook',  clicks: 19, ctr: 1.73 },
       { channel: 'Instagram', clicks: 14, ctr: 2.48 },
     ],
-    // Where the location-based display ads showed up (May 29 – Jun 28 running totals)
+    // Top publishers from the Jun 14 – Jun 20 Databox snapshot.
     topPublishers: [
-      { publisher: 'nytimes.com',     views: 13965 },
-      { publisher: 'theatlantic.com', views: 4869  },
-      { publisher: 'mlb.com',         views: 3795  },
-      { publisher: 'nypost.com',      views: 3058  },
-      { publisher: 'gothamist.com',   views: 2807  },
-      { publisher: 'huffpost.com',    views: 1914  },
+      { publisher: 'nytimes.com',     views: 2980 },
+      { publisher: 'nypost.com',      views: 2774 },
+      { publisher: 'huffpost.com',    views: 1421 },
+      { publisher: 'theatlantic.com', views: 1406 },
+      { publisher: 'mlb.com',         views: 1210 },
+      { publisher: 'yahoo.com',       views: 1123 },
     ],
     audienceHouseholdIncome: [
-      { bracket: 'Top 10%', share: 94.4 },
-      { bracket: '41–50%',  share: 2.9  },
-      { bracket: '21–30%',  share: 1.3  },
+      { bracket: 'Top 10%', share: 93.7 },
+      { bracket: '41–50%',  share: 3.2  },
+      { bracket: '21–30%',  share: 1.5  },
     ],
-    socialTrafficPeriod: 'June 4 – June 10, 2026',
+    // Social traffic split flipped this week — Facebook now leads.
+    socialTrafficPeriod: 'June 11 – June 17, 2026',
     socialTrafficShare: [
-      { channel: 'Facebook',  share: 77.1 },
-      { channel: 'Instagram', share: 22.9 },
+      { channel: 'Facebook',  share: 61.0 },
+      { channel: 'Instagram', share: 39.0 },
     ],
   },
 
@@ -438,10 +507,10 @@ export const BALTIC_REPORT: WeeklyReport = {
 
   strategy: {
     keyRecommendations: '',
-    marketingPlanNextWeek: '— Price-adjustment announcement push: new "$3.25M" creative across all social and display ads\n— Re-engage all prior open-house attendees and broker contacts with the new price\n— Refreshed Instagram reel on @maggie_leigh_marshall and @soldbycy highlighting the new price\n— Weekly broker blast to NYC network with price adjustment\n— Location-based display campaign continues through June 28 (NYT, Atlantic, NY Post, Gothamist, etc.)',
+    marketingPlanNextWeek: '— Continue $3.25M price-adjustment push across all social and display creatives\n— Refresh Instagram content — Facebook is now the lead social traffic source (61%), so push fresh Reels + Stories to rebalance Instagram\n— Location-based display campaign continues — NYT, NYPost, HuffPost, Atlantic, MLB, Yahoo all driving steady ad views\n— Targeted re-engagement of prior open-house attendees and broker contacts with the new price\n— Weekly broker blast to NYC network',
     pricingStrategy: '',
     upcomingCampaigns: '',
     brokerEvents: '',
-    openHousesPlanned: '— Public open house: Sunday June 14, 1:00–2:30 PM (first showing at new $3.25M price)',
+    openHousesPlanned: '— Public open house: Sunday June 28, 1:00–2:30 PM',
   },
 }

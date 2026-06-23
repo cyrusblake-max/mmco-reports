@@ -184,15 +184,32 @@ export default function ReportShell({ report, onDuplicate }: Props) {
             weeklySnapshot:   () => inc.weeklySnapshot
               ? { id: 'weekly-snapshot', render: n => <WeeklySnapshot report={report} sectionNum={n} /> }
               : null,
-            openHouses:       () => inc.openHouses && (
-              (report.openHouses && report.openHouses.length > 0) ||
-              (report.currentMetrics?.showingRequests ?? 0) > 0
-            )
-              ? { id: 'open-house', render: n => <OpenHouseReport report={report} sectionNum={n} /> }
-              : null,
-            marketing:        () => inc.marketing && report.marketing && report.marketing.length > 0
-              ? { id: 'marketing', render: n => <MarketingActivities report={report} sectionNum={n} /> }
-              : null,
+            openHouses:       () => {
+              if (!inc.openHouses) return null
+              // Mirror OpenHouseReport's own visibility rules so the slot is
+              // only allocated when something will actually render (otherwise
+              // section numbering would gap).
+              const start = report.weekStartDate
+              const end = report.weekEndDate
+              const eventsInWindow = (report.openHouses ?? []).filter(oh =>
+                !start || !end ? true : (oh.date >= start && oh.date <= end))
+              const showings = report.currentMetrics?.showingRequests ?? 0
+              const ohAttendees = report.currentMetrics?.openHouseAttendees ?? 0
+              if (eventsInWindow.length === 0 && showings === 0 && ohAttendees === 0) return null
+              return { id: 'open-house', render: n => <OpenHouseReport report={report} sectionNum={n} /> }
+            },
+            marketing:        () => {
+              if (!inc.marketing || !report.marketing || report.marketing.length === 0) return null
+              const start = report.weekStartDate
+              const end = report.weekEndDate
+              // Match MarketingActivities' own week filter so we don't allocate
+              // a section number when nothing in the window will render.
+              const inWindow = (!start || !end)
+                ? report.marketing
+                : report.marketing.filter(m => m.date >= start && m.date <= end)
+              if (inWindow.length === 0) return null
+              return { id: 'marketing', render: n => <MarketingActivities report={report} sectionNum={n} /> }
+            },
             socialMedia:      () => inc.socialMedia && report.socialMedia && report.socialMedia.length > 0
               ? { id: 'social', render: n => <DigitalAds report={report} sectionNum={n} /> }
               : null,

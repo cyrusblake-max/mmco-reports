@@ -66,6 +66,41 @@ export interface MetricsSnapshot {
   metrics: WeeklyMetrics
 }
 
+export type OpenHouseKind =
+  | 'public'           // Public open house (default — split into broker/buyer)
+  | 'broker'           // Broker-only event (no buyer column)
+  | 'private_preview'  // Private preview (single attendee tile, no split)
+  | 'private_showing'  // Private showing — same shape as preview
+  | 'custom'           // Custom labeled event
+
+export const OPEN_HOUSE_KIND_LABELS: Record<OpenHouseKind, string> = {
+  public:          'Public Open House',
+  broker:          'Broker Open House',
+  private_preview: 'Private Preview',
+  private_showing: 'Private Showing',
+  custom:          'Custom Event',
+}
+
+/**
+ * Field keys that can be hidden per-event. The editor surfaces these as
+ * "show/hide" toggles so an agent can strip out fields that don't apply
+ * (e.g. drop interest level + questions for a quick private preview row).
+ */
+export type OpenHouseField =
+  | 'attendeeBreakdown'  // brokers/buyers split (otherwise just totalAttendees)
+  | 'interestLevel'
+  | 'commonFeedback'
+  | 'questionsAsked'
+  | 'followUpActions'
+
+export const OPEN_HOUSE_FIELD_LABELS: Record<OpenHouseField, string> = {
+  attendeeBreakdown: 'Broker / Buyer split',
+  interestLevel:     'Interest level',
+  commonFeedback:    'Common feedback',
+  questionsAsked:    'Questions asked',
+  followUpActions:   'Follow-up actions',
+}
+
 export interface OpenHouseEvent {
   id: string
   date: string
@@ -78,6 +113,12 @@ export interface OpenHouseEvent {
   commonFeedback: string
   questionsAsked: string
   followUpActions: string
+  /** What kind of event — drives the header label. Defaults to 'public'. */
+  kind?: OpenHouseKind
+  /** Custom override for the header label when `kind === 'custom'`. */
+  customLabel?: string
+  /** Field keys to hide from rendering. Empty/missing = show all that apply. */
+  hiddenFields?: OpenHouseField[]
 }
 
 export type MarketingType =

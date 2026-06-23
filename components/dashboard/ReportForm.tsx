@@ -4,7 +4,9 @@ import { useRouter }  from 'next/navigation'
 import {
   WeeklyReport, WeeklyMetrics, METRIC_LABELS, MARKETING_LABELS, MarketingType,
   DEFAULT_INCLUDED_SECTIONS, SECTION_DISPLAY, DEFAULT_SECTION_ORDER,
+  OPEN_HOUSE_KIND_LABELS, OPEN_HOUSE_FIELD_LABELS,
   type IncludedSections, type SectionKey, type CustomSection,
+  type OpenHouseKind, type OpenHouseField,
 } from '@/lib/types'
 import { saveReport } from '@/lib/store'
 import { v4 as uuidv4 } from 'uuid'
@@ -654,7 +656,7 @@ export default function ReportForm({ initial, onChange, onSaved }: Props) {
       }],
     }))
   }
-  function updateOpenHouse(id: string, key: string, value: string | number) {
+  function updateOpenHouse(id: string, key: string, value: string | number | string[]) {
     setReport(r => ({
       ...r,
       openHouses: r.openHouses.map(oh => oh.id === id ? { ...oh, [key]: value } : oh),
@@ -937,49 +939,121 @@ export default function ReportForm({ initial, onChange, onSaved }: Props) {
       </SectionPanel>
 
       {/* === OPEN HOUSES === */}
-      <SectionPanel title="Open Houses" num="03">
+      <SectionPanel title="Open Houses & Showings" num="03">
         <div className="mt-4 space-y-6">
-          {report.openHouses.map((oh, i) => (
-            <div key={oh.id} className="border border-luxury-cream p-5 relative">
-              <button
-                type="button"
-                onClick={() => removeOpenHouse(oh.id)}
-                className="absolute top-3 right-3 text-luxury-taupe hover:text-danger transition-colors"
-              >
-                <Trash2 className="w-4 h-4" />
-              </button>
-              <p className="section-label text-luxury-gold mb-4">Event {i + 1}</p>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                <Field label="Date"       name={`date-${oh.id}`}      value={oh.date}       type="date" onChange={v => updateOpenHouse(oh.id, 'date', v)} />
-                <Field label="Start Time" name={`start-${oh.id}`}     value={oh.startTime}  type="time" onChange={v => updateOpenHouse(oh.id, 'startTime', v)} />
-                <Field label="End Time"   name={`end-${oh.id}`}       value={oh.endTime}    type="time" onChange={v => updateOpenHouse(oh.id, 'endTime', v)} />
-                <Field label="Total Attendees" name={`att-${oh.id}`}  value={oh.totalAttendees} type="number" onChange={v => updateOpenHouse(oh.id, 'totalAttendees', parseInt(v) || 0)} />
-                <Field label="Buyers"     name={`buy-${oh.id}`}       value={oh.buyers}     type="number" onChange={v => updateOpenHouse(oh.id, 'buyers', parseInt(v) || 0)} />
-                <Field label="Brokers"    name={`bro-${oh.id}`}       value={oh.brokers}    type="number" onChange={v => updateOpenHouse(oh.id, 'brokers', parseInt(v) || 0)} />
-                <div>
-                  <label className="section-label text-luxury-taupe block mb-1.5">Interest Level (1–5)</label>
-                  <select
-                    className="w-full bg-white border border-luxury-cream px-3 py-2 text-sm focus:outline-none focus:border-luxury-gold"
-                    value={oh.seriousInterestLevel}
-                    onChange={e => updateOpenHouse(oh.id, 'seriousInterestLevel', parseInt(e.target.value) as 1|2|3|4|5)}
-                  >
-                    {[1,2,3,4,5].map(n => <option key={n} value={n}>{n}</option>)}
-                  </select>
+          {report.openHouses.map((oh, i) => {
+            // Mirror the render-side heuristic so an unset legacy event surfaces
+            // as e.g. "Private Preview" instead of misleadingly defaulting to public.
+            const inferredKind: OpenHouseKind = oh.kind
+              ?? (oh.brokers > 0 && oh.buyers === 0 ? 'broker'
+                : oh.totalAttendees === 1 && oh.brokers === 0 ? 'private_preview'
+                : 'public')
+            const kind: OpenHouseKind = inferredKind
+            const hidden = new Set<OpenHouseField>(oh.hiddenFields ?? [])
+            const toggleField = (key: OpenHouseField) => {
+              const next = new Set(hidden)
+              if (next.has(key)) next.delete(key); else next.add(key)
+              updateOpenHouse(oh.id, 'hiddenFields', Array.from(next))
+            }
+            const showBreakdown = !hidden.has('attendeeBreakdown') && (kind === 'public' || kind === 'custom')
+            return (
+              <div key={oh.id} className="border border-luxury-cream p-5 relative space-y-4">
+                <button
+                  type="button"
+                  onClick={() => removeOpenHouse(oh.id)}
+                  className="absolute top-3 right-3 text-luxury-taupe hover:text-danger transition-colors"
+                  title="Remove event"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+                <p className="section-label text-luxury-gold">Event {i + 1}</p>
+
+                {/* Event type + custom label */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  <div>
+                    <label className="section-label text-luxury-taupe block mb-1.5">Event Type</label>
+                    <select
+                      className="w-full bg-white border border-luxury-cream px-3 py-2 text-sm focus:outline-none focus:border-luxury-gold transition-colors"
+                      value={kind}
+                      onChange={e => updateOpenHouse(oh.id, 'kind', e.target.value as OpenHouseKind)}
+                    >
+                      {(Object.entries(OPEN_HOUSE_KIND_LABELS) as [OpenHouseKind, string][]).map(([k, label]) => (
+                        <option key={k} value={k}>{label}</option>
+                      ))}
+                    </select>
+                  </div>
+                  {kind === 'custom' && (
+                    <div className="md:col-span-2">
+                      <Field label="Custom Label" name={`cl-${oh.id}`} value={oh.customLabel ?? ''} onChange={v => updateOpenHouse(oh.id, 'customLabel', v)} placeholder="Twilight Cocktail Preview" />
+                    </div>
+                  )}
                 </div>
+
+                {/* Field visibility — checkboxes that hide subfields on the rendered card */}
+                <div className="bg-luxury-off border border-luxury-cream p-3">
+                  <p className="section-label text-luxury-taupe mb-2" style={{ fontSize: '0.58rem' }}>Show on rendered card</p>
+                  <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
+                    {(Object.keys(OPEN_HOUSE_FIELD_LABELS) as OpenHouseField[]).map(key => {
+                      const on = !hidden.has(key)
+                      return (
+                        <label key={key} className={`flex items-center gap-2 px-2 py-1.5 border cursor-pointer transition-colors text-xs ${
+                          on ? 'border-luxury-gold/40 bg-luxury-gold/5' : 'border-luxury-cream'
+                        }`}>
+                          <input type="checkbox" checked={on} onChange={() => toggleField(key)} className="accent-luxury-gold flex-shrink-0 w-3.5 h-3.5" />
+                          <span className={on ? 'text-luxury-black' : 'text-luxury-taupe line-through'}>{OPEN_HOUSE_FIELD_LABELS[key]}</span>
+                        </label>
+                      )
+                    })}
+                  </div>
+                </div>
+
+                {/* Date / time always shown */}
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                  <Field label="Date"       name={`date-${oh.id}`}      value={oh.date}       type="date" onChange={v => updateOpenHouse(oh.id, 'date', v)} />
+                  <Field label="Start Time" name={`start-${oh.id}`}     value={oh.startTime}  type="time" onChange={v => updateOpenHouse(oh.id, 'startTime', v)} />
+                  <Field label="End Time"   name={`end-${oh.id}`}       value={oh.endTime}    type="time" onChange={v => updateOpenHouse(oh.id, 'endTime', v)} />
+                </div>
+
+                {/* Attendees — collapses to a single total field when broker split is off */}
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                  <Field label="Total Attendees" name={`att-${oh.id}`}  value={oh.totalAttendees} type="number" onChange={v => updateOpenHouse(oh.id, 'totalAttendees', parseInt(v) || 0)} />
+                  {showBreakdown && (
+                    <>
+                      <Field label="Buyers"   name={`buy-${oh.id}`} value={oh.buyers}  type="number" onChange={v => updateOpenHouse(oh.id, 'buyers',  parseInt(v) || 0)} />
+                      <Field label="Brokers"  name={`bro-${oh.id}`} value={oh.brokers} type="number" onChange={v => updateOpenHouse(oh.id, 'brokers', parseInt(v) || 0)} />
+                    </>
+                  )}
+                  {!hidden.has('interestLevel') && (
+                    <div>
+                      <label className="section-label text-luxury-taupe block mb-1.5">Interest Level (1–5)</label>
+                      <select
+                        className="w-full bg-white border border-luxury-cream px-3 py-2 text-sm focus:outline-none focus:border-luxury-gold"
+                        value={oh.seriousInterestLevel}
+                        onChange={e => updateOpenHouse(oh.id, 'seriousInterestLevel', parseInt(e.target.value) as 1|2|3|4|5)}
+                      >
+                        {[1,2,3,4,5].map(n => <option key={n} value={n}>{n}</option>)}
+                      </select>
+                    </div>
+                  )}
+                </div>
+
+                {/* Narrative — each subfield only renders if the corresponding visibility toggle is on */}
+                {(!hidden.has('commonFeedback') || !hidden.has('questionsAsked') || !hidden.has('followUpActions')) && (
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    {!hidden.has('commonFeedback')  && <Field label="Common Feedback"   name={`fb-${oh.id}`} value={oh.commonFeedback}  rows={3} onChange={v => updateOpenHouse(oh.id, 'commonFeedback', v)} />}
+                    {!hidden.has('questionsAsked') && <Field label="Questions Asked"   name={`qa-${oh.id}`} value={oh.questionsAsked}  rows={3} onChange={v => updateOpenHouse(oh.id, 'questionsAsked', v)} />}
+                    {!hidden.has('followUpActions')&& <Field label="Follow-Up Actions" name={`fu-${oh.id}`} value={oh.followUpActions} rows={3} onChange={v => updateOpenHouse(oh.id, 'followUpActions', v)} />}
+                  </div>
+                )}
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-3">
-                <Field label="Common Feedback"   name={`fb-${oh.id}`}  value={oh.commonFeedback}  rows={3} onChange={v => updateOpenHouse(oh.id, 'commonFeedback', v)} />
-                <Field label="Questions Asked"   name={`qa-${oh.id}`}  value={oh.questionsAsked}  rows={3} onChange={v => updateOpenHouse(oh.id, 'questionsAsked', v)} />
-                <Field label="Follow-Up Actions" name={`fu-${oh.id}`}  value={oh.followUpActions} rows={3} onChange={v => updateOpenHouse(oh.id, 'followUpActions', v)} />
-              </div>
-            </div>
-          ))}
+            )
+          })}
           <button
             type="button"
             onClick={addOpenHouse}
             className="flex items-center gap-2 text-sm text-luxury-gold hover:text-luxury-sand transition-colors section-label"
           >
-            <Plus className="w-4 h-4" /> Add Open House Event
+            <Plus className="w-4 h-4" /> Add Open House / Preview
           </button>
         </div>
       </SectionPanel>

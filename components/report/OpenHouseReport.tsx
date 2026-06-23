@@ -1,27 +1,51 @@
 'use client'
 import { Users, Briefcase, TrendingUp } from 'lucide-react'
-import { WeeklyReport, OpenHouseEvent } from '@/lib/types'
+import { WeeklyReport, OpenHouseEvent, OPEN_HOUSE_KIND_LABELS } from '@/lib/types'
 import { formatDate } from '@/lib/utils'
 import SectionMast from './SectionMast'
 
 interface Props { report: WeeklyReport; sectionNum?: string }
 
+/**
+ * Derive the event kind. Modern events set `kind` explicitly; older rows
+ * use legacy heuristics: all-broker → broker open house, single attendee → preview.
+ */
+function eventKind(event: OpenHouseEvent): OpenHouseEvent['kind'] {
+  if (event.kind) return event.kind
+  if (event.brokers > 0 && event.buyers === 0) return 'broker'
+  if (event.totalAttendees === 1 && event.brokers === 0) return 'private_preview'
+  return 'public'
+}
+
+function eventLabel(event: OpenHouseEvent): string {
+  const kind = eventKind(event) ?? 'public'
+  if (kind === 'custom' && event.customLabel?.trim()) return event.customLabel
+  return OPEN_HOUSE_KIND_LABELS[kind]
+}
+
+function fieldHidden(event: OpenHouseEvent, key: NonNullable<OpenHouseEvent['hiddenFields']>[number]) {
+  return event.hiddenFields?.includes(key) ?? false
+}
+
 function EventCard({ event }: { event: OpenHouseEvent }) {
-  const isBrokerEvent = event.brokers > 0 && event.buyers === 0
-  const tiles = isBrokerEvent
-    ? [{ icon: Users, label: 'Total Attendees', value: event.totalAttendees, accent: true }]
-    : [
+  const kind = eventKind(event)
+  const showBreakdown = !fieldHidden(event, 'attendeeBreakdown')
+    && (kind === 'public' || kind === 'custom')
+    && (event.buyers > 0 || event.brokers > 0)
+
+  const tiles = showBreakdown
+    ? [
         { icon: Users,     label: 'Total',         value: event.totalAttendees, accent: true },
         { icon: Users,     label: 'Represented',   value: event.buyers,         accent: false },
         { icon: Briefcase, label: 'Unrepresented', value: event.brokers,        accent: false },
       ]
+    : [{ icon: Users, label: 'Total Attendees', value: event.totalAttendees, accent: true }]
+
   return (
     <div className="card-luxury p-6 md:p-8">
       <div className="flex items-start justify-between mb-6">
         <div>
-          <p className="section-label text-luxury-taupe mb-1">
-            {isBrokerEvent ? 'Broker Open House' : 'Open House'}
-          </p>
+          <p className="section-label text-luxury-taupe mb-1">{eventLabel(event)}</p>
           <p className="font-serif-display text-2xl font-light">
             {formatDate(event.date, 'short')}
           </p>
@@ -31,8 +55,8 @@ function EventCard({ event }: { event: OpenHouseEvent }) {
         </div>
       </div>
 
-      {/* Attendee breakdown — single tile for broker events, 3-up for public open houses */}
-      <div className={`grid ${isBrokerEvent ? 'grid-cols-1' : 'grid-cols-3'} gap-px bg-luxury-cream mb-6`}>
+      {/* Attendee tiles — collapses to a single tile when broker/buyer split is hidden */}
+      <div className={`grid ${tiles.length === 1 ? 'grid-cols-1' : 'grid-cols-3'} gap-px bg-luxury-cream mb-6`}>
         {tiles.map(({ icon: Icon, label, value, accent }) => (
           <div key={label} className={`p-4 text-center ${accent ? 'bg-luxury-black' : 'bg-white'}`}>
             <Icon className={`w-4 h-4 mx-auto mb-1.5 ${accent ? 'text-luxury-gold' : 'text-luxury-taupe'}`} strokeWidth={1.5} />
@@ -42,21 +66,21 @@ function EventCard({ event }: { event: OpenHouseEvent }) {
         ))}
       </div>
 
-      {/* Feedback */}
+      {/* Feedback — each subfield renders only if it has content AND isn't hidden */}
       <div className="space-y-4">
-        {event.commonFeedback && (
+        {event.commonFeedback && !fieldHidden(event, 'commonFeedback') && (
           <div>
             <p className="section-label text-luxury-taupe mb-2">Common Feedback</p>
             <p className="text-sm text-luxury-taupe leading-relaxed">{event.commonFeedback}</p>
           </div>
         )}
-        {event.questionsAsked && (
+        {event.questionsAsked && !fieldHidden(event, 'questionsAsked') && (
           <div>
             <p className="section-label text-luxury-taupe mb-2">Questions Asked</p>
             <p className="text-sm text-luxury-taupe leading-relaxed">{event.questionsAsked}</p>
           </div>
         )}
-        {event.followUpActions && (
+        {event.followUpActions && !fieldHidden(event, 'followUpActions') && (
           <div className="border-l-2 border-luxury-gold pl-4">
             <p className="section-label text-luxury-gold mb-2">Follow-Up Actions</p>
             <p className="text-sm leading-relaxed">{event.followUpActions}</p>
@@ -70,17 +94,19 @@ function EventCard({ event }: { event: OpenHouseEvent }) {
 export default function OpenHouseReport({ report, sectionNum = '03' }: Props) {
   const { openHouses, currentMetrics, weekStartDate, weekEndDate } = report
   const showings = currentMetrics?.showingRequests ?? 0
-  // Render whenever we have either an open-house event or private showings this week
-  if ((!openHouses || openHouses.length === 0) && showings === 0) return null
+  const ohAttendees = currentMetrics?.openHouseAttendees ?? 0
 
-  // Filter to events that occurred during THIS reporting week.
-  // Falls back to the latest event if the week range is misconfigured.
-  const weekEvents = openHouses && weekStartDate && weekEndDate
-    ? openHouses.filter(oh => oh.date >= weekStartDate && oh.date <= weekEndDate)
-    : []
-  const eventsToShow = weekEvents.length > 0
-    ? weekEvents
-    : openHouses && openHouses.length > 0 ? [openHouses[openHouses.length - 1]] : []
+  // Filter to events that occurred during THIS reporting window.
+  // Falls back to ALL events only if the report has no week range set,
+  // so we never accidentally surface a stale event from a prior week.
+  const weekEvents = (openHouses ?? []).filter(oh => {
+    if (!weekStartDate || !weekEndDate) return true
+    return oh.date >= weekStartDate && oh.date <= weekEndDate
+  })
+  const eventsToShow = weekEvents
+
+  // Skip the section entirely when there's nothing to report in this window
+  if (eventsToShow.length === 0 && showings === 0 && ohAttendees === 0) return null
 
   const weekTotalAttendees = eventsToShow.reduce((s, oh) => s + oh.totalAttendees, 0)
   const weekAvgAttendance  = eventsToShow.length > 0 ? Math.round(weekTotalAttendees / eventsToShow.length) : 0
