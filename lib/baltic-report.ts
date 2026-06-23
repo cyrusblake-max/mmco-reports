@@ -434,6 +434,30 @@ export const BALTIC_REPORT: WeeklyReport = {
       notes:
         'Targeted email blast to the full NYC broker community announcing the price adjustment to $3,249,000. Reactivates brokers with $3M–$3.5M buyers who may not have looked at the higher price.',
     },
+    {
+      id: 'mkt-baltic-w6-broker-blast',
+      type: 'broker_outreach',
+      name: 'Broker Blast — NYC Network (Week 6)',
+      date: '2026-06-17',
+      impressions: 0,
+      engagement: 0,
+      clicks: 0,
+      reach: 8000,
+      notes:
+        'Weekly broker blast to the full NYC agent network — reinforcing the $3,249,000 price.',
+    },
+    {
+      id: 'mkt-baltic-w7-broker-blast',
+      type: 'broker_outreach',
+      name: 'Broker Blast — NYC Network (Week 7)',
+      date: '2026-06-19',
+      impressions: 0,
+      engagement: 0,
+      clicks: 0,
+      reach: 8000,
+      notes:
+        'Weekly broker blast to the full NYC agent network — promoting the Sunday June 21 open house and continued availability at $3,249,000.',
+    },
   ],
 
   socialMedia: [
