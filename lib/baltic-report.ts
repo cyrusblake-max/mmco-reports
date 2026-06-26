@@ -2,12 +2,11 @@ import { WeeklyReport } from './types'
 
 export const BALTIC_REPORT: WeeklyReport = {
   id: 'baltic-613-9c-w1',
-  // Two-week catch-up: last week (Jun 14–20) wasn't sent. Window extends through
-  // Sun Jun 21 so this past Sunday's open house lands inside the reporting period.
-  weekNumber: 7,
+  // Week 8 — this week's reporting window (June 21 – June 27, 2026).
+  weekNumber: 8,
   reportDate: '2026-06-23',
-  weekStartDate: '2026-06-14',
-  weekEndDate: '2026-06-21',
+  weekStartDate: '2026-06-21',
+  weekEndDate: '2026-06-27',
 
   property: {
     address: '613 Baltic Street',
@@ -49,11 +48,29 @@ export const BALTIC_REPORT: WeeklyReport = {
     ],
   },
 
-  // Weeks 6–7 (June 7 – June 20, 2026): two-week catch-up window.
-  // Compass Insights (June 11 – June 17): 351 total views,
-  // 259 Compass / 92 StreetEasy. Top social channel flipped to Facebook
-  // (61.0% of social traffic) vs Instagram (39.0%).
+  // Week 8 (Jun 21 – Jun 27, 2026).
+  // Compass Insights pulled for Jun 19 – Jun 25: 268 total views (147 Compass /
+  // 121 StreetEasy), 114 unique visitors, 8s avg time spent. Compass was the
+  // top traffic source at 56% of visitors; 86% of Compass views from the public.
   currentMetrics: {
+    totalViews: 268,
+    websiteTraffic: 0,
+    zillowViews: 0,
+    streetEasyViews: 121,
+    compassViews: 147,
+    saves: 0,
+    inquiries: 0,
+    showingRequests: 0,
+    // Sunday Jun 21 open house — one couple came through.
+    openHouseAttendees: 2,
+    brokerInquiries: 0,
+    buyerLeads: 0,
+    socialReach: 0,
+    videoViews: 0,
+  },
+
+  // Previous = prior week (Jun 14–20) for week-over-week comparison.
+  previousMetrics: {
     totalViews: 351,
     websiteTraffic: 0,
     zillowViews: 0,
@@ -62,26 +79,7 @@ export const BALTIC_REPORT: WeeklyReport = {
     saves: 0,
     inquiries: 0,
     showingRequests: 0,
-    // Three open houses across the two weeks — one couple at each (2 attendees × 3).
-    openHouseAttendees: 6,
-    brokerInquiries: 0,
-    buyerLeads: 0,
-    socialReach: 0,
-    videoViews: 0,
-  },
-
-  // Previous = the prior comparable two weeks (Weeks 4 + 5, May 28 – June 10)
-  // so the % deltas reflect a fair two-week-to-two-week comparison.
-  previousMetrics: {
-    totalViews: 665,
-    websiteTraffic: 0,
-    zillowViews: 0,
-    streetEasyViews: 213,
-    compassViews: 452,
-    saves: 0,
-    inquiries: 0,
-    showingRequests: 1,
-    openHouseAttendees: 11,
+    openHouseAttendees: 4,
     brokerInquiries: 0,
     buyerLeads: 0,
     socialReach: 0,
@@ -488,31 +486,37 @@ export const BALTIC_REPORT: WeeklyReport = {
   digitalAds: {
     campaignName: 'Location-Based Targeting',
     targetingFocus: 'Boerum Hill · Park Slope · Cobble Hill · Carroll Gardens · Brooklyn Heights · Fort Greene',
-    // Latest Compass Digital Ads pull — week of Jun 14 – Jun 20, 2026.
-    reportingPeriod: 'Jun 14 – Jun 20, 2026',
-    totalImpressions: 23345,
-    totalClicks: 133,
-    topChannel: { name: 'nytimes.com', ctr: 0.57 },
+    // Latest Compass Digital Ads pull — Jun 21 – Jun 27, 2026 (Databox).
+    reportingPeriod: 'Jun 21 – Jun 27, 2026',
+    totalImpressions: 15425,
+    totalClicks: 111,
+    topChannel: { name: 'nytimes.com', ctr: 0.72 },
     byChannel: [
       { channel: 'Google',    clicks: 88, ctr: 1.82 },
       { channel: 'Facebook',  clicks: 19, ctr: 1.73 },
       { channel: 'Instagram', clicks: 14, ctr: 2.48 },
     ],
-    // Top publishers from the Jun 14 – Jun 20 Databox snapshot.
+    // Top 12 publishers from the Jun 21 – Jun 27 Databox snapshot.
     topPublishers: [
-      { publisher: 'nytimes.com',     views: 2980 },
-      { publisher: 'nypost.com',      views: 2774 },
-      { publisher: 'huffpost.com',    views: 1421 },
-      { publisher: 'theatlantic.com', views: 1406 },
-      { publisher: 'mlb.com',         views: 1210 },
-      { publisher: 'yahoo.com',       views: 1123 },
+      { publisher: 'nytimes.com',     views: 3643 },
+      { publisher: 'nypost.com',      views: 1968 },
+      { publisher: 'theatlantic.com', views: 853  },
+      { publisher: 'huffpost.com',    views: 769  },
+      { publisher: 'gothamist.com',   views: 562  },
+      { publisher: 'yahoo.com',       views: 528  },
+      { publisher: 'npr.org',         views: 485  },
+      { publisher: 'therealdeal.com', views: 348  },
+      { publisher: 'foxnews.com',     views: 348  },
+      { publisher: 'collive.com',     views: 337  },
+      { publisher: 'thedailybeast.com', views: 315 },
+      { publisher: 'cnn.com',         views: 310  },
     ],
     audienceHouseholdIncome: [
-      { bracket: 'Top 10%', share: 93.7 },
-      { bracket: '41–50%',  share: 3.2  },
-      { bracket: '21–30%',  share: 1.5  },
+      { bracket: 'Top 10%', share: 90.3 },
+      { bracket: '41–50%',  share: 5.0  },
+      { bracket: '21–30%',  share: 2.1  },
     ],
-    // Social traffic split flipped this week — Facebook now leads.
+    // Carrying forward Jun 11 – Jun 17 social split until the next pull.
     socialTrafficPeriod: 'June 11 – June 17, 2026',
     socialTrafficShare: [
       { channel: 'Facebook',  share: 61.0 },
@@ -531,7 +535,7 @@ export const BALTIC_REPORT: WeeklyReport = {
 
   strategy: {
     keyRecommendations: '',
-    marketingPlanNextWeek: '— Continue $3.25M price-adjustment push across all social and display creatives\n— Refresh Instagram content — Facebook is now the lead social traffic source (61%), so push fresh Reels + Stories to rebalance Instagram\n— Location-based display campaign continues — NYT, NYPost, HuffPost, Atlantic, MLB, Yahoo all driving steady ad views\n— Targeted re-engagement of prior open-house attendees and broker contacts with the new price\n— Weekly broker blast to NYC network',
+    marketingPlanNextWeek: '— Continue $3.25M price-adjustment push across all social and display creatives\n— Refresh Instagram content — Facebook still leads social traffic, push fresh Reels + Stories to rebalance Instagram\n— Location-based display campaign continues — NYT (3.6K views), NYPost, The Atlantic, HuffPost, Gothamist, Yahoo, NPR, The Real Deal all driving steady ad views\n— Weekly broker blast to NYC network',
     pricingStrategy: '',
     upcomingCampaigns: '',
     brokerEvents: '',
