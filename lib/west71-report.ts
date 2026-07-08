@@ -158,7 +158,7 @@ export const WEST71_REPORT: WeeklyReport = {
     marketing:        false,
     socialMedia:      false,
     digitalAds:       true,
-    feedback:         true,
+    feedback:         false,
     marketActivity:   false,
     strategy:         true,
   },
