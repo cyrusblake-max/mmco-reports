@@ -7,11 +7,11 @@ import { WeeklyReport } from './types'
  */
 export const WEST71_REPORT: WeeklyReport = {
   id: 'west71-266-w1',
-  weekNumber: 2,
-  reportDate: '2026-06-23',
-  // Reporting window: this past week (June 15 – June 21, 2026)
-  weekStartDate: '2026-06-15',
-  weekEndDate: '2026-06-21',
+  weekNumber: 3,
+  reportDate: '2026-07-08',
+  // Reporting window: last week (June 29 – July 5, 2026) — spans the July 4th holiday.
+  weekStartDate: '2026-06-29',
+  weekEndDate: '2026-07-05',
 
   property: {
     address: '266 West 71st Street',
@@ -53,12 +53,29 @@ export const WEST71_REPORT: WeeklyReport = {
     ],
   },
 
-  // Week 2 (June 15 – 21):
-  //   • Sunday open house (Jun 21) — 4 attendees
-  //   • 3 private showings — including 2 visits from the same client (3rd scheduled)
-  // Compass Insights (Jun 11 – 17): 770 total views,
-  //   89 Compass / 415 Realtor / 264 StreetEasy / 2 Other.
+  // Week 3 (June 29 – July 5) — spans July 4th holiday.
+  // Compass Insights: 729 total views (199 Compass / 335 Realtor / 195 StreetEasy),
+  // 162 unique visitors (up 52.8%), 44s avg time spent (up 106%).
+  // 91% of Compass views from public. Compass is the top traffic source (68%).
+  // Showings + open house numbers pending — user will send shortly.
   currentMetrics: {
+    totalViews: 729,
+    websiteTraffic: 0,
+    zillowViews: 0,
+    streetEasyViews: 195,
+    compassViews: 199,
+    saves: 0,
+    inquiries: 0,
+    showingRequests: 0,
+    openHouseAttendees: 0,
+    brokerInquiries: 0,
+    buyerLeads: 0,
+    socialReach: 0,
+    videoViews: 0,
+  },
+
+  // Previous = Week 2 (Jun 15 – 21) for week-over-week trend math.
+  previousMetrics: {
     totalViews: 770,
     websiteTraffic: 0,
     zillowViews: 0,
@@ -68,23 +85,6 @@ export const WEST71_REPORT: WeeklyReport = {
     inquiries: 0,
     showingRequests: 3,
     openHouseAttendees: 4,
-    brokerInquiries: 0,
-    buyerLeads: 0,
-    socialReach: 0,
-    videoViews: 0,
-  },
-
-  // Previous = Week 1 (since-listing report, Jun 2 – Jun 11) so WoW trends compute.
-  previousMetrics: {
-    totalViews: 831,
-    websiteTraffic: 0,
-    zillowViews: 0,
-    streetEasyViews: 453,
-    compassViews: 96,
-    saves: 0,
-    inquiries: 0,
-    showingRequests: 5,
-    openHouseAttendees: 0,
     brokerInquiries: 0,
     buyerLeads: 0,
     socialReach: 0,
@@ -130,6 +130,25 @@ export const WEST71_REPORT: WeeklyReport = {
         videoViews: 0,
       },
     },
+    {
+      weekLabel: 'Week 3',
+      weekNumber: 3,
+      metrics: {
+        totalViews: 729,
+        websiteTraffic: 0,
+        zillowViews: 0,
+        streetEasyViews: 195,
+        compassViews: 199,
+        saves: 0,
+        inquiries: 0,
+        showingRequests: 0,
+        openHouseAttendees: 0,
+        brokerInquiries: 0,
+        buyerLeads: 0,
+        socialReach: 0,
+        videoViews: 0,
+      },
+    },
   ],
 
   includedSections: {
@@ -138,7 +157,7 @@ export const WEST71_REPORT: WeeklyReport = {
     openHouses:       true,
     marketing:        false,
     socialMedia:      false,
-    digitalAds:       false,
+    digitalAds:       true,
     feedback:         true,
     marketActivity:   false,
     strategy:         true,
@@ -184,8 +203,41 @@ export const WEST71_REPORT: WeeklyReport = {
     pricingFeedback: '',
     layoutFeedback: '',
     competingProperties: '',
-    brokerSentiment: 'Week 2: Sunday open house drew 4 attendees. Three additional private showings completed — including two visits from the same client with a third already scheduled. Repeat interest is the strongest signal so far.',
+    brokerSentiment: 'Week 3 spanned the July 4th holiday. Compass Insights show 729 total views — Realtor is now the leading traffic source (335), followed closely by Compass (199) and StreetEasy (195). Unique visitors up 52.8% week-over-week; average time on listing more than doubled (44s, +106%). Showings + open house detail to be added on receipt.',
     recommendedAdjustments: '',
+  },
+
+  digitalAds: {
+    campaignName: 'Location-Based Targeting',
+    targetingFocus: 'Upper West Side · Lincoln Square · Central Park West · Riverside · Columbus Ave',
+    // Latest Compass Digital Ads pull — Jun 28 – Jul 4, 2026 (Databox).
+    reportingPeriod: 'Jun 28 – Jul 4, 2026',
+    totalImpressions: 10054,
+    totalClicks: 183,
+    topChannel: { name: 'nytimes.com', ctr: 1.82 },
+    byChannel: [],
+    // Top 12 publishers from the Jun 28 – Jul 4 Databox snapshot.
+    topPublishers: [
+      { publisher: 'nytimes.com',       views: 3758 },
+      { publisher: 'nypost.com',        views: 952  },
+      { publisher: 'foxnews.com',       views: 751  },
+      { publisher: 'cnn.com',           views: 364  },
+      { publisher: 'yahoo.com',         views: 314  },
+      { publisher: 'theguardian.com',   views: 299  },
+      { publisher: 'huffpost.com',      views: 273  },
+      { publisher: 'thedailybeast.com', views: 259  },
+      { publisher: 'cbssports.com',     views: 162  },
+      { publisher: 'triblive.com',      views: 160  },
+      { publisher: 'cnbc.com',          views: 144  },
+      { publisher: 'pagesix.com',       views: 107  },
+    ],
+    audienceHouseholdIncome: [
+      { bracket: 'Top 10%', share: 90.1 },
+      { bracket: '11–20%',  share: 5.2  },
+      { bracket: '21–30%',  share: 3.1  },
+    ],
+    socialTrafficPeriod: 'Jun 29 – Jul 5, 2026',
+    socialTrafficShare: [],
   },
 
   marketActivity: {
@@ -198,10 +250,10 @@ export const WEST71_REPORT: WeeklyReport = {
 
   strategy: {
     keyRecommendations: '',
-    marketingPlanNextWeek: '— Convert the repeat client — third showing is on the books, push for an offer conversation\n— Sunday open house drew 4 — keep weekly cadence to build a wider buyer pool\n— Realtor.com is now the dominant traffic source (415 views vs. 264 StreetEasy / 89 Compass) — explore boosting StreetEasy + Compass presence to broaden the funnel\n— Targeted broker outreach to agents with active Upper West Side buyers',
+    marketingPlanNextWeek: '— Post-holiday re-engagement — reach back out to any Jun/early-Jul appointment holders\n— Location-based display campaign is efficient — 10K impressions / 1.82% CTR / 90% audience in the top 10% income bracket. Continue as-is\n— Refresh Instagram + Realtor.com creative to capture the audience quality Compass has already earned (44s average time on listing this week)\n— Weekly broker outreach to Upper West Side buyer agents',
     pricingStrategy: '',
     upcomingCampaigns: '',
     brokerEvents: '',
-    openHousesPlanned: '— Public open house: Sunday June 28, 1:00–2:30 PM\n— Third showing scheduled with the repeat-visit client',
+    openHousesPlanned: '— Public open house: Sunday July 12, 1:00–2:30 PM (first post-holiday weekend)',
   },
 }

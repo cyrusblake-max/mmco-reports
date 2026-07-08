@@ -108,10 +108,19 @@ export default function OpenHouseReport({ report, sectionNum = '03' }: Props) {
   // Skip the section entirely when there's nothing to report in this window
   if (eventsToShow.length === 0 && showings === 0 && ohAttendees === 0) return null
 
-  const weekTotalAttendees = eventsToShow.reduce((s, oh) => s + oh.totalAttendees, 0)
-  const weekAvgAttendance  = eventsToShow.length > 0 ? Math.round(weekTotalAttendees / eventsToShow.length) : 0
-  const peak = eventsToShow.length > 0
-    ? eventsToShow.reduce((best, oh) => oh.totalAttendees > best.totalAttendees ? oh : best, eventsToShow[0])
+  // Private showings + previews have their own headline tile — don't roll
+  // their attendees into the Open House count.
+  const isPrivateEvent = (oh: OpenHouseEvent) =>
+    oh.kind === 'private_showing' || oh.kind === 'private_preview'
+  const openHouseEvents = eventsToShow.filter(oh => !isPrivateEvent(oh))
+  const privateShowingEvents = eventsToShow.filter(isPrivateEvent)
+
+  const weekTotalAttendees = openHouseEvents.reduce((s, oh) => s + oh.totalAttendees, 0)
+  const weekAvgAttendance  = openHouseEvents.length > 0 ? Math.round(weekTotalAttendees / openHouseEvents.length) : 0
+  // "Private Showings" tile: prefer explicit event count, fall back to the metric.
+  const privateShowingCount = privateShowingEvents.length > 0 ? privateShowingEvents.length : showings
+  const peak = openHouseEvents.length > 0
+    ? openHouseEvents.reduce((best, oh) => oh.totalAttendees > best.totalAttendees ? oh : best, openHouseEvents[0])
     : null
 
   return (
@@ -133,7 +142,7 @@ export default function OpenHouseReport({ report, sectionNum = '03' }: Props) {
           </div>
           <div className="bg-luxury-off p-6">
             <p className="section-label text-luxury-taupe mb-2">Private Showings</p>
-            <p className="font-serif-display text-4xl font-light">{showings}</p>
+            <p className="font-serif-display text-4xl font-light">{privateShowingCount}</p>
             <p className="section-label text-luxury-taupe mt-1">This Week</p>
           </div>
         </div>

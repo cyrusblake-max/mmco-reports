@@ -60,8 +60,8 @@ export const BALTIC_REPORT: WeeklyReport = {
     compassViews: 130,
     saves: 0,
     inquiries: 0,
-    // No showings this week — likely holiday-driven slowdown.
-    showingRequests: 0,
+    // One private showing this week — Tuesday Jun 30 morning.
+    showingRequests: 1,
     // Sunday Jun 28 open house — no attendees over the holiday weekend.
     openHouseAttendees: 0,
     brokerInquiries: 0,
@@ -370,6 +370,20 @@ export const BALTIC_REPORT: WeeklyReport = {
       // Hide the broker/buyer split for this zero-attendee event so the card
       // stays clean instead of showing three "0" tiles.
       hiddenFields: ['attendeeBreakdown'],
+    },
+    {
+      id: 'oh-baltic-w9-tue-showing',
+      kind: 'private_showing',
+      date: '2026-06-30',
+      startTime: '10:00',
+      endTime: '10:45',
+      totalAttendees: 1,
+      brokers: 0,
+      buyers: 1,
+      seriousInterestLevel: 3,
+      commonFeedback: '',
+      questionsAsked: '',
+      followUpActions: 'Private showing Tuesday morning — one prospective buyer toured the home.',
     },
   ],
 
