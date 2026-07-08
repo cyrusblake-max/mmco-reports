@@ -203,7 +203,7 @@ export const WEST71_REPORT: WeeklyReport = {
     pricingFeedback: '',
     layoutFeedback: '',
     competingProperties: '',
-    brokerSentiment: 'Week 3 spanned the July 4th holiday. Compass Insights show 729 total views — Realtor is now the leading traffic source (335), followed closely by Compass (199) and StreetEasy (195). Unique visitors up 52.8% week-over-week; average time on listing more than doubled (44s, +106%). Showings + open house detail to be added on receipt.',
+    brokerSentiment: 'Week 3 spanned the July 4th holiday — no showings and no open houses on the calendar this week, in line with the seasonal slowdown. That said, engagement quality jumped: Compass Insights show 729 total views, with Realtor now the leading traffic source (335), followed by Compass (199) and StreetEasy (195). Unique visitors up 52.8% week-over-week and average time on listing more than doubled (44s, +106%) — buyers are spending real time with the listing even without in-person tours.',
     recommendedAdjustments: '',
   },
 
@@ -249,7 +249,7 @@ export const WEST71_REPORT: WeeklyReport = {
   },
 
   strategy: {
-    keyRecommendations: '',
+    keyRecommendations: 'Active offer on the table — response in progress. Continue full-court marketing to preserve leverage while the offer works.',
     marketingPlanNextWeek: '— Post-holiday re-engagement — reach back out to any Jun/early-Jul appointment holders\n— Location-based display campaign is efficient — 10K impressions / 1.82% CTR / 90% audience in the top 10% income bracket. Continue as-is\n— Refresh Instagram + Realtor.com creative to capture the audience quality Compass has already earned (44s average time on listing this week)\n— Weekly broker outreach to Upper West Side buyer agents',
     pricingStrategy: '',
     upcomingCampaigns: '',
