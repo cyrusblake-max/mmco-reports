@@ -528,6 +528,18 @@ export const BALTIC_REPORT: WeeklyReport = {
       notes:
         'Weekly broker blast to the full NYC agent network — promoting the Sunday June 21 open house and continued availability at $3,249,000.',
     },
+    {
+      id: 'mkt-baltic-w9-broker-blast',
+      type: 'broker_outreach',
+      name: 'Broker Blast — NYC Network (Week 9)',
+      date: '2026-07-01',
+      impressions: 0,
+      engagement: 0,
+      clicks: 0,
+      reach: 8000,
+      notes:
+        'Weekly broker blast to the full NYC agent network — reinforcing the $3,249,000 price over the July 4th holiday week.',
+    },
   ],
 
   socialMedia: [
