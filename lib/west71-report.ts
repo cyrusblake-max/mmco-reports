@@ -249,7 +249,7 @@ export const WEST71_REPORT: WeeklyReport = {
   },
 
   strategy: {
-    keyRecommendations: 'Active offer on the table — response in progress. Continue full-court marketing to preserve leverage while the offer works.',
+    keyRecommendations: 'Active offer on the table — response in progress.',
     marketingPlanNextWeek: '— Post-holiday re-engagement — reach back out to any Jun/early-Jul appointment holders\n— Location-based display campaign is efficient — 10K impressions / 1.82% CTR / 90% audience in the top 10% income bracket. Continue as-is\n— Refresh Instagram + Realtor.com creative to capture the audience quality Compass has already earned (44s average time on listing this week)\n— Weekly broker outreach to Upper West Side buyer agents',
     pricingStrategy: '',
     upcomingCampaigns: '',
