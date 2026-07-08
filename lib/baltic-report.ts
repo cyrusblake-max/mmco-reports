@@ -2,11 +2,11 @@ import { WeeklyReport } from './types'
 
 export const BALTIC_REPORT: WeeklyReport = {
   id: 'baltic-613-9c-w1',
-  // Week 8 — this week's reporting window (June 21 – June 27, 2026).
-  weekNumber: 8,
-  reportDate: '2026-06-23',
-  weekStartDate: '2026-06-21',
-  weekEndDate: '2026-06-27',
+  // Week 9 — reporting window Jun 28 – Jul 5, 2026 (over the July 4th weekend).
+  weekNumber: 9,
+  reportDate: '2026-07-08',
+  weekStartDate: '2026-06-28',
+  weekEndDate: '2026-07-05',
 
   property: {
     address: '613 Baltic Street',
@@ -48,11 +48,30 @@ export const BALTIC_REPORT: WeeklyReport = {
     ],
   },
 
-  // Week 8 (Jun 21 – Jun 27, 2026).
-  // Compass Insights pulled for Jun 19 – Jun 25: 268 total views (147 Compass /
-  // 121 StreetEasy), 114 unique visitors, 8s avg time spent. Compass was the
-  // top traffic source at 56% of visitors; 86% of Compass views from the public.
+  // Week 9 (Jun 28 – Jul 5, 2026) — the July 4th holiday week.
+  // Compass Insights (Jun 29 – Jul 5): 220 total views (130 Compass / 90
+  // StreetEasy), 114 unique visitors, 14s avg time spent. Compass remains the
+  // top traffic source (62%); 92% of Compass views from public visitors.
   currentMetrics: {
+    totalViews: 220,
+    websiteTraffic: 0,
+    zillowViews: 0,
+    streetEasyViews: 90,
+    compassViews: 130,
+    saves: 0,
+    inquiries: 0,
+    // No showings this week — likely holiday-driven slowdown.
+    showingRequests: 0,
+    // Sunday Jun 28 open house — no attendees over the holiday weekend.
+    openHouseAttendees: 0,
+    brokerInquiries: 0,
+    buyerLeads: 0,
+    socialReach: 0,
+    videoViews: 0,
+  },
+
+  // Previous = prior week (Jun 19 – Jun 25 insights pull) for week-over-week.
+  previousMetrics: {
     totalViews: 268,
     websiteTraffic: 0,
     zillowViews: 0,
@@ -61,25 +80,7 @@ export const BALTIC_REPORT: WeeklyReport = {
     saves: 0,
     inquiries: 0,
     showingRequests: 0,
-    // Sunday Jun 21 open house — one couple came through.
     openHouseAttendees: 2,
-    brokerInquiries: 0,
-    buyerLeads: 0,
-    socialReach: 0,
-    videoViews: 0,
-  },
-
-  // Previous = prior week (Jun 14–20) for week-over-week comparison.
-  previousMetrics: {
-    totalViews: 351,
-    websiteTraffic: 0,
-    zillowViews: 0,
-    streetEasyViews: 92,
-    compassViews: 259,
-    saves: 0,
-    inquiries: 0,
-    showingRequests: 0,
-    openHouseAttendees: 4,
     brokerInquiries: 0,
     buyerLeads: 0,
     socialReach: 0,
@@ -203,6 +204,46 @@ export const BALTIC_REPORT: WeeklyReport = {
         videoViews: 0,
       },
     },
+    {
+      // Week 8 was captured in the Jun 19 – Jun 25 Compass Insights pull.
+      weekLabel: 'Week 8',
+      weekNumber: 8,
+      metrics: {
+        totalViews: 268,
+        websiteTraffic: 0,
+        zillowViews: 0,
+        streetEasyViews: 121,
+        compassViews: 147,
+        saves: 0,
+        inquiries: 0,
+        showingRequests: 0,
+        openHouseAttendees: 2,
+        brokerInquiries: 0,
+        buyerLeads: 0,
+        socialReach: 0,
+        videoViews: 0,
+      },
+    },
+    {
+      // Week 9 — this reporting window (Jun 29 – Jul 5 insights pull).
+      weekLabel: 'Week 9',
+      weekNumber: 9,
+      metrics: {
+        totalViews: 220,
+        websiteTraffic: 0,
+        zillowViews: 0,
+        streetEasyViews: 90,
+        compassViews: 130,
+        saves: 0,
+        inquiries: 0,
+        showingRequests: 0,
+        openHouseAttendees: 0,
+        brokerInquiries: 0,
+        buyerLeads: 0,
+        socialReach: 0,
+        videoViews: 0,
+      },
+    },
   ],
 
   includedSections: {
@@ -312,6 +353,23 @@ export const BALTIC_REPORT: WeeklyReport = {
       commonFeedback: '',
       questionsAsked: '',
       followUpActions: 'One couple attended — steady weekend interest at the new price.',
+    },
+    {
+      id: 'oh-baltic-w9-sun',
+      kind: 'public',
+      date: '2026-06-28',
+      startTime: '13:00',
+      endTime: '14:30',
+      totalAttendees: 0,
+      brokers: 0,
+      buyers: 0,
+      seriousInterestLevel: 1,
+      commonFeedback: '',
+      questionsAsked: '',
+      followUpActions: 'No attendees — the Fourth of July holiday weekend drove foot traffic well below usual.',
+      // Hide the broker/buyer split for this zero-attendee event so the card
+      // stays clean instead of showing three "0" tiles.
+      hiddenFields: ['attendeeBreakdown'],
     },
   ],
 
@@ -486,35 +544,36 @@ export const BALTIC_REPORT: WeeklyReport = {
   digitalAds: {
     campaignName: 'Location-Based Targeting',
     targetingFocus: 'Boerum Hill · Park Slope · Cobble Hill · Carroll Gardens · Brooklyn Heights · Fort Greene',
-    // Latest Compass Digital Ads pull — Jun 21 – Jun 27, 2026 (Databox).
-    reportingPeriod: 'Jun 21 – Jun 27, 2026',
-    totalImpressions: 15425,
-    totalClicks: 111,
-    topChannel: { name: 'nytimes.com', ctr: 0.72 },
+    // Latest Compass Digital Ads pull — Jun 28 – Jul 4, 2026 (Databox).
+    reportingPeriod: 'Jun 28 – Jul 4, 2026',
+    totalImpressions: 19772,
+    totalClicks: 127,
+    topChannel: { name: 'nytimes.com', ctr: 0.64 },
     byChannel: [
       { channel: 'Google',    clicks: 88, ctr: 1.82 },
       { channel: 'Facebook',  clicks: 19, ctr: 1.73 },
       { channel: 'Instagram', clicks: 14, ctr: 2.48 },
     ],
-    // Top 12 publishers from the Jun 21 – Jun 27 Databox snapshot.
+    // Top 12 publishers from the Jun 28 – Jul 4 Databox snapshot.
     topPublishers: [
-      { publisher: 'nytimes.com',     views: 3643 },
-      { publisher: 'nypost.com',      views: 1968 },
-      { publisher: 'theatlantic.com', views: 853  },
-      { publisher: 'huffpost.com',    views: 769  },
-      { publisher: 'gothamist.com',   views: 562  },
-      { publisher: 'yahoo.com',       views: 528  },
-      { publisher: 'npr.org',         views: 485  },
-      { publisher: 'therealdeal.com', views: 348  },
-      { publisher: 'foxnews.com',     views: 348  },
-      { publisher: 'collive.com',     views: 337  },
-      { publisher: 'thedailybeast.com', views: 315 },
-      { publisher: 'cnn.com',         views: 310  },
+      { publisher: 'nytimes.com',       views: 4119 },
+      { publisher: 'yahoo.com',         views: 2871 },
+      { publisher: 'nypost.com',        views: 1993 },
+      { publisher: 'foxnews.com',       views: 1018 },
+      { publisher: 'theguardian.com',   views: 664  },
+      { publisher: 'huffpost.com',      views: 604  },
+      { publisher: 'theatlantic.com',   views: 530  },
+      { publisher: 'collive.com',       views: 408  },
+      { publisher: 'thedailybeast.com', views: 392  },
+      { publisher: 'cbssports.com',     views: 378  },
+      { publisher: 'npr.org',           views: 375  },
+      { publisher: 'cnn.com',           views: 336  },
     ],
     audienceHouseholdIncome: [
-      { bracket: 'Top 10%', share: 90.3 },
-      { bracket: '41–50%',  share: 5.0  },
-      { bracket: '21–30%',  share: 2.1  },
+      { bracket: 'Top 10%', share: 88.4 },
+      { bracket: '41–50%',  share: 4.6  },
+      { bracket: '11–20%',  share: 3.5  },
+      { bracket: '21–30%',  share: 2.7  },
     ],
     // Carrying forward Jun 11 – Jun 17 social split until the next pull.
     socialTrafficPeriod: 'June 11 – June 17, 2026',
@@ -535,10 +594,10 @@ export const BALTIC_REPORT: WeeklyReport = {
 
   strategy: {
     keyRecommendations: '',
-    marketingPlanNextWeek: '— Continue $3.25M price-adjustment push across all social and display creatives\n— Refresh Instagram content — Facebook still leads social traffic, push fresh Reels + Stories to rebalance Instagram\n— Location-based display campaign continues — NYT (3.6K views), NYPost, The Atlantic, HuffPost, Gothamist, Yahoo, NPR, The Real Deal all driving steady ad views\n— Weekly broker blast to NYC network',
+    marketingPlanNextWeek: '— Fresh push post-holiday — buyer attention returns after July 4th, plan a "back on market" content moment across social\n— Location-based display campaign remains strong — NYT (4.1K views), Yahoo (2.9K), NYPost, Fox News, The Guardian, HuffPost driving steady ad views\n— Refresh Instagram content — Facebook still leads social traffic, push new Reels to rebalance Instagram engagement\n— Broker re-engagement — re-open dialogue with buyers who toured in June',
     pricingStrategy: '',
     upcomingCampaigns: '',
     brokerEvents: '',
-    openHousesPlanned: '— Public open house: Sunday June 28, 1:00–2:30 PM',
+    openHousesPlanned: '— Public open house: Sunday July 12, 1:00–2:30 PM (first post-holiday weekend)',
   },
 }
