@@ -624,6 +624,6 @@ export const BALTIC_REPORT: WeeklyReport = {
     pricingStrategy: '',
     upcomingCampaigns: '',
     brokerEvents: '',
-    openHousesPlanned: '— Public open house: Sunday July 12, 1:00–2:30 PM (first post-holiday weekend)',
+    openHousesPlanned: '— Public open house: Sunday July 12, 1:00–2:30 PM (first post-holiday weekend) — one appointment already confirmed',
   },
 }
