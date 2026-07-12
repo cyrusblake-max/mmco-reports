@@ -2,11 +2,12 @@ import { WeeklyReport } from './types'
 
 export const BALTIC_REPORT: WeeklyReport = {
   id: 'baltic-613-9c-w1',
-  // Week 9 — reporting window Jun 28 – Jul 5, 2026 (over the July 4th weekend).
-  weekNumber: 9,
-  reportDate: '2026-07-08',
-  weekStartDate: '2026-06-28',
-  weekEndDate: '2026-07-05',
+  // Week 10 — reporting window Jul 5 – Jul 12, 2026 (Sun–Sun to include
+  // Sunday's open house).
+  weekNumber: 10,
+  reportDate: '2026-07-12',
+  weekStartDate: '2026-07-05',
+  weekEndDate: '2026-07-12',
 
   property: {
     address: '613 Baltic Street',
@@ -48,10 +49,9 @@ export const BALTIC_REPORT: WeeklyReport = {
     ],
   },
 
-  // Week 9 (Jun 28 – Jul 5, 2026) — the July 4th holiday week.
-  // Compass Insights (Jun 29 – Jul 5): 220 total views (130 Compass / 90
-  // StreetEasy), 114 unique visitors, 14s avg time spent. Compass remains the
-  // top traffic source (62%); 92% of Compass views from public visitors.
+  // Week 10 (Jul 5 – Jul 12, 2026) — first full week post-holiday.
+  // Compass Insights view numbers carry forward from the Jun 29 – Jul 5 pull
+  // (220 total / 130 Compass / 90 StreetEasy) — Wednesday's next pull will refresh.
   currentMetrics: {
     totalViews: 220,
     websiteTraffic: 0,
@@ -60,27 +60,26 @@ export const BALTIC_REPORT: WeeklyReport = {
     compassViews: 130,
     saves: 0,
     inquiries: 0,
-    // One private showing this week — Tuesday Jun 30 morning.
-    showingRequests: 1,
-    // Sunday Jun 28 open house — no attendees over the holiday weekend.
-    openHouseAttendees: 0,
+    showingRequests: 0,
+    // Sunday Jul 12 public open house — 3 attendees.
+    openHouseAttendees: 3,
     brokerInquiries: 0,
     buyerLeads: 0,
     socialReach: 0,
     videoViews: 0,
   },
 
-  // Previous = prior week (Jun 19 – Jun 25 insights pull) for week-over-week.
+  // Previous = Week 9 (Jun 28 – Jul 5, the holiday week) for week-over-week.
   previousMetrics: {
-    totalViews: 268,
+    totalViews: 220,
     websiteTraffic: 0,
     zillowViews: 0,
-    streetEasyViews: 121,
-    compassViews: 147,
+    streetEasyViews: 90,
+    compassViews: 130,
     saves: 0,
     inquiries: 0,
-    showingRequests: 0,
-    openHouseAttendees: 2,
+    showingRequests: 1,
+    openHouseAttendees: 0,
     brokerInquiries: 0,
     buyerLeads: 0,
     socialReach: 0,
@@ -225,7 +224,7 @@ export const BALTIC_REPORT: WeeklyReport = {
       },
     },
     {
-      // Week 9 — this reporting window (Jun 29 – Jul 5 insights pull).
+      // Week 9 — holiday week (Jun 29 – Jul 5 insights pull).
       weekLabel: 'Week 9',
       weekNumber: 9,
       metrics: {
@@ -236,8 +235,28 @@ export const BALTIC_REPORT: WeeklyReport = {
         compassViews: 130,
         saves: 0,
         inquiries: 0,
-        showingRequests: 0,
+        showingRequests: 1,
         openHouseAttendees: 0,
+        brokerInquiries: 0,
+        buyerLeads: 0,
+        socialReach: 0,
+        videoViews: 0,
+      },
+    },
+    {
+      // Week 10 — Sunday Jul 12 open house drew 3 attendees.
+      weekLabel: 'Week 10',
+      weekNumber: 10,
+      metrics: {
+        totalViews: 220,
+        websiteTraffic: 0,
+        zillowViews: 0,
+        streetEasyViews: 90,
+        compassViews: 130,
+        saves: 0,
+        inquiries: 0,
+        showingRequests: 0,
+        openHouseAttendees: 3,
         brokerInquiries: 0,
         buyerLeads: 0,
         socialReach: 0,
@@ -384,6 +403,20 @@ export const BALTIC_REPORT: WeeklyReport = {
       commonFeedback: '',
       questionsAsked: '',
       followUpActions: 'Private showing Tuesday morning — one prospective buyer toured the home.',
+    },
+    {
+      id: 'oh-baltic-w10-sun',
+      kind: 'public',
+      date: '2026-07-12',
+      startTime: '13:00',
+      endTime: '14:30',
+      totalAttendees: 3,
+      brokers: 0,
+      buyers: 3,
+      seriousInterestLevel: 3,
+      commonFeedback: '',
+      questionsAsked: '',
+      followUpActions: 'Sunday public open house — three prospective buyers walked through, first meaningful post-holiday activity.',
     },
   ],
 
@@ -540,6 +573,18 @@ export const BALTIC_REPORT: WeeklyReport = {
       notes:
         'Weekly broker blast to the full NYC agent network — reinforcing the $3,249,000 price over the July 4th holiday week.',
     },
+    {
+      id: 'mkt-baltic-w10-broker-blast',
+      type: 'broker_outreach',
+      name: 'Broker Blast — NYC Network (Week 10)',
+      date: '2026-07-08',
+      impressions: 0,
+      engagement: 0,
+      clicks: 0,
+      reach: 8000,
+      notes:
+        'Weekly broker blast to the full NYC agent network — promoting the Sunday July 12 open house at $3,249,000.',
+    },
   ],
 
   socialMedia: [
@@ -570,36 +615,35 @@ export const BALTIC_REPORT: WeeklyReport = {
   digitalAds: {
     campaignName: 'Location-Based Targeting',
     targetingFocus: 'Boerum Hill · Park Slope · Cobble Hill · Carroll Gardens · Brooklyn Heights · Fort Greene',
-    // Latest Compass Digital Ads pull — Jun 28 – Jul 4, 2026 (Databox).
-    reportingPeriod: 'Jun 28 – Jul 4, 2026',
-    totalImpressions: 19772,
-    totalClicks: 127,
+    // Latest Compass Digital Ads pull — Jul 5 – Jul 11, 2026 (Databox).
+    reportingPeriod: 'Jul 5 – Jul 11, 2026',
+    totalImpressions: 24787,
+    totalClicks: 158,
     topChannel: { name: 'nytimes.com', ctr: 0.64 },
     byChannel: [
       { channel: 'Google',    clicks: 88, ctr: 1.82 },
       { channel: 'Facebook',  clicks: 19, ctr: 1.73 },
       { channel: 'Instagram', clicks: 14, ctr: 2.48 },
     ],
-    // Top 12 publishers from the Jun 28 – Jul 4 Databox snapshot.
+    // Top 12 publishers from the Jul 5 – Jul 11 Databox snapshot.
     topPublishers: [
-      { publisher: 'nytimes.com',       views: 4119 },
-      { publisher: 'yahoo.com',         views: 2871 },
-      { publisher: 'nypost.com',        views: 1993 },
-      { publisher: 'foxnews.com',       views: 1018 },
-      { publisher: 'theguardian.com',   views: 664  },
-      { publisher: 'huffpost.com',      views: 604  },
-      { publisher: 'theatlantic.com',   views: 530  },
-      { publisher: 'collive.com',       views: 408  },
-      { publisher: 'thedailybeast.com', views: 392  },
-      { publisher: 'cbssports.com',     views: 378  },
-      { publisher: 'npr.org',           views: 375  },
-      { publisher: 'cnn.com',           views: 336  },
+      { publisher: 'nytimes.com',       views: 6984 },
+      { publisher: 'theatlantic.com',   views: 2867 },
+      { publisher: 'nypost.com',        views: 2794 },
+      { publisher: 'huffpost.com',      views: 1254 },
+      { publisher: 'yahoo.com',         views: 767  },
+      { publisher: 'gothamist.com',     views: 678  },
+      { publisher: 'npr.org',           views: 602  },
+      { publisher: 'theguardian.com',   views: 547  },
+      { publisher: 'cnn.com',           views: 475  },
+      { publisher: 'mlb.com',           views: 468  },
+      { publisher: 'foxnews.com',       views: 428  },
+      { publisher: 'thedailybeast.com', views: 426  },
     ],
     audienceHouseholdIncome: [
-      { bracket: 'Top 10%', share: 88.4 },
-      { bracket: '41–50%',  share: 4.6  },
-      { bracket: '11–20%',  share: 3.5  },
-      { bracket: '21–30%',  share: 2.7  },
+      { bracket: 'Top 10%', share: 92.0 },
+      { bracket: '41–50%',  share: 4.2  },
+      { bracket: '21–30%',  share: 1.7  },
     ],
     // Carrying forward Jun 11 – Jun 17 social split until the next pull.
     socialTrafficPeriod: 'June 11 – June 17, 2026',
@@ -620,10 +664,10 @@ export const BALTIC_REPORT: WeeklyReport = {
 
   strategy: {
     keyRecommendations: '',
-    marketingPlanNextWeek: '— Fresh push post-holiday — buyer attention returns after July 4th, plan a "back on market" content moment across social\n— Location-based display campaign remains strong — NYT (4.1K views), Yahoo (2.9K), NYPost, Fox News, The Guardian, HuffPost driving steady ad views\n— Refresh Instagram content — Facebook still leads social traffic, push new Reels to rebalance Instagram engagement\n— Broker re-engagement — re-open dialogue with buyers who toured in June',
+    marketingPlanNextWeek: '— Follow up hard on the three Sunday open house attendees — send comps + insights within 24 hours\n— Location-based display campaign is scaling — NYT alone drove 6.9K ad views this week, The Atlantic and NYPost both cleared 2.7K\n— Continue weekly broker blasts to the NYC network\n— Refresh Instagram Reels — Facebook still leads social traffic, need new content to rebalance',
     pricingStrategy: '',
     upcomingCampaigns: '',
     brokerEvents: '',
-    openHousesPlanned: '— Public open house: Sunday July 12, 1:00–2:30 PM (first post-holiday weekend) — one appointment already confirmed',
+    openHousesPlanned: '— Private tour: Monday July 13, 10:00 AM — one qualified buyer, already booked\n— Public open house cadence continues next Sunday',
   },
 }
