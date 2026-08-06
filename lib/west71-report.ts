@@ -7,7 +7,9 @@ import { WeeklyReport } from './types'
  */
 export const WEST71_REPORT: WeeklyReport = {
   id: 'west71-266-w1',
-  weekNumber: 4,
+  // Week number = weeks on market (71 days as of Aug 6), not report count —
+  // reports paused during July so the two drifted apart.
+  weekNumber: 10,
   reportDate: '2026-08-06',
   // Reporting window: the past two weeks (July 20 – August 2, 2026) —
   // public open houses on both Sundays (Jul 26 + Aug 2) plus one weekday showing.
@@ -25,7 +27,7 @@ export const WEST71_REPORT: WeeklyReport = {
     beds: 4,
     baths: 5,
     sqft: 3520,
-    listingDate: '2026-06-02',
+    listingDate: '2026-05-27', // 71 days on market as of the Aug 6 report
     mainImageUrl: '/west71-hero.jpg',
     galleryImages: [],
     description:
@@ -54,7 +56,7 @@ export const WEST71_REPORT: WeeklyReport = {
     ],
   },
 
-  // Week 4 (Jul 20 – Aug 2, two-week window) —
+  // Week 10 (Jul 20 – Aug 2, two-week window) —
   // 2 public open houses (Sun Jul 26 + Sun Aug 2), 3 buyer parties total,
   // plus 1 private weekday showing.
   // Compass Insights traffic numbers pending — user will send the next pull.
@@ -150,8 +152,8 @@ export const WEST71_REPORT: WeeklyReport = {
       },
     },
     {
-      weekLabel: 'Week 4',
-      weekNumber: 4,
+      weekLabel: 'Week 10',
+      weekNumber: 10,
       metrics: {
         totalViews: 0,
         websiteTraffic: 0,
