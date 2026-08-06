@@ -7,11 +7,12 @@ import { WeeklyReport } from './types'
  */
 export const WEST71_REPORT: WeeklyReport = {
   id: 'west71-266-w1',
-  weekNumber: 3,
-  reportDate: '2026-07-08',
-  // Reporting window: last week (June 29 – July 5, 2026) — spans the July 4th holiday.
-  weekStartDate: '2026-06-29',
-  weekEndDate: '2026-07-05',
+  weekNumber: 4,
+  reportDate: '2026-08-06',
+  // Reporting window: the past two weeks (July 20 – August 2, 2026) —
+  // public open houses on both Sundays (Jul 26 + Aug 2) plus one weekday showing.
+  weekStartDate: '2026-07-20',
+  weekEndDate: '2026-08-02',
 
   property: {
     address: '266 West 71st Street',
@@ -53,12 +54,28 @@ export const WEST71_REPORT: WeeklyReport = {
     ],
   },
 
-  // Week 3 (June 29 – July 5) — spans July 4th holiday.
-  // Compass Insights: 729 total views (199 Compass / 335 Realtor / 195 StreetEasy),
-  // 162 unique visitors (up 52.8%), 44s avg time spent (up 106%).
-  // 91% of Compass views from public. Compass is the top traffic source (68%).
-  // Showings + open house numbers pending — user will send shortly.
+  // Week 4 (Jul 20 – Aug 2, two-week window) —
+  // 2 public open houses (Sun Jul 26 + Sun Aug 2), 3 buyer parties total,
+  // plus 1 private weekday showing.
+  // Compass Insights traffic numbers pending — user will send the next pull.
   currentMetrics: {
+    totalViews: 0,
+    websiteTraffic: 0,
+    zillowViews: 0,
+    streetEasyViews: 0,
+    compassViews: 0,
+    saves: 0,
+    inquiries: 0,
+    showingRequests: 1,
+    openHouseAttendees: 3,
+    brokerInquiries: 0,
+    buyerLeads: 0,
+    socialReach: 0,
+    videoViews: 0,
+  },
+
+  // Previous = Week 3 (Jun 29 – Jul 5) for week-over-week trend math.
+  previousMetrics: {
     totalViews: 729,
     websiteTraffic: 0,
     zillowViews: 0,
@@ -68,23 +85,6 @@ export const WEST71_REPORT: WeeklyReport = {
     inquiries: 0,
     showingRequests: 0,
     openHouseAttendees: 0,
-    brokerInquiries: 0,
-    buyerLeads: 0,
-    socialReach: 0,
-    videoViews: 0,
-  },
-
-  // Previous = Week 2 (Jun 15 – 21) for week-over-week trend math.
-  previousMetrics: {
-    totalViews: 770,
-    websiteTraffic: 0,
-    zillowViews: 0,
-    streetEasyViews: 264,
-    compassViews: 89,
-    saves: 0,
-    inquiries: 0,
-    showingRequests: 3,
-    openHouseAttendees: 4,
     brokerInquiries: 0,
     buyerLeads: 0,
     socialReach: 0,
@@ -149,6 +149,25 @@ export const WEST71_REPORT: WeeklyReport = {
         videoViews: 0,
       },
     },
+    {
+      weekLabel: 'Week 4',
+      weekNumber: 4,
+      metrics: {
+        totalViews: 0,
+        websiteTraffic: 0,
+        zillowViews: 0,
+        streetEasyViews: 0,
+        compassViews: 0,
+        saves: 0,
+        inquiries: 0,
+        showingRequests: 1,
+        openHouseAttendees: 3,
+        brokerInquiries: 0,
+        buyerLeads: 0,
+        socialReach: 0,
+        videoViews: 0,
+      },
+    },
   ],
 
   includedSections: {
@@ -157,7 +176,9 @@ export const WEST71_REPORT: WeeklyReport = {
     openHouses:       true,
     marketing:        false,
     socialMedia:      false,
-    digitalAds:       true,
+    // Digital ads data on file is the Jun 28 – Jul 4 pull — re-enable once the
+    // fresh Databox snapshot lands.
+    digitalAds:       false,
     feedback:         false,
     marketActivity:   false,
     strategy:         true,
@@ -191,6 +212,36 @@ export const WEST71_REPORT: WeeklyReport = {
       questionsAsked: '',
       followUpActions: '',
     },
+    // Jul 26 + Aug 2: 3 buyer parties total across the two Sundays.
+    // Split assumed 2/1 — adjust in the editor if it was the other way around.
+    {
+      id: 'oh-west71-w4-sun1',
+      kind: 'public',
+      date: '2026-07-26',
+      startTime: '13:00',
+      endTime: '14:30',
+      totalAttendees: 2,
+      brokers: 0,
+      buyers: 2,
+      seriousInterestLevel: 3,
+      commonFeedback: '',
+      questionsAsked: '',
+      followUpActions: '',
+    },
+    {
+      id: 'oh-west71-w4-sun2',
+      kind: 'public',
+      date: '2026-08-02',
+      startTime: '13:00',
+      endTime: '14:30',
+      totalAttendees: 1,
+      brokers: 0,
+      buyers: 1,
+      seriousInterestLevel: 3,
+      commonFeedback: '',
+      questionsAsked: '',
+      followUpActions: '',
+    },
   ],
 
   marketing: [],
@@ -203,7 +254,7 @@ export const WEST71_REPORT: WeeklyReport = {
     pricingFeedback: '',
     layoutFeedback: '',
     competingProperties: '',
-    brokerSentiment: 'Week 3 spanned the July 4th holiday — no showings and no open houses on the calendar this week, in line with the seasonal slowdown. That said, engagement quality jumped: Compass Insights show 729 total views, with Realtor now the leading traffic source (335), followed by Compass (199) and StreetEasy (195). Unique visitors up 52.8% week-over-week and average time on listing more than doubled (44s, +106%) — buyers are spending real time with the listing even without in-person tours.',
+    brokerSentiment: 'In-person activity picked back up after the July 4th lull. The home was shown at public open houses on each of the past two Sundays (July 26 and August 2), with three buyer parties through in total, plus one private weekday showing. Momentum continues into next week with another public open house this Sunday and a broker blast going out to buyer agents.',
     recommendedAdjustments: '',
   },
 
@@ -249,11 +300,11 @@ export const WEST71_REPORT: WeeklyReport = {
   },
 
   strategy: {
-    keyRecommendations: 'Active offer on the table — response in progress.',
-    marketingPlanNextWeek: '— Post-holiday re-engagement — reach back out to any Jun/early-Jul appointment holders\n— Location-based display campaign is efficient — 10K impressions / 1.82% CTR / 90% audience in the top 10% income bracket. Continue as-is\n— Refresh Instagram + Realtor.com creative to capture the audience quality Compass has already earned (44s average time on listing this week)\n— Weekly broker outreach to Upper West Side buyer agents',
+    keyRecommendations: 'Steady in-person traffic returned over the past two weeks — two consecutive Sunday open houses (3 buyer parties) plus a private weekday showing. Keep the Sunday cadence going and put the listing directly in front of buyer agents with the broker blast.',
+    marketingPlanNextWeek: '— Broker blast to Upper West Side and Manhattan buyer agents ahead of Sunday’s open house\n— Follow up with all open-house attendees from July 26 and August 2\n— Continue the location-based display campaign — 90% of the audience in the top 10% income bracket',
     pricingStrategy: '',
     upcomingCampaigns: '',
     brokerEvents: '',
-    openHousesPlanned: '— Public open house: Sunday July 12, 1:00–2:30 PM (first post-holiday weekend)',
+    openHousesPlanned: '— Public open house: Sunday, August 9\n— Broker blast to buyer agents in advance of the open house',
   },
 }
