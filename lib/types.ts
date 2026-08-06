@@ -52,7 +52,8 @@ export const METRIC_LABELS: Record<keyof WeeklyMetrics, string> = {
   compassViews:       'Compass Views',
   saves:              'Saves / Favorites',
   inquiries:          'Inquiries',
-  showingRequests:    'Showing Requests',
+  // MM&Co logs actual in-person private showings here, not inbound requests
+  showingRequests:    'Private Showings',
   openHouseAttendees: 'Open House Attendees',
   brokerInquiries:    'Broker Inquiries',
   buyerLeads:         'Buyer Leads',

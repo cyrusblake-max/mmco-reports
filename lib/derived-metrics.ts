@@ -121,7 +121,8 @@ const LABELS: Record<MetricKey, string> = {
   compassViews:       'Compass',
   saves:              'Saves',
   inquiries:          'Inquiries',
-  showingRequests:    'Showing Requests',
+  // MM&Co logs actual in-person private showings here, not inbound requests
+  showingRequests:    'Private Showings',
   openHouseAttendees: 'Open House Attendees',
   brokerInquiries:    'Broker Inquiries',
   buyerLeads:         'Qualified Buyer Leads',
