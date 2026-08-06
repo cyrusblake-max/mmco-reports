@@ -37,6 +37,18 @@ export function formatDate(dateStr: string, format: 'long' | 'short' | 'month' =
   return d.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
 }
 
+// Label for the reporting window ("This Week" / "Last Two Weeks") based on
+// how many days the report actually covers.
+export function periodLabel(weekStartDate?: string, weekEndDate?: string): string {
+  if (!weekStartDate || !weekEndDate) return 'This Week'
+  const start = new Date(weekStartDate + 'T00:00:00')
+  const end   = new Date(weekEndDate + 'T00:00:00')
+  const days  = Math.round((end.getTime() - start.getTime()) / 86_400_000) + 1
+  if (days <= 8)  return 'This Week'
+  if (days <= 15) return 'Last Two Weeks'
+  return 'This Period'
+}
+
 export function daysOnMarket(listingDate: string): number {
   const listed = new Date(listingDate)
   const today  = new Date()

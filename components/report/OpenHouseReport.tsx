@@ -1,7 +1,7 @@
 'use client'
 import { Users, Briefcase, TrendingUp } from 'lucide-react'
 import { WeeklyReport, OpenHouseEvent, OPEN_HOUSE_KIND_LABELS } from '@/lib/types'
-import { formatDate } from '@/lib/utils'
+import { formatDate, periodLabel } from '@/lib/utils'
 import SectionMast from './SectionMast'
 
 interface Props { report: WeeklyReport; sectionNum?: string }
@@ -133,17 +133,17 @@ export default function OpenHouseReport({ report, sectionNum = '03' }: Props) {
           kicker="A summary of the week's open houses, broker previews, and the quality of buyer interest observed at each."
         />
 
-        {/* This week's totals */}
+        {/* Reporting-window totals */}
         <div className="grid grid-cols-2 gap-px bg-luxury-cream mb-12">
           <div className="bg-luxury-black p-6">
             <p className="section-label text-luxury-gold mb-2">Open House Attendees</p>
             <p className="font-serif-display text-4xl font-light text-white">{weekTotalAttendees}</p>
-            <p className="section-label text-white/40 mt-1">This Week</p>
+            <p className="section-label text-white/40 mt-1">{periodLabel(weekStartDate, weekEndDate)}</p>
           </div>
           <div className="bg-luxury-off p-6">
             <p className="section-label text-luxury-taupe mb-2">Private Showings</p>
             <p className="font-serif-display text-4xl font-light">{privateShowingCount}</p>
-            <p className="section-label text-luxury-taupe mt-1">This Week</p>
+            <p className="section-label text-luxury-taupe mt-1">{periodLabel(weekStartDate, weekEndDate)}</p>
           </div>
         </div>
 

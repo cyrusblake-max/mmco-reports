@@ -4,7 +4,7 @@ import {
   ResponsiveContainer, Legend, Area, AreaChart,
 } from 'recharts'
 import { WeeklyReport } from '@/lib/types'
-import { formatNumber } from '@/lib/utils'
+import { formatNumber, periodLabel } from '@/lib/utils'
 import {
   synthesisePrevious, scorecardsFor, heroPick,
 } from '@/lib/derived-metrics'
@@ -34,7 +34,7 @@ export default function WeeklySnapshot({ report, sectionNum = '02' }: Props) {
         {/* ── HERO STAT ── */}
         {hero && (
           <div className="bg-white border border-luxury-cream px-8 md:px-16 py-14 md:py-20 mb-10 text-center">
-            <p className="section-label text-luxury-taupe mb-4">{hero.label} · This Week</p>
+            <p className="section-label text-luxury-taupe mb-4">{hero.label} · {periodLabel(report.weekStartDate, report.weekEndDate)}</p>
             <p
               className="font-serif-display font-light leading-none mb-5"
               style={{ fontSize: 'clamp(4.5rem, 12vw, 9rem)' }}
