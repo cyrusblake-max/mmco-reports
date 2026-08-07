@@ -9,10 +9,14 @@ import {
   type OpenHouseKind, type OpenHouseField,
 } from '@/lib/types'
 import { saveReport } from '@/lib/store'
+import { supabaseConfigured } from '@/lib/supabase'
 import { v4 as uuidv4 } from 'uuid'
-import { Plus, Trash2, ChevronDown, ChevronUp, Save, Eye, Upload, ArrowUp, ArrowDown } from 'lucide-react'
+import { Plus, Trash2, ChevronDown, ChevronUp, Save, Eye, Upload, ArrowUp, ArrowDown, ScanSearch } from 'lucide-react'
+import Link from 'next/link'
 import ImageDrop from './ImageDrop'
 import GalleryDrop from './GalleryDrop'
+import { RoughNotesBox, StrategyDraftButton, type PolishedNotes, type DraftedStrategy } from './AiTools'
+import type { FeedbackItem } from '@/lib/types'
 
 interface Props {
   initial: WeeklyReport
@@ -23,6 +27,17 @@ interface Props {
 }
 
 type Section = 'property' | 'metrics' | 'openhouses' | 'marketing' | 'social' | 'feedback' | 'market' | 'strategy'
+
+/** Keep exactly one "Showing Activity" custom section, appending new summaries. */
+function upsertShowingSummary(sections: CustomSection[], summary: string): CustomSection[] {
+  const existing = sections.find(s => s.title === 'Showing Activity')
+  if (!existing) {
+    return [...sections, { id: uuidv4(), title: 'Showing Activity', eyebrow: 'THIS WEEK', body: summary }]
+  }
+  return sections.map(s => s.id === existing.id
+    ? { ...s, body: s.body.trim() ? `${s.body}\n${summary}` : summary }
+    : s)
+}
 
 const SECTIONS: { key: Section; label: string; num: string }[] = [
   { key: 'property',   label: 'Property & Agent',       num: '01' },
@@ -504,6 +519,7 @@ export default function ReportForm({ initial, onChange, onSaved }: Props) {
   const router = useRouter()
   const [report, setReportState] = useState<WeeklyReport>(initial)
   const [saving, setSaving] = useState(false)
+  const [shareCopied, setShareCopied] = useState(false)
 
   // Wrap setReport so the parent gets every state change for live preview / dirty tracking
   const setReport: typeof setReportState = useCallback((updater: React.SetStateAction<WeeklyReport>) => {
@@ -695,6 +711,41 @@ export default function ReportForm({ initial, onChange, onSaved }: Props) {
   function setFeedback(key: string, value: string) {
     setReport(r => ({ ...r, feedback: { ...r.feedback, [key]: value } }))
   }
+  /** Merge AI-polished rough notes into feedback — appends, never clobbers. */
+  function applyPolishedNotes(p: PolishedNotes, newItems: FeedbackItem[]) {
+    const join = (prev: string, add: string) => !add.trim() ? prev : !prev.trim() ? add : `${prev}\n${add}`
+    setReport(r => ({
+      ...r,
+      feedback: {
+        ...r.feedback,
+        items: [...(r.feedback.items ?? []), ...newItems],
+        commonObjections:    join(r.feedback.commonObjections, p.commonObjections),
+        pricingFeedback:     join(r.feedback.pricingFeedback, p.pricingFeedback),
+        layoutFeedback:      join(r.feedback.layoutFeedback, p.layoutFeedback),
+        competingProperties: join(r.feedback.competingProperties, p.competingProperties),
+        brokerSentiment:     join(r.feedback.brokerSentiment, p.brokerSentiment),
+      },
+      customSections: p.showingsSummary.trim()
+        ? upsertShowingSummary(r.customSections ?? [], p.showingsSummary)
+        : r.customSections,
+    }))
+  }
+
+  function applyDraftedStrategy(d: DraftedStrategy) {
+    setReport(r => ({
+      ...r,
+      strategy: {
+        ...r.strategy,
+        keyRecommendations: d.keyRecommendations,
+        marketingPlanNextWeek: d.marketingPlanNextWeek,
+        pricingStrategy: d.pricingStrategy,
+      },
+      feedback: d.recommendedAdjustments
+        ? { ...r.feedback, recommendedAdjustments: d.recommendedAdjustments }
+        : r.feedback,
+    }))
+  }
+
   function setStrategy(key: string, value: string) {
     setReport(r => ({ ...r, strategy: { ...r.strategy, [key]: value } }))
   }
@@ -903,6 +954,16 @@ export default function ReportForm({ initial, onChange, onSaved }: Props) {
       {/* === METRICS === */}
       <SectionPanel title="Weekly Metrics" num="02">
         <div className="mt-4 space-y-6">
+          <Link
+            href={`/dashboard/import/${report.id}`}
+            className="flex items-center gap-2.5 border border-luxury-gold/50 bg-luxury-gold/[0.05] hover:bg-luxury-gold/10 transition-colors p-3.5"
+          >
+            <ScanSearch className="w-4 h-4 text-luxury-gold flex-shrink-0" />
+            <span className="text-xs text-luxury-black">
+              <span className="font-medium">Import from screenshots</span>
+              <span className="text-luxury-taupe"> — upload Compass, StreetEasy, Zillow, Instagram or email analytics and review the extracted numbers before they land here.</span>
+            </span>
+          </Link>
           <div>
             <p className="section-label text-luxury-gold mb-3">This Week</p>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
@@ -1276,6 +1337,29 @@ export default function ReportForm({ initial, onChange, onSaved }: Props) {
       {/* === FEEDBACK === */}
       <SectionPanel title="Buyer & Broker Feedback" num="06">
         <div className="mt-4 space-y-4">
+          <RoughNotesBox report={report} onApply={applyPolishedNotes} />
+          {(report.feedback?.items?.length ?? 0) > 0 && (
+            <div className="space-y-2">
+              <p className="section-label text-luxury-taupe">Feedback entries</p>
+              {report.feedback.items.map(item => (
+                <div key={item.id} className="flex items-start gap-2 border border-luxury-cream p-3">
+                  <span className={`text-xs px-1.5 py-0.5 border flex-shrink-0 ${
+                    item.sentiment === 'positive' ? 'border-luxury-gold/50 text-luxury-gold' :
+                    item.sentiment === 'negative' ? 'border-danger/40 text-danger' :
+                    'border-luxury-cream text-luxury-taupe'
+                  }`}>{item.source} · {item.sentiment}</span>
+                  <p className="text-xs text-luxury-black flex-1 min-w-0">{item.comment}</p>
+                  <button
+                    type="button"
+                    onClick={() => setReport(r => ({ ...r, feedback: { ...r.feedback, items: r.feedback.items.filter(x => x.id !== item.id) } }))}
+                    className="p-1 text-luxury-taupe hover:text-danger flex-shrink-0" title="Remove"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
           <Field label="Common Objections"           name="objections"   value={report.feedback?.commonObjections ?? ''}   rows={3} onChange={v => setFeedback('commonObjections', v)} />
           <Field label="Pricing Feedback"            name="pricing"      value={report.feedback?.pricingFeedback ?? ''}    rows={3} onChange={v => setFeedback('pricingFeedback', v)} />
           <Field label="Layout Feedback"             name="layout"       value={report.feedback?.layoutFeedback ?? ''}     rows={3} onChange={v => setFeedback('layoutFeedback', v)} />
@@ -1296,12 +1380,83 @@ export default function ReportForm({ initial, onChange, onSaved }: Props) {
       {/* === STRATEGY === */}
       <SectionPanel title="Agent Strategy & Next Steps" num="08">
         <div className="mt-4 space-y-4">
+          <StrategyDraftButton report={report} onApply={applyDraftedStrategy} />
           <Field label="Key Recommendations (one per line)"      name="rec"      value={report.strategy?.keyRecommendations ?? ''}   rows={4} onChange={v => setStrategy('keyRecommendations', v)} />
           <Field label="Marketing Plan — Next Week (one per line)" name="mktplan" value={report.strategy?.marketingPlanNextWeek ?? ''} rows={4} onChange={v => setStrategy('marketingPlanNextWeek', v)} />
           <Field label="Pricing Strategy"                         name="pricing"  value={report.strategy?.pricingStrategy ?? ''}      rows={3} onChange={v => setStrategy('pricingStrategy', v)} />
           <Field label="Upcoming Campaigns (one per line)"        name="campaigns" value={report.strategy?.upcomingCampaigns ?? ''}   rows={3} onChange={v => setStrategy('upcomingCampaigns', v)} />
           <Field label="Broker Events (one per line)"             name="bkrevents" value={report.strategy?.brokerEvents ?? ''}        rows={3} onChange={v => setStrategy('brokerEvents', v)} />
           <Field label="Open Houses Planned (one per line)"       name="ohplanned" value={report.strategy?.openHousesPlanned ?? ''}   rows={3} onChange={v => setStrategy('openHousesPlanned', v)} />
+        </div>
+      </SectionPanel>
+
+      {/* === SHARING & ACCESS === */}
+      <SectionPanel title="Sharing & Access" num="09">
+        <div className="mt-4 space-y-4">
+          <p className="text-xs text-luxury-taupe">
+            The share link is how your client receives this report. Optionally add a passcode and an
+            expiry date — light protection for a private listing, not encryption.
+          </p>
+
+          {!supabaseConfigured && (
+            <div className="flex items-start gap-2 border border-luxury-gold/50 bg-luxury-gold/[0.06] p-3 text-xs text-luxury-black">
+              <span className="text-luxury-gold flex-shrink-0 font-medium">!</span>
+              <span>
+                Shared storage isn&rsquo;t connected yet, so this link only opens on devices that already
+                have the report. Set up Supabase (see <span className="font-medium">SUPABASE.md</span>) and
+                the link will work on your client&rsquo;s phone too.
+              </span>
+            </div>
+          )}
+
+          <div>
+            <label className="section-label text-luxury-taupe block mb-1.5">Client link</label>
+            <div className="flex items-stretch gap-2">
+              <input
+                type="text" readOnly
+                value={typeof window !== 'undefined' ? `${window.location.origin}/report/${report.id}?share=1` : ''}
+                onFocus={e => e.target.select()}
+                className="flex-1 min-w-0 bg-luxury-off border border-luxury-cream px-3 py-2 text-xs text-luxury-taupe focus:outline-none"
+              />
+              <button
+                type="button"
+                onClick={async () => {
+                  await handleSave(false)
+                  const url = `${window.location.origin}/report/${report.id}?share=1`
+                  try { await navigator.clipboard.writeText(url) } catch { /* older Safari */ }
+                  setShareCopied(true)
+                  setTimeout(() => setShareCopied(false), 2000)
+                }}
+                className="flex items-center gap-1.5 px-4 py-2 text-xs bg-luxury-black text-white hover:bg-luxury-dark transition-colors flex-shrink-0"
+              >
+                {shareCopied ? 'Copied' : 'Save & copy link'}
+              </button>
+            </div>
+            <p className="text-xs text-luxury-taupe/70 mt-1.5">
+              Copying saves the report first, so your client always sees the latest version.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+              <label className="section-label text-luxury-taupe block mb-1.5">Passcode (optional)</label>
+              <input
+                type="text"
+                placeholder="Leave blank for open link"
+                value={report.share?.password ?? ''}
+                onChange={e => setReport(r => ({ ...r, share: { ...r.share, password: e.target.value || undefined } }))}
+                className="w-full bg-white border border-luxury-cream px-3 py-2 text-sm focus:outline-none focus:border-luxury-gold transition-colors"
+              />
+            </div>
+            <div>
+              <label className="section-label text-luxury-taupe block mb-1.5">Link expires (optional)</label>
+              <input
+                type="date"
+                value={report.share?.expiresAt ?? ''}
+                onChange={e => setReport(r => ({ ...r, share: { ...r.share, expiresAt: e.target.value || undefined } }))}
+                className="w-full bg-white border border-luxury-cream px-3 py-2 text-sm focus:outline-none focus:border-luxury-gold transition-colors"
+              />
+            </div>
+          </div>
         </div>
       </SectionPanel>
 

@@ -6,7 +6,7 @@ import { WeeklyReport } from '@/lib/types'
 import { getReport } from '@/lib/store'
 import ReportForm from '@/components/dashboard/ReportForm'
 import ReportShell from '@/components/report/ReportShell'
-import { ArrowLeft, Eye, EyeOff, Check, AlertCircle, Clock } from 'lucide-react'
+import { ArrowLeft, Eye, EyeOff, Check, AlertCircle, Clock, ScanSearch } from 'lucide-react'
 
 type SaveState = { savedAt: number | null; dirty: boolean }
 
@@ -100,6 +100,16 @@ export default function EditReportPage() {
                 {status.text}
               </span>
             )}
+
+            {/* Screenshot import — primary phone workflow */}
+            <Link
+              href={`/dashboard/import/${report.id}`}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs border border-luxury-gold/60 text-luxury-gold hover:bg-luxury-gold hover:text-luxury-black transition-colors"
+              title="Upload analytics screenshots and review extracted metrics"
+            >
+              <ScanSearch className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Import</span>
+            </Link>
 
             {/* Preview toggle */}
             <button

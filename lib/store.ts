@@ -13,6 +13,7 @@ import { MOCK_REPORT } from './mock-data'
 import { BALTIC_REPORT } from './baltic-report'
 import { WEST71_REPORT } from './west71-report'
 import { sb, supabaseConfigured } from './supabase'
+import { getBranding } from './branding-store'
 import { v4 as uuidv4 } from 'uuid'
 
 const STORAGE_KEY = 'luxury_reports_v3'
@@ -129,6 +130,7 @@ export async function duplicateReport(id: string): Promise<WeeklyReport | null> 
 
 export async function createBlankReport(): Promise<WeeklyReport> {
   const today = new Date().toISOString().split('T')[0]
+  const branding = getBranding()
   const blank: WeeklyReport = {
     ...MOCK_REPORT,
     id: uuidv4(),
@@ -154,16 +156,11 @@ export async function createBlankReport(): Promise<WeeklyReport> {
       mainImageUrl: '',
       galleryImages: [],
       description: '',
-      agent: {
-        name: '',
-        title: 'Licensed Associate Real Estate Broker',
-        team: 'MM&co',
-        brokerage: 'Compass',
-        phone: '',
-        email: '',
-        photoUrl: '',
-        logoUrl: '/mmco-logo.png',
-      },
+      agent: { ...branding.defaultAgent },
+    },
+    branding: {
+      footerText: branding.footerText,
+      disclaimer: branding.disclaimer,
     },
     currentMetrics: {
       totalViews: 0, websiteTraffic: 0, zillowViews: 0, streetEasyViews: 0,

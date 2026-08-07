@@ -261,6 +261,19 @@ export default function ReportShell({ report, onDuplicate }: Props) {
             return <div key={s.id} id={s.id}>{s.render(num)}</div>
           })
         })()}
+
+        {/* Branded footer + legal disclaimer — travels with the report JSON so
+            it renders identically on shared links and in the exported PDF. */}
+        {(report.branding?.footerText || report.branding?.disclaimer) && (
+          <footer className="bg-white border-t border-luxury-cream px-6 md:px-12 py-10 text-center">
+            {report.branding.footerText && (
+              <p className="font-serif-display text-luxury-black text-sm mb-4">{report.branding.footerText}</p>
+            )}
+            {report.branding.disclaimer && (
+              <p className="text-[0.65rem] leading-relaxed text-luxury-taupe max-w-2xl mx-auto">{report.branding.disclaimer}</p>
+            )}
+          </footer>
+        )}
       </div>
     </>
   )

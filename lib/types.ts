@@ -275,6 +275,20 @@ export interface CustomSection {
   eyebrow?: string
 }
 
+/** Optional soft protection on the public share link. */
+export interface ShareSettings {
+  /** Plain passcode the viewer must type. Light protection, not encryption. */
+  password?: string
+  /** ISO date after which the share link shows an "expired" screen. */
+  expiresAt?: string
+}
+
+/** Per-report branding overrides, seeded from the branding settings page. */
+export interface ReportBranding {
+  footerText?: string
+  disclaimer?: string
+}
+
 export interface WeeklyReport {
   id: string
   weekNumber: number
@@ -301,6 +315,14 @@ export interface WeeklyReport {
    * order from `DEFAULT_SECTION_ORDER` is used.
    */
   sectionOrder?: string[]
+  /**
+   * Provenance log of screenshot imports: which files were extracted, what
+   * was approved, and any manual corrections. Thumbnails only — originals
+   * stay on the uploader's device.
+   */
+  extractions?: import('./extraction').ExtractionRecord[]
+  share?: ShareSettings
+  branding?: ReportBranding
 }
 
 export interface IncludedSections {

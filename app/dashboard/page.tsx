@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { WeeklyReport } from '@/lib/types'
 import { getReports, deleteReport, duplicateReport, createBlankReport } from '@/lib/store'
 import { formatCurrency, formatDate, daysOnMarket } from '@/lib/utils'
-import { Plus, Eye, Edit2, Copy, Trash2, FileText, Image as ImageIcon, Search } from 'lucide-react'
+import { Plus, Eye, Edit2, Copy, Trash2, FileText, Image as ImageIcon, Search, Palette } from 'lucide-react'
 
 export default function DashboardPage() {
   const router = useRouter()
@@ -74,6 +74,14 @@ export default function DashboardPage() {
             <h1 className="font-serif-display text-xl sm:text-2xl md:text-3xl font-light truncate">Seller Report System</h1>
           </div>
           <div className="flex items-center gap-2 flex-shrink-0">
+            <Link
+              href="/dashboard/branding"
+              className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 border border-white/20 text-white text-xs sm:text-sm hover:bg-white/10 transition-colors"
+              title="Team branding — logo, agent defaults, footer, disclaimer"
+            >
+              <Palette className="w-4 h-4" />
+              <span className="hidden sm:inline">Branding</span>
+            </Link>
             <Link
               href="/dashboard/assets"
               className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 border border-white/20 text-white text-xs sm:text-sm hover:bg-white/10 transition-colors"
