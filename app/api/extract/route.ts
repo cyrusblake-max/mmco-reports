@@ -17,7 +17,9 @@ import { ExtractionResultSchema, EXTRACTION_TOOL_SCHEMA, type ExtractionResult }
 
 export const maxDuration = 120
 
-const MODEL = process.env.ANTHROPIC_EXTRACT_MODEL || 'claude-sonnet-4-6'
+// Haiku keeps extraction around half a cent per screenshot. Set
+// ANTHROPIC_EXTRACT_MODEL=claude-sonnet-4-6 for tougher screenshots.
+const MODEL = process.env.ANTHROPIC_EXTRACT_MODEL || 'claude-haiku-4-5'
 const MAX_FILES = 12
 const CONCURRENCY = 3
 

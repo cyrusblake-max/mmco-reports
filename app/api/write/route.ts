@@ -18,7 +18,9 @@ import { z } from 'zod'
 
 export const maxDuration = 60
 
-const MODEL = process.env.ANTHROPIC_WRITE_MODEL || 'claude-sonnet-4-6'
+// Haiku writes serviceable seller copy for well under a cent per call. Set
+// ANTHROPIC_WRITE_MODEL=claude-sonnet-4-6 if you want more polished prose.
+const MODEL = process.env.ANTHROPIC_WRITE_MODEL || 'claude-haiku-4-5'
 
 const VOICE = `Writing rules for MM&Co., a luxury residential team in New York City:
 - Confident, calm, sophisticated, honest. Concise but substantive.
