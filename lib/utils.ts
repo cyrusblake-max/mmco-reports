@@ -44,8 +44,10 @@ export function periodLabel(weekStartDate?: string, weekEndDate?: string): strin
   const start = new Date(weekStartDate + 'T00:00:00')
   const end   = new Date(weekEndDate + 'T00:00:00')
   const days  = Math.round((end.getTime() - start.getTime()) / 86_400_000) + 1
-  if (days <= 8)  return 'This Week'
-  if (days <= 15) return 'Last Two Weeks'
+  // A window stretched a few days past 7 (e.g. to catch a weekend open house)
+  // still reads as one week; only a true fortnight gets the two-week label.
+  if (days <= 12) return 'This Week'
+  if (days <= 16) return 'Last Two Weeks'
   return 'This Period'
 }
 

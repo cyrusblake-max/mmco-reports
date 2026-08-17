@@ -10,10 +10,11 @@ export const WEST71_REPORT: WeeklyReport = {
   // Week number = weeks on market (listed May 27), not report count.
   weekNumber: 11,
   reportDate: '2026-08-17',
-  // Reporting window matches the Compass Insight & Digital Ad Report pull
-  // (Katie Langham email, Aug 13): Aug 6 – Aug 12, 2026.
+  // Traffic metrics are the Compass Insight & Digital Ad Report pull
+  // (Katie Langham email, Aug 13) covering Aug 6 – 12; the window extends
+  // through Sunday Aug 16 to capture that day's open house.
   weekStartDate: '2026-08-06',
-  weekEndDate: '2026-08-12',
+  weekEndDate: '2026-08-16',
 
   property: {
     address: '266 West 71st Street',
@@ -60,7 +61,7 @@ export const WEST71_REPORT: WeeklyReport = {
   // 30s avg time spent (down 47.9%), Compass top traffic source (74% of visitors),
   // 81% of Compass views from public.
   // Views by publisher: Realtor 697 / StreetEasy 268 / Compass 37.
-  // Sunday Aug 9 public open house — 1 visitor. No other showings this week.
+  // Sunday Aug 16 public open house — 1 visitor. No other showings this week.
   // 1 inquiry → qualified buyer lead, private showing booked for Tue Aug 18.
   currentMetrics: {
     totalViews: 1002,
@@ -270,7 +271,7 @@ export const WEST71_REPORT: WeeklyReport = {
     {
       id: 'oh-west71-w11-sun',
       kind: 'public',
-      date: '2026-08-09',
+      date: '2026-08-16',
       startTime: '13:00',
       endTime: '14:30',
       totalAttendees: 1,
@@ -293,7 +294,7 @@ export const WEST71_REPORT: WeeklyReport = {
     pricingFeedback: '',
     layoutFeedback: '',
     competingProperties: '',
-    brokerSentiment: 'A quieter mid-August week online, in line with the late-summer market, but buyer activity is converting: the listing drew 1,002 views led by Realtor.com (697) and StreetEasy (268), Sunday’s open house on August 9 brought one buyer party through, and a direct inquiry became a qualified lead with a private showing booked for Tuesday, August 18.',
+    brokerSentiment: 'A quieter mid-August week online, in line with the late-summer market, but buyer activity is converting: the listing drew 1,002 views led by Realtor.com (697) and StreetEasy (268), Sunday’s open house on August 16 brought one buyer party through, and a direct inquiry became a qualified lead with a private showing booked for Tuesday, August 18.',
     recommendedAdjustments: '',
   },
 
@@ -340,7 +341,7 @@ export const WEST71_REPORT: WeeklyReport = {
 
   strategy: {
     keyRecommendations: 'Buyer activity is converting: one inquiry this week became a qualified lead, with a private showing booked for Tuesday, August 18. Online reach held above 1,000 views, led by Realtor.com and StreetEasy, though engagement cooled with the late-summer market. The focus into the final stretch of August is direct outreach — getting the listing in front of buyer agents rather than waiting on portal traffic.',
-    marketingPlanNextWeek: '— Private showing: Tuesday, August 18 (qualified buyer lead from this week’s inquiry)\n— Follow up with the August 9 open-house visitor\n— Renewed broker outreach to Upper West Side buyer agents\n— Re-engage the buyer parties from the late-July open houses ahead of the fall market',
+    marketingPlanNextWeek: '— Private showing: Tuesday, August 18 (qualified buyer lead from this week’s inquiry)\n— Follow up with the August 16 open-house visitor\n— Renewed broker outreach to Upper West Side buyer agents\n— Re-engage the buyer parties from the late-July open houses ahead of the fall market',
     pricingStrategy: '',
     upcomingCampaigns: '',
     brokerEvents: '',
