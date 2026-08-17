@@ -61,6 +61,7 @@ export const WEST71_REPORT: WeeklyReport = {
   // 81% of Compass views from public.
   // Views by publisher: Realtor 697 / StreetEasy 268 / Compass 37.
   // Sunday Aug 9 public open house — 1 visitor. No other showings this week.
+  // 1 inquiry → qualified buyer lead, private showing booked for Tue Aug 18.
   currentMetrics: {
     totalViews: 1002,
     websiteTraffic: 0,
@@ -68,11 +69,11 @@ export const WEST71_REPORT: WeeklyReport = {
     streetEasyViews: 268,
     compassViews: 37,
     saves: 0,
-    inquiries: 0,
+    inquiries: 1,
     showingRequests: 0,
     openHouseAttendees: 1,
     brokerInquiries: 0,
-    buyerLeads: 0,
+    buyerLeads: 1,
     socialReach: 0,
     videoViews: 0,
   },
@@ -183,11 +184,11 @@ export const WEST71_REPORT: WeeklyReport = {
         streetEasyViews: 268,
         compassViews: 37,
         saves: 0,
-        inquiries: 0,
+        inquiries: 1,
         showingRequests: 0,
         openHouseAttendees: 1,
         brokerInquiries: 0,
-        buyerLeads: 0,
+        buyerLeads: 1,
         socialReach: 0,
         videoViews: 0,
       },
@@ -292,7 +293,7 @@ export const WEST71_REPORT: WeeklyReport = {
     pricingFeedback: '',
     layoutFeedback: '',
     competingProperties: '',
-    brokerSentiment: 'A quieter mid-August week, in line with the late-summer market. The listing drew 1,002 views across the platforms, led by Realtor.com (697) and StreetEasy (268), with Compass the top source of unique visitors (74%). Sunday’s public open house on August 9 brought one buyer party through; no private showings this week.',
+    brokerSentiment: 'A quieter mid-August week online, in line with the late-summer market, but buyer activity is converting: the listing drew 1,002 views led by Realtor.com (697) and StreetEasy (268), Sunday’s open house on August 9 brought one buyer party through, and a direct inquiry became a qualified lead with a private showing booked for Tuesday, August 18.',
     recommendedAdjustments: '',
   },
 
@@ -338,8 +339,8 @@ export const WEST71_REPORT: WeeklyReport = {
   },
 
   strategy: {
-    keyRecommendations: 'Online reach held above 1,000 views this week, led by Realtor.com and StreetEasy, though engagement cooled with the late-summer market — unique visitors and time-on-listing both eased. With traffic softening into the final stretch of August, the focus is direct outreach: getting the listing in front of buyer agents rather than waiting on portal traffic.',
-    marketingPlanNextWeek: '— Follow up with the August 9 open-house visitor\n— Renewed broker outreach to Upper West Side buyer agents\n— Re-engage the buyer parties from the late-July open houses ahead of the fall market',
+    keyRecommendations: 'Buyer activity is converting: one inquiry this week became a qualified lead, with a private showing booked for Tuesday, August 18. Online reach held above 1,000 views, led by Realtor.com and StreetEasy, though engagement cooled with the late-summer market. The focus into the final stretch of August is direct outreach — getting the listing in front of buyer agents rather than waiting on portal traffic.',
+    marketingPlanNextWeek: '— Private showing: Tuesday, August 18 (qualified buyer lead from this week’s inquiry)\n— Follow up with the August 9 open-house visitor\n— Renewed broker outreach to Upper West Side buyer agents\n— Re-engage the buyer parties from the late-July open houses ahead of the fall market',
     pricingStrategy: '',
     upcomingCampaigns: '',
     brokerEvents: '',
