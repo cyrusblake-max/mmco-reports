@@ -20,6 +20,9 @@ const SEEDS: WeeklyReport[] = [BALTIC_REPORT, WEST71_REPORT]
 const FALLBACK_PUBLIC = '/613-baltic-listing.jpg'
 
 async function getReport(id: string): Promise<WeeklyReport | null> {
+  // Seeds win, matching lib/store.ts getReport.
+  const seed = SEEDS.find(r => r.id === id)
+  if (seed) return seed
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
   if (url && key) {

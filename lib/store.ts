@@ -60,8 +60,13 @@ export async function getReports(): Promise<WeeklyReport[]> {
 }
 
 export async function getReport(id: string): Promise<WeeklyReport | null> {
-  // Supabase first — any edits made through the dashboard win.
-  // Source-code seeds act as factory defaults when there's no DB copy yet.
+  // Seeds always win, same as getReports — the repo file is the source of
+  // truth for the active listings, so weekly git updates go live on deploy.
+  // (A stale June dashboard save in Supabase was masking months of updates.)
+  const seed = SEEDS.find(r => r.id === id)
+  if (seed) return seed
+
+  // Supabase first for user-created reports — dashboard edits win there.
   if (supabaseConfigured) {
     try {
       const rows = await sb<RemoteRow[]>(`/reports?id=eq.${encodeURIComponent(id)}&select=data&limit=1`)
@@ -70,8 +75,6 @@ export async function getReport(id: string): Promise<WeeklyReport | null> {
       console.warn('[store] Supabase fetch failed, falling back to seed/local:', e)
     }
   }
-  const seed = SEEDS.find(r => r.id === id)
-  if (seed) return seed
   return lsLoad().find(r => r.id === id) ?? null
 }
 

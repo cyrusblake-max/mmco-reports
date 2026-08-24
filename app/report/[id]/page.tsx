@@ -29,10 +29,13 @@ function toAbsolute(url: string | undefined | null): string {
 
 /**
  * Server-side report fetch for metadata.
- * Tries Supabase first (any dashboard edits override the seed), falls back
- * to the in-repo seed. Never throws — metadata generation must not 500 the page.
+ * Seeds win (matching lib/store.ts getReport) so weekly git updates control
+ * the share title; Supabase covers user-created reports. Never throws —
+ * metadata generation must not 500 the page.
  */
 async function fetchReportForMeta(id: string): Promise<WeeklyReport | null> {
+  const seed = SEEDS.find(r => r.id === id)
+  if (seed) return seed
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
   if (url && key) {
@@ -50,10 +53,10 @@ async function fetchReportForMeta(id: string): Promise<WeeklyReport | null> {
         if (rows[0]?.data) return rows[0].data
       }
     } catch {
-      // fall through to seed
+      // fall through
     }
   }
-  return SEEDS.find(r => r.id === id) ?? null
+  return null
 }
 
 export async function generateMetadata(
