@@ -45,7 +45,7 @@ export const WEST71_REPORT: WeeklyReport = {
     coAgents: [
       {
         name: 'Jonathan Banks',
-        title: 'Licensed Real Estate Salesperson',
+        title: 'Licensed Associate Real Estate Broker',
         team: '',                       // Not on MM&Co. — just Compass
         brokerage: 'Compass',
         phone: '917-657-2252',
@@ -285,20 +285,8 @@ export const WEST71_REPORT: WeeklyReport = {
       questionsAsked: '',
       followUpActions: '',
     },
-    {
-      id: 'oh-west71-w11-sun',
-      kind: 'public',
-      date: '2026-08-16',
-      startTime: '13:00',
-      endTime: '14:30',
-      totalAttendees: 1,
-      brokers: 0,
-      buyers: 1,
-      seriousInterestLevel: 3,
-      commonFeedback: '',
-      questionsAsked: '',
-      followUpActions: '',
-    },
+    // Aug 16 OH (1 visitor) removed from the page for Week 12 — falls inside
+    // the Aug 13–24 window but belongs to last week's report.
     {
       id: 'oh-west71-w12-sun',
       kind: 'public',
