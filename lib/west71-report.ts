@@ -8,13 +8,13 @@ import { WeeklyReport } from './types'
 export const WEST71_REPORT: WeeklyReport = {
   id: 'west71-266-w1',
   // Week number = weeks on market (listed May 27), not report count.
-  weekNumber: 11,
-  reportDate: '2026-08-17',
-  // Traffic metrics are the Compass Insight & Digital Ad Report pull
-  // (Katie Langham email, Aug 13) covering Aug 6 – 12; the window extends
-  // through Sunday Aug 16 to capture that day's open house.
-  weekStartDate: '2026-08-06',
-  weekEndDate: '2026-08-16',
+  weekNumber: 12,
+  reportDate: '2026-08-24',
+  // Traffic metrics are the Compass Insights pull covering Aug 13 – 19;
+  // the window extends through Mon Aug 24 to capture Sunday's open house
+  // (Aug 23) and Monday's private showing.
+  weekStartDate: '2026-08-13',
+  weekEndDate: '2026-08-24',
 
   property: {
     address: '266 West 71st Street',
@@ -56,14 +56,31 @@ export const WEST71_REPORT: WeeklyReport = {
     ],
   },
 
-  // Week 11 (Aug 6 – 12) — Compass Insights:
-  // 1,002 total views (down 32.5% over 7 days), 30 unique visitors (down 11.8%),
-  // 30s avg time spent (down 47.9%), Compass top traffic source (74% of visitors),
-  // 81% of Compass views from public.
-  // Views by publisher: Realtor 697 / StreetEasy 268 / Compass 37.
-  // Sunday Aug 16 public open house — 1 visitor. No other showings this week.
-  // 1 inquiry → qualified buyer lead, private showing booked for Tue Aug 18.
+  // Week 12 (Aug 13 – 19) — Compass Insights:
+  // 1,045 total views (down 34.2% over 7 days), 38 unique visitors (up 15.2%),
+  // 42s avg time spent (up 40.1%), Compass top traffic source (94% of visitors),
+  // 87% of Compass views from public.
+  // Views by publisher: Realtor 734 / StreetEasy 257 / Compass 52 / Others 2.
+  // Sunday Aug 23 public open house — 4 buyer groups. Private showing Mon
+  // Aug 24 — 1 group. 5 groups through the home this week.
   currentMetrics: {
+    totalViews: 1045,
+    websiteTraffic: 0,
+    zillowViews: 0,
+    streetEasyViews: 257,
+    compassViews: 52,
+    saves: 0,
+    inquiries: 0,
+    showingRequests: 1,
+    openHouseAttendees: 4,
+    brokerInquiries: 0,
+    buyerLeads: 0,
+    socialReach: 0,
+    videoViews: 0,
+  },
+
+  // Previous = Week 11 (Aug 6 – 16).
+  previousMetrics: {
     totalViews: 1002,
     websiteTraffic: 0,
     zillowViews: 0,
@@ -75,25 +92,6 @@ export const WEST71_REPORT: WeeklyReport = {
     openHouseAttendees: 1,
     brokerInquiries: 0,
     buyerLeads: 1,
-    socialReach: 0,
-    videoViews: 0,
-  },
-
-  // Previous = Week 10 (Jul 20 – Aug 2). Its Compass views pull never arrived,
-  // so totalViews is back-derived from this week's Compass-reported -32.5% WoW
-  // (1,002 / 0.675 ≈ 1,485) to keep the trend arrow honest.
-  previousMetrics: {
-    totalViews: 1485,
-    websiteTraffic: 0,
-    zillowViews: 0,
-    streetEasyViews: 0,
-    compassViews: 0,
-    saves: 0,
-    inquiries: 0,
-    showingRequests: 1,
-    openHouseAttendees: 3,
-    brokerInquiries: 0,
-    buyerLeads: 0,
     socialReach: 0,
     videoViews: 0,
   },
@@ -194,6 +192,25 @@ export const WEST71_REPORT: WeeklyReport = {
         videoViews: 0,
       },
     },
+    {
+      weekLabel: 'Week 12',
+      weekNumber: 12,
+      metrics: {
+        totalViews: 1045,
+        websiteTraffic: 0,
+        zillowViews: 0,
+        streetEasyViews: 257,
+        compassViews: 52,
+        saves: 0,
+        inquiries: 0,
+        showingRequests: 1,
+        openHouseAttendees: 4,
+        brokerInquiries: 0,
+        buyerLeads: 0,
+        socialReach: 0,
+        videoViews: 0,
+      },
+    },
   ],
 
   includedSections: {
@@ -282,6 +299,34 @@ export const WEST71_REPORT: WeeklyReport = {
       questionsAsked: '',
       followUpActions: '',
     },
+    {
+      id: 'oh-west71-w12-sun',
+      kind: 'public',
+      date: '2026-08-23',
+      startTime: '13:00',
+      endTime: '14:30',
+      totalAttendees: 4,
+      brokers: 0,
+      buyers: 4,
+      seriousInterestLevel: 3,
+      commonFeedback: '',
+      questionsAsked: '',
+      followUpActions: '',
+    },
+    {
+      id: 'oh-west71-w12-private',
+      kind: 'private_showing',
+      date: '2026-08-24',
+      startTime: '',
+      endTime: '',
+      totalAttendees: 1,
+      brokers: 0,
+      buyers: 1,
+      seriousInterestLevel: 3,
+      commonFeedback: '',
+      questionsAsked: '',
+      followUpActions: '',
+    },
   ],
 
   marketing: [],
@@ -294,7 +339,7 @@ export const WEST71_REPORT: WeeklyReport = {
     pricingFeedback: '',
     layoutFeedback: '',
     competingProperties: '',
-    brokerSentiment: 'A quieter mid-August week online, in line with the late-summer market, but buyer activity is converting: the listing drew 1,002 views led by Realtor.com (697) and StreetEasy (268), Sunday’s open house on August 16 brought one buyer party through, and a direct inquiry became a qualified lead with a private showing booked for Tuesday, August 18.',
+    brokerSentiment: 'The strongest week of in-person activity this month: Sunday’s open house on August 23 brought four buyer groups through, and a private showing on Monday, August 24 made it five groups total for the week. Online, the listing drew 1,045 views led by Realtor.com (734) and StreetEasy (257), and while total views cooled with the late-summer market, engagement deepened — unique visitors rose 15.2% and average time on the listing jumped 40.1% to 42 seconds, a sign the buyers who are looking are looking closely.',
     recommendedAdjustments: '',
   },
 
@@ -340,8 +385,8 @@ export const WEST71_REPORT: WeeklyReport = {
   },
 
   strategy: {
-    keyRecommendations: 'Buyer activity is converting: one inquiry this week became a qualified lead, with a private showing booked for Tuesday, August 18. Online reach held above 1,000 views, led by Realtor.com and StreetEasy, though engagement cooled with the late-summer market. The focus into the final stretch of August is direct outreach — getting the listing in front of buyer agents rather than waiting on portal traffic.',
-    marketingPlanNextWeek: '— Private showing: Tuesday, August 18 (qualified buyer lead from this week’s inquiry)\n— Follow up with the August 16 open-house visitor\n— Renewed broker outreach to Upper West Side buyer agents\n— Re-engage the buyer parties from the late-July open houses ahead of the fall market',
+    keyRecommendations: 'Momentum is building heading into the fall market: five buyer groups saw the home this week — the most in-person activity since launch — and engagement metrics online moved the right way, with unique visitors up 15.2% and time on the listing up 40.1%. The focus now is converting that foot traffic: prompt follow-up with all five groups while interest is fresh, and keeping the Sunday open-house cadence going as buyers return from summer.',
+    marketingPlanNextWeek: '— Follow up with all four buyer groups from the August 23 open house\n— Follow up with the August 24 private showing\n— Continue the Sunday open-house cadence into the fall market\n— Renewed broker outreach to Upper West Side buyer agents',
     pricingStrategy: '',
     upcomingCampaigns: '',
     brokerEvents: '',

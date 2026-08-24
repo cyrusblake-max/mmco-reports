@@ -1,5 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // A stray package-lock.json in the home directory makes Next infer the
+  // workspace root as ~, which stalls dev startup scanning the whole disk.
+  outputFileTracingRoot: __dirname,
   images: {
     remotePatterns: [
       { protocol: 'https', hostname: 'images.unsplash.com' },
